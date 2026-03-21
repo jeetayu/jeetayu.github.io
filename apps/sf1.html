@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isoform Expression Viewer — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+
+/* Body split */
+.body-split{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:256px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:16px}
+.sb-heading{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:10px;margin-top:16px}
+.sb-heading:first-child{margin-top:0}
+.search-row{display:flex;gap:6px}
+.search-row input{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Sans",sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.search-row input:focus{border-color:#C2185B}
+.search-btn{background:#C2185B;border:none;border-radius:5px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 12px;transition:background .15s;white-space:nowrap}
+.search-btn:hover{background:#A3144E}
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ctrl-lbl{font-size:11px;font-weight:600;color:#78716C;min-width:80px}
+.ctrl-row select,.ctrl-row input[type=number]{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.ctrl-row select:focus,.ctrl-row input:focus{border-color:#C2185B}
+.ckbox{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px;color:#44403C;cursor:pointer}
+.ckbox input{accent-color:#C2185B;width:14px;height:14px}
+
+/* Iso checkboxes */
+.iso-grid{display:flex;flex-direction:column;gap:4px}
+.iso-check{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:3px 0}
+.iso-check input{accent-color:#C2185B;width:14px;height:14px}
+.iso-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Gene info panel */
+.gene-info{background:#F5F4F1;border:1px solid #E2DDD8;border-radius:6px;padding:10px 12px;font-size:11px;color:#44403C;margin-bottom:8px;line-height:1.7}
+.gene-info strong{color:#1C1917;display:block;font-size:13px;margin-bottom:2px}
+
+/* Main panel */
+.main-panel{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* Tabs */
+.vtabs{display:flex;gap:2px;background:#fff;border:1px solid #E2DDD8;border-radius:7px;padding:3px;width:fit-content}
+.vtab-btn{background:none;border:none;border-radius:5px;color:#78716C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:6px 16px;transition:all .15s;white-space:nowrap}
+.vtab-btn.active{background:#C2185B;color:#fff}
+.vtab-btn:hover:not(.active){background:#F5F4F1;color:#1C1917}
+.vpane{display:none}.vpane.active{display:block}
+
+/* Cards */
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.vcard-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:16px}
+
+/* Banners */
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+
+/* Plot containers */
+#gtex-plot,#tcga-plot,#pct-plot-gtex,#pct-plot-tcga,#heatmap-gtex,#heatmap-tcga{width:100%;min-height:480px}
+#struct-plot{width:100%;min-height:360px}
+/* Side-by-side pct/heatmap layout */
+.dual-plot-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dual-plot-row .vcard{margin-bottom:0}
+
+/* Gene structure SVG */
+#struct-svg{width:100%;overflow-x:auto}
+#struct-svg svg{min-width:600px}
+
+/* Transcript table */
+#tx-table{width:100%;border-collapse:collapse;font-size:12px}
+#tx-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:2px solid #E2DDD8}
+#tx-table td{padding:7px 10px;border-top:1px solid #EDE9E5}
+#tx-table tr:nth-child(even) td{background:#FAFAF9}
+
+/* Loading */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+    <div>
+      <div class="topbar-logo"><em>Isoform</em> Expression Viewer</div>
+      <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; Any gene &middot; GTEx v8 &amp; TCGA</div>
+    </div>
+  </div>
+
+  <div class="body-split">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sb-heading">Gene</div>
+      <div class="search-row">
+        <input type="text" id="gene-input" placeholder="e.g. SF1, U2AF1" value="SF1" autocomplete="off"
+               onkeydown="if(event.key==='Enter')loadGene()">
+        <button class="search-btn" onclick="loadGene()">Load</button>
+      </div>
+      <div id="gene-info-box" style="margin-top:10px"></div>
+
+      <div class="sb-heading">Isoforms</div>
+      <div class="iso-grid" id="iso-checkboxes"></div>
+
+      <div class="sb-heading">Display</div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Box width</span>
+        <input type="number" id="box-width" value="0.5" min="0.1" max="1.0" step="0.05" onchange="replot()">
+      </div>
+      <label class="ckbox" title="Overlays mean expression as a diamond marker on each box (raw sample points are not stored in cache)"><input type="checkbox" id="show-points" onchange="replot()"> Show mean markers</label>
+      <label class="ckbox"><input type="checkbox" id="log-scale" onchange="replot()"> Log scale (TPM)</label>
+
+      <div class="sb-heading">Sort Tissues</div>
+      <div class="ctrl-row">
+        <select id="sort-by" onchange="replot()" style="width:100%;flex:1">
+          <option value="alpha">Alphabetical</option>
+          <option value="median-desc">Median ↓ (highest first)</option>
+          <option value="median-asc">Median ↑ (lowest first)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="main-panel">
+
+      <!-- Tabs -->
+      <div class="vtabs">
+        <button class="vtab-btn active" onclick="showPane('gtex')">GTEx Tissues</button>
+        <button class="vtab-btn" onclick="showPane('tcga')">TCGA Cancer Types</button>
+        <button class="vtab-btn" onclick="showPane('pct')">Isoform %</button>
+        <button class="vtab-btn" onclick="showPane('heatmap')">Heatmap</button>
+        <button class="vtab-btn" onclick="showPane('struct')">Gene Structure</button>
+      </div>
+
+      <!-- GTEx pane -->
+      <div class="vpane active" id="vpane-gtex">
+        <div class="vcard">
+          <div class="vcard-title">GTEx v8 — Isoform Expression by Tissue</div>
+          <div class="vcard-sub">Median transcript TPM &middot; 53 tissues &middot; n&asymp;7,852 samples per isoform</div>
+          <div id="gtex-plot"></div>
+        </div>
+      </div>
+
+      <!-- TCGA pane -->
+      <div class="vpane" id="vpane-tcga">
+        <div class="vcard">
+          <div class="vcard-title">TCGA — Isoform Expression by Cancer Type</div>
+          <div class="vcard-sub">Median transcript TPM &middot; 33 cancer types &middot; n&asymp;10,535 tumor samples</div>
+          <div id="tcga-plot"></div>
+        </div>
+      </div>
+
+      <!-- Isoform % pane -->
+      <div class="vpane" id="vpane-pct">
+        <div class="dual-plot-row">
+          <div class="vcard">
+            <div class="vcard-title">GTEx — Isoform %</div>
+            <div class="vcard-sub">Each isoform as % of total gene TPM · 53 tissues · GTEx v8</div>
+            <div id="pct-plot-gtex"></div>
+          </div>
+          <div class="vcard">
+            <div class="vcard-title">TCGA — Isoform %</div>
+            <div class="vcard-sub">Each isoform as % of total gene TPM · 33 cancer types · TCGA</div>
+            <div id="pct-plot-tcga"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heatmap pane -->
+      <div class="vpane" id="vpane-heatmap">
+        <div class="dual-plot-row">
+          <div class="vcard">
+            <div class="vcard-title">GTEx — Isoform Heatmap</div>
+            <div class="vcard-sub">% of total gene expression per tissue · GTEx v8</div>
+            <div id="heatmap-gtex"></div>
+          </div>
+          <div class="vcard">
+            <div class="vcard-title">TCGA — Isoform Heatmap</div>
+            <div class="vcard-sub">% of total gene expression per cancer type · TCGA</div>
+            <div id="heatmap-tcga"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gene structure pane -->
+      <div class="vpane" id="vpane-struct">
+        <div class="vcard">
+          <div class="vcard-title">Gene Structure</div>
+          <div class="vcard-sub">Transcript models from Ensembl REST API &middot; exons &amp; CDS regions</div>
+          <div id="struct-msg"></div>
+          <div id="struct-svg"></div>
+          <div id="struct-table-wrap" style="margin-top:16px"></div>
+        </div>
+      </div>
+
+    </div><!-- /main-panel -->
+  </div><!-- /body-split -->
+</div><!-- /shell -->
+
+<script>
+// ── Constants ───────────────────────────────────────────────────────────────
+const ISO_COLORS = {
+  "SF1-1": "#C2185B", "SF1-2": "#5E35B1", "SF1-4": "#00897B",
+  "SF1-5": "#E65100", "SF1-6": "#1565C0"
+};
+const GENERIC_COLORS = [
+  "#C2185B","#5E35B1","#00897B","#E65100","#1565C0",
+  "#AD1457","#6A1B9A","#00695C","#BF360C","#0D47A1"
+];
+const GTEX_API    = "https://gtexportal.org/api/v2";
+const ENSEMBL_API = "https://rest.ensembl.org";
+
+// ── Cache helpers ────────────────────────────────────────────────────────────
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function cacheSet(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), value }));
+  } catch(e) { /* storage full — silently skip */ }
+}
+
+function cacheGet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { ts, value } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL_MS) { localStorage.removeItem(key); return null; }
+    return value;
+  } catch(e) { return null; }
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let sf1Data    = null;   // pre-processed JSON
+let geneInfo   = null;   // current gene lookup result
+let isoformData = null;  // {isoform: {tissue: box_stats}} for current gene
+let tcgaData    = null;  // {isoform: {project: box_stats}}
+let pctData     = null;  // pct_total from JSON
+let allIsos     = [];
+let activeIsos  = new Set();
+let currentGene = "SF1";
+let gtexLog2    = false; // true when cached data is log2(TPM+0.001) scale
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const resp = await fetch("/apps/sf1-data.json");
+    sf1Data = await resp.json();
+  } catch(e) {
+    sf1Data = null;
+    console.warn("Could not load sf1-data.json:", e);
+  }
+  await loadGene();
+});
+
+// ── Try loading pre-computed server-side JSON for a gene ──────────────────────
+async function fetchGeneCache(sym) {
+  try {
+    const resp = await fetch(`/apps/gene-cache/${encodeURIComponent(sym)}.json`);
+    if (resp.ok) return await resp.json();
+    // Cache miss — ask the API server to build it (parallel GTEx fetch, auto-cached)
+    const resp2 = await fetch(`/api/gene/${encodeURIComponent(sym)}`);
+    if (resp2.ok) return await resp2.json();
+    return null;
+  } catch(e) { return null; }
+}
+
+// ── Load gene ─────────────────────────────────────────────────────────────────
+async function loadGene() {
+  const sym = document.getElementById("gene-input").value.trim().toUpperCase() || "SF1";
+  currentGene = sym;
+
+  setMsg("gtex-plot",    "Loading…");
+  setMsg("tcga-plot",   "");
+  setMsg("pct-plot-gtex","");
+  setMsg("pct-plot-tcga","");
+  setMsg("heatmap-gtex","");
+  setMsg("heatmap-tcga","");
+  setMsg("struct-svg",  "");
+  setMsg("struct-msg",  "");
+  document.getElementById("struct-table-wrap").innerHTML = "";
+
+  // 1. Check for pre-computed server-side JSON
+  setMsg("gtex-plot", '<span class="spinner"></span>Loading cache…');
+  const serverCache = sym === "SF1" ? sf1Data : await fetchGeneCache(sym);
+  if (serverCache) {
+    try {
+      // Build geneInfo from cache — use stored coordinates if enrichment script has added them
+      if (serverCache.gene) {
+        const g    = serverCache.gene;
+        const ensg = g.ensg || "";
+        geneInfo = {
+          symbol:   g.symbol || sym,
+          ensg,
+          ensgBase: ensg.replace(/\.\d+$/, ""),
+          chr:      g.chr    || null,
+          start:    g.start  || null,
+          end:      g.end    || null,
+          strand:   g.strand || null,
+        };
+      }
+      renderGeneInfo(geneInfo);
+      allIsos     = serverCache.isoforms;
+      isoformData = buildGtexFromJson(serverCache.gtex_boxplot);
+      tcgaData    = serverCache.tcga_boxplot ? buildTcgaFromJson(serverCache.tcga_boxplot) : null;
+      pctData     = serverCache.pct_total    || null;
+      gtexLog2    = serverCache.log2_scale   || false;
+      const preActive = sym === "SF1"
+        ? Object.keys(ISO_COLORS)
+        : topIsosByExpression(isoformData, 10);
+      buildIsoCheckboxes(allIsos, preActive);
+      setMsg("gtex-plot", "");
+      replot();
+    } catch(err) {
+      setMsg("gtex-plot", `<div class="banner banner-err">Error rendering ${sym}: ${err.message}</div>`);
+      console.error("loadGene cached path error:", err);
+    }
+    // Coordinates (chr/start/end/strand) are fetched lazily when Structure tab is opened
+    // — avoids an external GTEx API round-trip on every gene load.
+    return;
+  }
+
+  // 2. Lookup gene info (with localStorage cache)
+  geneInfo = await lookupGeneWithCache(sym);
+  renderGeneInfo(geneInfo);
+
+  if (geneInfo) {
+    // 3. Check localStorage for expression data
+    const cacheKey = `gtex:${geneInfo.ensg}`;
+    let gtexRaw = cacheGet(cacheKey);
+    if (gtexRaw) {
+      setMsg("gtex-plot", '<div class="banner banner-ok" style="margin-bottom:8px">Loaded from local cache.</div>');
+    } else {
+      setMsg("gtex-plot", '<span class="spinner"></span>Fetching GTEx expression data…');
+      gtexRaw = await fetchGtexMedian(geneInfo.ensg);
+      if (gtexRaw) cacheSet(cacheKey, gtexRaw);
+    }
+
+    if (gtexRaw) {
+      const { isos, data } = parseGtexApiData(gtexRaw);
+      allIsos     = isos;
+      isoformData = data;
+      tcgaData    = null;
+      pctData     = null;
+      buildIsoCheckboxes(isos, null);
+      replot();
+    } else {
+      setMsg("gtex-plot", '<div class="banner banner-warn">No GTEx expression data found for this gene.</div>');
+    }
+    setMsg("tcga-plot",    '<div class="banner banner-info">TCGA data available for pre-cached genes only.</div>');
+    setMsg("pct-plot-gtex",'<div class="banner banner-info">Isoform % breakdown available for pre-cached genes only.</div>');
+    setMsg("pct-plot-tcga",'');
+  } else {
+    setMsg("gtex-plot", '<div class="banner banner-err">Gene not found. Try a different symbol (e.g. SF1, U2AF1, PCBP2).</div>');
+  }
+}
+
+// ── Top isoforms by total median expression ───────────────────────────────────
+function topIsosByExpression(isoData, n) {
+  return Object.keys(isoData)
+    .map(iso => {
+      const total = Object.values(isoData[iso] || {}).reduce((s, t) => s + (t.median || 0), 0);
+      return { iso, total };
+    })
+    .sort((a, b) => b.total - a.total)
+    .slice(0, n)
+    .map(x => x.iso);
+}
+
+// ── Build iso checkboxes ──────────────────────────────────────────────────────
+function buildIsoCheckboxes(isos, preActive) {
+  const container = document.getElementById("iso-checkboxes");
+  container.innerHTML = "";
+  activeIsos = new Set(preActive || isos);
+  isos.forEach((iso, i) => {
+    const col = ISO_COLORS[iso] || GENERIC_COLORS[i % GENERIC_COLORS.length];
+    const checked = activeIsos.has(iso);
+    const label = document.createElement("label");
+    label.className = "iso-check";
+    label.innerHTML = `
+      <input type="checkbox" ${checked?"checked":""} onchange="toggleIso('${iso}',this.checked)">
+      <span class="iso-dot" style="background:${col}"></span>${iso}`;
+    container.appendChild(label);
+  });
+}
+
+function toggleIso(iso, on) {
+  on ? activeIsos.add(iso) : activeIsos.delete(iso);
+  replot();
+}
+
+// ── Gene lookup (with localStorage cache) ─────────────────────────────────────
+async function lookupGeneWithCache(symbol) {
+  const key = `geneinfo:${symbol.toUpperCase()}`;
+  const cached = cacheGet(key);
+  if (cached) return cached;
+  const result = await lookupGene(symbol);
+  if (result) cacheSet(key, result);
+  return result;
+}
+
+async function lookupGene(symbol) {
+  try {
+    const resp = await fetch(`${GTEX_API}/reference/gene?geneId=${encodeURIComponent(symbol)}&pageSize=1`);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data.data || !data.data.length) return null;
+    const g = data.data[0];
+    return {
+      symbol:  g.geneSymbol,
+      ensg:    g.gencodeId,
+      ensgBase:g.gencodeId.replace(/\.\d+$/, ""),
+      chr:     g.chromosome,
+      start:   g.start,
+      end:     g.end,
+      strand:  g.strand
+    };
+  } catch(e) { return null; }
+}
+
+function renderGeneInfo(g) {
+  const el = document.getElementById("gene-info-box");
+  if (!g) { el.innerHTML = ""; return; }
+  const coords = g.chr ? `chr${escHtml(String(g.chr))}:${Number(g.start).toLocaleString()}–${Number(g.end).toLocaleString()} &middot; strand: ${g.strand > 0 ? "+" : "−"}` : "";
+  el.innerHTML = `<div class="gene-info">
+    <strong>${escHtml(g.symbol)}</strong>
+    ${escHtml(g.ensg)}${coords ? "<br>" + coords : ""}
+  </div>`;
+}
+
+// ── Fetch GTEx median expression ─────────────────────────────────────────────
+async function fetchGtexMedian(ensg) {
+  try {
+    // Fetch page 0 first to discover total page count
+    const url0 = `${GTEX_API}/expression/medianTranscriptExpression?gencodeId=${encodeURIComponent(ensg)}&datasetId=gtex_v8&pageSize=500&page=0`;
+    const resp0 = await fetch(url0);
+    if (!resp0.ok) return null;
+    const data0 = await resp0.json();
+    if (!data0.data || !data0.data.length) return null;
+    let all = data0.data;
+    const nPages = data0.paging_info ? data0.paging_info.numberOfPages : 1;
+    if (nPages > 1) {
+      // Fetch all remaining pages in parallel
+      const pages = Array.from({length: nPages - 1}, (_, i) => i + 1);
+      const reqs  = pages.map(p =>
+        fetch(`${GTEX_API}/expression/medianTranscriptExpression?gencodeId=${encodeURIComponent(ensg)}&datasetId=gtex_v8&pageSize=500&page=${p}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(d => (d && d.data) ? d.data : [])
+          .catch(() => [])
+      );
+      const results = await Promise.all(reqs);
+      for (const rows of results) all = all.concat(rows);
+    }
+    return all.length ? all : null;
+  } catch(e) { return null; }
+}
+
+// ── Parse GTEx API data (for non-SF1 genes) ──────────────────────────────────
+function parseGtexApiData(rows) {
+  // rows: [{transcriptId, tissueSiteDetailId, median, unit, ...}]
+  // We need tissue labels - use tissueSiteDetailId as proxy (or fetch tissue info)
+  const isoSet = new Set();
+  const data   = {};  // {isoform: {tissue: {median: n, ...}}}
+  for (const row of rows) {
+    const iso    = row.transcriptId ? row.transcriptId.replace(/\.\d+$/, "") : "unknown";
+    const tissue = row.tissueSiteDetailId || "Unknown";
+    const median = row.median || 0;
+    isoSet.add(iso);
+    if (!data[iso]) data[iso] = {};
+    if (!data[iso][tissue]) data[iso][tissue] = { median: 0, n: 1, q1: 0, q3: 0, min: 0, max: 0, mean: 0 };
+    data[iso][tissue].median = median;
+    data[iso][tissue].mean   = median;
+    data[iso][tissue].q1     = median * 0.8;
+    data[iso][tissue].q3     = median * 1.2;
+    data[iso][tissue].min    = 0;
+    data[iso][tissue].max    = median * 1.5;
+  }
+  return { isos: [...isoSet], data };
+}
+
+// ── Build structures from pre-computed JSON ───────────────────────────────────
+function buildGtexFromJson(gtex_boxplot) {
+  // Invert: {tissue: {iso: stats}} → {iso: {tissue: stats}}
+  const data = {};
+  for (const tissue of Object.keys(gtex_boxplot)) {
+    for (const iso of Object.keys(gtex_boxplot[tissue])) {
+      if (!data[iso]) data[iso] = {};
+      data[iso][tissue] = gtex_boxplot[tissue][iso];
+    }
+  }
+  return data;
+}
+
+function buildTcgaFromJson(tcga_boxplot) {
+  // Store raw values. If the JSON was pre-computed as log2(TPM+0.001), back-transform to raw TPM.
+  // Detection: if the median of any entry is negative we know values are on a log2 scale.
+  let isLog2 = false;
+  outer: for (const project of Object.keys(tcga_boxplot)) {
+    for (const iso of Object.keys(tcga_boxplot[project])) {
+      const s = tcga_boxplot[project][iso];
+      if (s && s.median != null && s.median < 0) { isLog2 = true; break outer; }
+    }
+  }
+
+  const data = {};
+  for (const project of Object.keys(tcga_boxplot)) {
+    for (const iso of Object.keys(tcga_boxplot[project])) {
+      if (!data[iso]) data[iso] = {};
+      const s = tcga_boxplot[project][iso];
+      if (!isLog2 || !s) {
+        data[iso][project] = s;
+      } else {
+        // Back-transform log2(TPM+0.001) → raw TPM: 2^x - 0.001, floored at 0
+        const bt = v => v == null ? null : Math.max(0, Math.pow(2, v) - 0.001);
+        data[iso][project] = {
+          median: bt(s.median),
+          mean:   bt(s.mean),
+          q1:     bt(s.q1),
+          q3:     bt(s.q3),
+          min:    bt(s.min),
+          max:    bt(s.max),
+          n:      s.n
+        };
+      }
+    }
+  }
+  return data;
+}
+
+// ── Replot (GTEx box plots) ──────────────────────────────────────────────────
+function replot() {
+  if (!isoformData || !activeIsos.size) {
+    setMsg("gtex-plot", '<div class="banner banner-warn">No isoform data loaded.</div>');
+    return;
+  }
+
+  const sortBy   = document.getElementById("sort-by").value;
+  const logScale = document.getElementById("log-scale").checked;
+  const showPts  = document.getElementById("show-points").checked;
+  const boxW     = parseFloat(document.getElementById("box-width").value) || 0.5;
+
+  // Get tissues (sorted)
+  const firstIso = activeIsos.values().next().value;
+  let tissues = Object.keys(isoformData[firstIso] || {});
+
+  if (sortBy === "alpha") {
+    tissues = tissues.sort();
+  } else {
+    // Sort by median of first active isoform
+    const stats = isoformData[firstIso];
+    tissues = tissues.sort((a, b) => {
+      const ma = stats[a]?.median || 0;
+      const mb = stats[b]?.median || 0;
+      return sortBy === "median-desc" ? mb - ma : ma - mb;
+    });
+  }
+
+  const traces = [];
+  const isos   = allIsos.filter(iso => activeIsos.has(iso));
+
+  isos.forEach((iso, i) => {
+    const col   = ISO_COLORS[iso] || GENERIC_COLORS[i % GENERIC_COLORS.length];
+    const tdata = isoformData[iso] || {};
+
+    const q1s     = [], medians = [], q3s = [], means = [];
+    const lowFences = [], highFences = [];
+
+    tissues.forEach(t => {
+      const s = tdata[t] || {};
+      q1s.push(s.q1 ?? 0);
+      medians.push(s.median ?? 0);
+      q3s.push(s.q3 ?? 0);
+      means.push(s.mean ?? 0);
+      const iqr = (s.q3 ?? 0) - (s.q1 ?? 0);
+      lowFences.push(Math.max(s.min ?? 0, (s.q1 ?? 0) - 1.5 * iqr));
+      highFences.push(Math.min(s.max ?? 0, (s.q3 ?? 0) + 1.5 * iqr));
+    });
+
+    traces.push({
+      type: "box",
+      name: iso,
+      x: tissues,
+      q1: q1s,
+      median: medians,
+      q3: q3s,
+      mean: means,
+      lowerfence: lowFences,
+      upperfence: highFences,
+      marker: { color: col, size: 3 },
+      fillcolor: hexAlpha(col, 0.25),
+      line: { color: col, width: 1.5 },
+      boxwidth: boxW,
+      boxpoints: false,
+      offsetgroup: iso
+    });
+
+    // Mean marker overlay — boxpoints has no effect with pre-computed stats
+    if (showPts) {
+      traces.push({
+        type: "scatter",
+        name: iso + " mean",
+        x: tissues,
+        y: means,
+        mode: "markers",
+        marker: { color: col, size: 7, symbol: "diamond", line: { color: "#fff", width: 1 } },
+        showlegend: false,
+        hovertemplate: "%{x}<br>Mean: %{y:.4f}<extra>" + iso + "</extra>"
+      });
+    }
+  });
+
+  const layout = {
+    barmode: "group",
+    paper_bgcolor: "#fff",
+    plot_bgcolor:  "#fff",
+    font: { family: "IBM Plex Sans, sans-serif", size: 11, color: "#1C1917" },
+    margin: { l: 55, r: 20, t: 20, b: 160 },
+    xaxis: {
+      tickangle: -45,
+      tickfont: { size: 10 },
+      showgrid: false,
+      zeroline: false,
+      linecolor: "#E2DDD8"
+    },
+    yaxis: {
+      title: { text: logScale ? "log₂(TPM)" : "TPM", font: { size: 11 } },
+      type: logScale ? "log" : "linear",
+      showgrid: true,
+      gridcolor: "#F0EDE9",
+      zeroline: false,
+      linecolor: "#E2DDD8"
+    },
+    legend: { orientation: "v", x: 1.01, xanchor: "left", y: 1, yanchor: "top" },
+    margin: { l: 55, r: 160, t: 20, b: 160 },
+    height: plotHeight()
+  };
+
+  Plotly.react("gtex-plot", traces, layout, { responsive: true, displayModeBar: 'hover' });
+}
+
+// ── TCGA plot ─────────────────────────────────────────────────────────────────
+function renderTcgaPlot() {
+  if (!tcgaData) {
+    setMsg("tcga-plot", '<div class="banner banner-info">No TCGA data available for this gene. Search a pre-cached gene (e.g. SF1, PCBP2, U2AF1).</div>');
+    return;
+  }
+
+  const sortBy   = document.getElementById("sort-by").value;
+  const boxW     = parseFloat(document.getElementById("box-width").value) || 0.5;
+  const showPts  = document.getElementById("show-points").checked;
+  const logScale = document.getElementById("log-scale").checked;
+
+  const firstIso = activeIsos.values().next().value;
+  let projects   = Object.keys(tcgaData[firstIso] || {});
+
+  if (sortBy === "alpha") {
+    projects = projects.sort();
+  } else {
+    const stats = tcgaData[firstIso];
+    projects = projects.sort((a, b) => {
+      const ma = stats[a]?.median || 0;
+      const mb = stats[b]?.median || 0;
+      return sortBy === "median-desc" ? mb - ma : ma - mb;
+    });
+  }
+
+  const isos   = allIsos.filter(iso => activeIsos.has(iso));
+  const traces = [];
+
+  isos.forEach((iso, i) => {
+    const col   = ISO_COLORS[iso] || GENERIC_COLORS[i % GENERIC_COLORS.length];
+    const tdata = tcgaData[iso] || {};
+    const q1s = [], medians = [], q3s = [], means = [], lf = [], hf = [];
+
+    projects.forEach(p => {
+      const s = tdata[p] || {};
+      q1s.push(s.q1 ?? 0);
+      medians.push(s.median ?? 0);
+      q3s.push(s.q3 ?? 0);
+      means.push(s.mean ?? 0);
+      const iqr = (s.q3 ?? 0) - (s.q1 ?? 0);
+      lf.push(Math.max(0,  (s.q1 ?? 0) - 1.5 * iqr));
+      hf.push(Math.min(s.max ?? ((s.q3 ?? 0) + 1.5 * iqr), (s.q3 ?? 0) + 1.5 * iqr));
+    });
+
+    traces.push({
+      type: "box",
+      name: iso,
+      x: projects,
+      q1: q1s, median: medians, q3: q3s, mean: means,
+      lowerfence: lf, upperfence: hf,
+      marker: { color: col, size: 3 },
+      fillcolor: hexAlpha(col, 0.25),
+      line: { color: col, width: 1.5 },
+      boxwidth: boxW,
+      boxpoints: false,
+      offsetgroup: iso
+    });
+
+    if (showPts) {
+      traces.push({
+        type: "scatter",
+        name: iso + " mean",
+        x: projects,
+        y: means,
+        mode: "markers",
+        marker: { color: col, size: 7, symbol: "diamond", line: { color: "#fff", width: 1 } },
+        showlegend: false,
+        hovertemplate: "%{x}<br>Mean: %{y:.4f}<extra>" + iso + "</extra>"
+      });
+    }
+  });
+
+  const layout = {
+    paper_bgcolor: "#fff", plot_bgcolor: "#fff",
+    font: { family: "IBM Plex Sans, sans-serif", size: 11, color: "#1C1917" },
+    margin: { l: 55, r: 20, t: 20, b: 140 },
+    xaxis: { tickangle: -45, tickfont: { size: 10 }, showgrid: false, zeroline: false, linecolor: "#E2DDD8" },
+    yaxis: { title: { text: logScale ? "log₂(TPM)" : "TPM", font: { size: 11 } }, type: logScale ? "log" : "linear", showgrid: true, gridcolor: "#F0EDE9", zeroline: false, linecolor: "#E2DDD8" },
+    legend: { orientation: "v", x: 1.01, xanchor: "left", y: 1, yanchor: "top" },
+    margin: { l: 55, r: 160, t: 20, b: 140 },
+    height: plotHeight()
+  };
+
+  Plotly.react("tcga-plot", traces, layout, { responsive: true, displayModeBar: 'hover' });
+}
+
+// ── Build pct from boxplot data ───────────────────────────────────────────────
+// Computes {category: {iso: pct}} from boxplot stats using median TPM
+function computePctFromBoxplot(boxplotData) {
+  if (!boxplotData) return null;
+  const result = {};
+  const cats = new Set();
+  for (const iso of Object.keys(boxplotData)) {
+    for (const cat of Object.keys(boxplotData[iso])) cats.add(cat);
+  }
+  for (const cat of cats) {
+    result[cat] = {};
+    let sum = 0;
+    for (const iso of Object.keys(boxplotData)) {
+      const s = boxplotData[iso][cat];
+      result[cat][iso] = (s && s.median != null) ? Math.max(0, s.median) : 0;
+      sum += result[cat][iso];
+    }
+    // Normalize to %
+    for (const iso of Object.keys(result[cat])) {
+      result[cat][iso] = sum > 0 ? (result[cat][iso] / sum) * 100 : 0;
+    }
+  }
+  return result;
+}
+
+// ── Generic stacked bar pct plot ──────────────────────────────────────────────
+function renderStackedPct(containerId, pct, isos, labels) {
+  if (!pct) {
+    setMsg(containerId, '<div class="banner banner-info">No data available for this gene.</div>');
+    return;
+  }
+  const cats = Object.keys(pct).sort();
+  const traces = isos.map((iso, i) => {
+    const col = ISO_COLORS[iso] || GENERIC_COLORS[i % GENERIC_COLORS.length];
+    return {
+      type: "bar", name: iso,
+      x: cats,
+      y: cats.map(c => pct[c]?.[iso] ?? 0),
+      marker: { color: col }, opacity: 0.88,
+      hovertemplate: "%{x}<br>" + iso + ": %{y:.1f}%<extra></extra>"
+    };
+  });
+  const layout = {
+    barmode: "stack",
+    paper_bgcolor: "#fff", plot_bgcolor: "#fff",
+    font: { family: "IBM Plex Sans, sans-serif", size: 11, color: "#1C1917" },
+    margin: { l: 55, r: 160, t: 10, b: 140 },
+    xaxis: { tickangle: -45, tickfont: { size: 10 }, showgrid: false, linecolor: "#E2DDD8" },
+    yaxis: { title: { text: "% of total gene TPM", font: { size: 11 } }, range: [0, 100], showgrid: true, gridcolor: "#F0EDE9", linecolor: "#E2DDD8" },
+    legend: { orientation: "v", x: 1.01, xanchor: "left", y: 1, yanchor: "top" },
+    height: Math.max(380, window.innerHeight - 230)
+  };
+  Plotly.react(containerId, traces, layout, { responsive: true, displayModeBar: 'hover' });
+}
+
+// ── Isoform % plot ────────────────────────────────────────────────────────────
+function renderPctPlot() {
+  const isos = allIsos;
+
+  // GTEx — compute from boxplot medians, same method as TCGA
+  if (isoformData) {
+    const gtexPct = computePctFromBoxplot(isoformData);
+    renderStackedPct("pct-plot-gtex", gtexPct, isos);
+  } else {
+    setMsg("pct-plot-gtex", '<div class="banner banner-info">GTEx isoform % not available for this gene.</div>');
+  }
+
+  // TCGA — compute from boxplot medians
+  if (tcgaData) {
+    const tcgaPct = computePctFromBoxplot(tcgaData);
+    renderStackedPct("pct-plot-tcga", tcgaPct, isos);
+  } else {
+    setMsg("pct-plot-tcga", '<div class="banner banner-info">TCGA isoform % not available for this gene.</div>');
+  }
+}
+
+// ── Heatmap plot ──────────────────────────────────────────────────────────────
+function renderHeatmapPlot() {
+  // GTEx heatmap — computed from boxplot medians, same method as TCGA
+  if (isoformData) {
+    const gtexPct  = computePctFromBoxplot(isoformData);
+    const tissues  = Object.keys(gtexPct).sort();
+    const isos     = allIsos.filter(iso => tissues.some(t => (gtexPct[t]?.[iso] ?? 0) > 0));
+    const z        = isos.map(iso => tissues.map(t => gtexPct[t]?.[iso] ?? 0));
+    const gtexTrace = [{
+      type: "heatmap",
+      z, x: tissues, y: isos,
+      colorscale: [
+        [0,   "#F5F4F1"],
+        [0.5, "#C2185B"],
+        [1,   "#4A148C"]
+      ],
+      colorbar: { title: "%", len: 0.5 },
+      hovertemplate: "%{x}<br>%{y}: %{z:.1f}%<extra></extra>"
+    }];
+    const gtexLayout = {
+      paper_bgcolor: "#fff", plot_bgcolor: "#fff",
+      font: { family: "IBM Plex Sans, sans-serif", size: 11, color: "#1C1917" },
+      margin: { l: 80, r: 80, t: 10, b: 160 },
+      xaxis: { tickangle: -55, tickfont: { size: 9 } },
+      yaxis: { tickfont: { size: 10 }, autorange: "reversed" },
+      height: Math.max(380, window.innerHeight - 230)
+    };
+    Plotly.react("heatmap-gtex", gtexTrace, gtexLayout, { responsive: true, displayModeBar: 'hover' });
+  } else {
+    setMsg("heatmap-gtex", '<div class="banner banner-info">GTEx heatmap not available for this gene.</div>');
+  }
+
+  // TCGA heatmap — compute from boxplot medians
+  if (tcgaData) {
+    const tcgaPct  = computePctFromBoxplot(tcgaData);
+    const projects = Object.keys(tcgaPct).sort();
+    const isos     = allIsos.filter(iso => projects.some(p => (tcgaPct[p]?.[iso] ?? 0) > 0));
+    const z        = isos.map(iso => projects.map(p => tcgaPct[p]?.[iso] ?? 0));
+    const tcgaTrace = [{
+      type: "heatmap",
+      z, x: projects, y: isos,
+      colorscale: [
+        [0,   "#F5F4F1"],
+        [0.5, "#C2185B"],
+        [1,   "#4A148C"]
+      ],
+      colorbar: { title: "%", len: 0.5 },
+      hovertemplate: "%{x}<br>%{y}: %{z:.1f}%<extra></extra>"
+    }];
+    const tcgaLayout = {
+      paper_bgcolor: "#fff", plot_bgcolor: "#fff",
+      font: { family: "IBM Plex Sans, sans-serif", size: 11, color: "#1C1917" },
+      margin: { l: 80, r: 80, t: 10, b: 160 },
+      xaxis: { tickangle: -55, tickfont: { size: 9 } },
+      yaxis: { tickfont: { size: 10 }, autorange: "reversed" },
+      height: Math.max(380, window.innerHeight - 230)
+    };
+    Plotly.react("heatmap-tcga", tcgaTrace, tcgaLayout, { responsive: true, displayModeBar: 'hover' });
+  } else {
+    setMsg("heatmap-tcga", '<div class="banner banner-info">TCGA heatmap available for pre-cached genes only.</div>');
+  }
+}
+
+// ── Gene structure (Ensembl REST) ─────────────────────────────────────────────
+async function loadGeneStructure() {
+  const ensgBase = geneInfo ? geneInfo.ensgBase : null;
+  if (!ensgBase) {
+    setMsg("struct-msg", '<div class="banner banner-warn">Load a gene first.</div>');
+    return;
+  }
+
+  const structKey = `ensembl:${ensgBase}`;
+  const cachedStruct = cacheGet(structKey);
+  if (cachedStruct) {
+    setMsg("struct-msg", "");
+    renderGeneStructure(cachedStruct);
+    return;
+  }
+
+  setMsg("struct-msg", '<span class="spinner"></span>Fetching gene structure from Ensembl…');
+
+  try {
+    const resp = await fetch(`${ENSEMBL_API}/lookup/id/${ensgBase}?content-type=application/json&expand=1`);
+    if (!resp.ok) throw new Error("Ensembl API error");
+    const gene = await resp.json();
+    cacheSet(structKey, gene);
+
+    if (!gene.Transcript || !gene.Transcript.length) {
+      setMsg("struct-msg", '<div class="banner banner-warn">No transcript data returned from Ensembl.</div>');
+      return;
+    }
+
+    setMsg("struct-msg", "");
+    renderGeneStructure(gene);
+  } catch(e) {
+    setMsg("struct-msg", `<div class="banner banner-err">Failed to fetch gene structure: ${escHtml(e.message)}</div>`);
+  }
+}
+
+function renderGeneStructure(gene) {
+  const txs = gene.Transcript || [];
+  const gStart = gene.start;
+  const gEnd   = gene.end;
+  const span   = gEnd - gStart;
+
+  const W          = 860;
+  const PAD_LEFT   = 130;
+  const PAD_RIGHT  = 80;
+  const H_per_tx   = 38;
+  const TRACK_H    = 16;
+  const UTR_H      = 8;
+  const plotW      = W - PAD_LEFT - PAD_RIGHT;
+  const ARROW_STEP = 60;
+
+  function toX(pos) { return PAD_LEFT + (pos - gStart) / span * plotW; }
+
+  const filtered = txs
+    .filter(t => ["protein_coding","lncRNA","processed_transcript"].includes(t.biotype))
+    .sort((a,b) => {
+      if (a.biotype === b.biotype) return a.display_name.localeCompare(b.display_name);
+      return a.biotype === "protein_coding" ? -1 : 1;
+    })
+    .slice(0, 24);
+
+  const totalH = 58 + filtered.length * H_per_tx + 30;
+  const isNegStrand = gene.strand < 0;
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${totalH}" style="font-family:'IBM Plex Sans',sans-serif;font-size:10px">`;
+
+  svg += `<text x="${PAD_LEFT}" y="18" font-size="13" font-weight="700" fill="#1C1917">${escHtml(gene.display_name || gene.id)}</text>`;
+  svg += `<text x="${PAD_LEFT}" y="32" font-size="10" fill="#78716C">chr${escHtml(String(gene.seq_region_name))}:${Number(gene.start).toLocaleString()}–${Number(gene.end).toLocaleString()} · strand: ${isNegStrand ? "−" : "+"}</text>`;
+
+  const legX = W - PAD_RIGHT + 4;
+  svg += `<rect x="${legX}" y="8"  width="10" height="10" rx="1" fill="#C2185B" opacity="0.9"/>`;
+  svg += `<text x="${legX + 14}" y="17" font-size="8" fill="#44403C">CDS</text>`;
+  svg += `<rect x="${legX}" y="22" width="10" height="6"  rx="1" fill="#94A3B8" opacity="0.7"/>`;
+  svg += `<text x="${legX + 14}" y="30" font-size="8" fill="#44403C">UTR</text>`;
+  svg += `<line x1="${legX}" y1="39" x2="${legX + 10}" y2="39" stroke="#94A3B8" stroke-width="1.5"/>`;
+  svg += `<text x="${legX + 14}" y="43" font-size="8" fill="#44403C">Intron</text>`;
+
+  const baseY = 50;
+
+  filtered.forEach((tx, row) => {
+    const y    = baseY + row * H_per_tx;
+    const midY = y + H_per_tx / 2 - 1;
+    const txX1 = toX(tx.start);
+    const txX2 = toX(tx.end);
+    const txColor = ISO_COLORS[tx.display_name] || GENERIC_COLORS[row % GENERIC_COLORS.length];
+
+    const cdsStart = tx.Translation ? tx.Translation.start : null;
+    const cdsEnd   = tx.Translation ? tx.Translation.end   : null;
+
+    svg += `<text x="${PAD_LEFT - 6}" y="${midY + 4}" text-anchor="end" fill="#44403C" font-size="9.5">${escHtml(tx.display_name || tx.id)}</text>`;
+    svg += `<line x1="${txX1}" y1="${midY}" x2="${txX2}" y2="${midY}" stroke="#CBD5E1" stroke-width="1.5"/>`;
+
+    const exons = (tx.Exon || []).slice().sort((a,b) => a.start - b.start);
+    for (let i = 0; i < exons.length - 1; i++) {
+      const intronX1 = toX(exons[i].end);
+      const intronX2 = toX(exons[i+1].start);
+      const gapPx = intronX2 - intronX1;
+      if (gapPx < 10) continue;
+      const nArrows = Math.max(1, Math.floor(gapPx / ARROW_STEP));
+      for (let k = 1; k <= nArrows; k++) {
+        const ax = intronX1 + gapPx * (k / (nArrows + 1));
+        const aw = 4, ah = 4;
+        if (isNegStrand) {
+          svg += `<polyline points="${ax+aw},${midY-ah} ${ax},${midY} ${ax+aw},${midY+ah}" fill="none" stroke="#94A3B8" stroke-width="1.2" stroke-linejoin="round"/>`;
+        } else {
+          svg += `<polyline points="${ax-aw},${midY-ah} ${ax},${midY} ${ax-aw},${midY+ah}" fill="none" stroke="#94A3B8" stroke-width="1.2" stroke-linejoin="round"/>`;
+        }
+      }
+    }
+
+    exons.forEach(ex => {
+      const ex1 = toX(ex.start);
+      const ex2 = toX(ex.end);
+      const w   = Math.max(1.5, ex2 - ex1);
+
+      if (!cdsStart) {
+        svg += `<rect x="${ex1}" y="${midY - UTR_H/2}" width="${w}" height="${UTR_H}" rx="1.5" fill="#94A3B8" opacity="0.75"/>`;
+        return;
+      }
+
+      const segments = [];
+      if (ex.start < cdsStart && ex.end > ex.start) {
+        const segEnd = Math.min(ex.end, cdsStart);
+        segments.push({ start: ex.start, end: segEnd, type: "utr" });
+      }
+      const cdsExStart = Math.max(ex.start, cdsStart);
+      const cdsExEnd   = Math.min(ex.end,   cdsEnd);
+      if (cdsExStart < cdsExEnd) {
+        segments.push({ start: cdsExStart, end: cdsExEnd, type: "cds" });
+      }
+      if (ex.end > cdsEnd) {
+        const segStart = Math.max(ex.start, cdsEnd);
+        segments.push({ start: segStart, end: ex.end, type: "utr" });
+      }
+      if (!segments.length) {
+        segments.push({ start: ex.start, end: ex.end, type: "utr" });
+      }
+
+      segments.forEach(seg => {
+        const sx1 = toX(seg.start);
+        const sx2 = toX(seg.end);
+        const sw  = Math.max(1.5, sx2 - sx1);
+        if (seg.type === "cds") {
+          svg += `<rect x="${sx1}" y="${midY - TRACK_H/2}" width="${sw}" height="${TRACK_H}" rx="2" fill="${txColor}" opacity="0.88"/>`;
+        } else {
+          svg += `<rect x="${sx1}" y="${midY - UTR_H/2}" width="${sw}" height="${UTR_H}" rx="1.5" fill="${txColor}" opacity="0.45"/>`;
+        }
+      });
+    });
+
+    const btCol = tx.biotype === "protein_coding" ? "#065F46" : "#3730A3";
+    const btBg  = tx.biotype === "protein_coding" ? "#ECFDF5" : "#EEF2FF";
+    const badgeX = txX2 + 6;
+    svg += `<rect x="${badgeX}" y="${midY - 6}" width="70" height="12" rx="3" fill="${btBg}"/>`;
+    svg += `<text x="${badgeX + 4}" y="${midY + 4}" font-size="8" fill="${btCol}">${escHtml(tx.biotype)}</text>`;
+  });
+
+  svg += `</svg>`;
+  document.getElementById("struct-svg").innerHTML = svg;
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function showPane(name) {
+  document.querySelectorAll(".vpane,.vtab-btn").forEach(el => el.classList.remove("active"));
+  document.getElementById("vpane-"+name).classList.add("active");
+  document.querySelector(`.vtab-btn[onclick="showPane('${name}')"]`).classList.add("active");
+  if (name === "struct")  { loadGeneStructure(); return; }
+  if (name === "pct")     { renderPctPlot();     return; }
+  if (name === "tcga")    { renderTcgaPlot();    return; }
+  if (name === "heatmap") { renderHeatmapPlot(); return; }
+  // GTEx tab — force Plotly resize since it was rendered while other tabs may have been active
+  if (name === "gtex" && isoformData) {
+    try { Plotly.Plots.resize("gtex-plot"); } catch(e) { replot(); }
+  }
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function setMsg(containerId, html) {
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Responsive resize ─────────────────────────────────────────────────────────
+function plotHeight() {
+  // Total chrome: topbar(52) + main-panel padding(20) + tabs(38) + vcard padding(20)
+  // + title(24) + subtitle(16) + card margin(16) = ~186px
+  return Math.max(380, window.innerHeight - 190);
+}
+
+window.addEventListener('resize', () => {
+  // Re-render whichever pane is currently active to pick up new height
+  if (document.getElementById('vpane-gtex').classList.contains('active') && isoformData) replot();
+  else if (document.getElementById('vpane-tcga').classList.contains('active') && tcgaData) renderTcgaPlot();
+  else if (document.getElementById('vpane-pct').classList.contains('active')) renderPctPlot();
+  else if (document.getElementById('vpane-heatmap').classList.contains('active')) renderHeatmapPlot();
+});
+</script>
+<script src="/js/sessions.js"></script>
+<script>
+// ─── Session persistence ───────────────────────────────────────────────────────
+function getSf1State() {
+  const state = {
+    gene:       currentGene,
+    boxWidth:   document.getElementById('box-width').value,
+    showPoints: document.getElementById('show-points').checked,
+    logScale:   document.getElementById('log-scale').checked,
+    sortBy:     document.getElementById('sort-by').value,
+    activeIsos: [...activeIsos],
+  };
+  return { stateJson: JSON.stringify(state), files: [] };
+}
+
+async function loadSf1State(stateJson) {
+  let ui; try { ui = JSON.parse(stateJson); } catch(_) { ui = {}; }
+
+  if (ui.boxWidth)    document.getElementById('box-width').value       = ui.boxWidth;
+  if (ui.showPoints   !== undefined) document.getElementById('show-points').checked = ui.showPoints;
+  if (ui.logScale     !== undefined) document.getElementById('log-scale').checked   = ui.logScale;
+  if (ui.sortBy)      document.getElementById('sort-by').value         = ui.sortBy;
+
+  if (ui.gene) {
+    document.getElementById('gene-input').value = ui.gene;
+    await loadGene();
+    // Restore isoform selection after gene loads
+    if (ui.activeIsos && ui.activeIsos.length) {
+      activeIsos = new Set(ui.activeIsos);
+      // Re-check isoform checkboxes
+      document.querySelectorAll('.iso-check').forEach(cb => {
+        cb.checked = activeIsos.has(cb.value);
+      });
+      replot();
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  SessionManager.mount('sf1', getSf1State, loadSf1State);
+});
+</script>
+</body>
+</html>

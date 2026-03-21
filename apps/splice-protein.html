@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Splice→Protein Impact — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.main{flex:1;padding:20px;max-width:1100px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.drop-zone{border:2px dashed #E2DDD8;border-radius:8px;padding:28px;text-align:center;background:#FAFAF9;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:8px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#C2185B;background:#FFF8F9}
+.drop-zone-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.drop-zone-sub{font-size:11px;color:#78716C}
+.file-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:4px;padding:3px 8px;font-size:11px;font-family:"IBM Plex Mono",monospace;color:#065F46;display:flex;align-items:center;gap:6px}
+.chip.missing{background:#FFF1F2;border-color:#FECDD3;color:#9F1239}
+.chip-rm{background:none;border:none;cursor:pointer;color:#9F1239;font-size:13px;padding:0 2px}
+.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ctrl-lbl{font-size:11px;font-weight:700;color:#78716C;white-space:nowrap;min-width:90px}
+.ctrl-val{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#C2185B;font-weight:700;min-width:40px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 16px;text-align:center;min-width:90px}
+.pill-num{font-size:22px;font-weight:700;display:block;line-height:1.1}
+.pill-lbl{font-size:9px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.tab-bar{display:flex;gap:2px;margin-bottom:14px;border-bottom:2px solid #E2DDD8}
+.tab-btn{background:none;border:none;padding:8px 14px;font-size:12px;font-weight:600;color:#78716C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn.active{color:#C2185B;border-bottom-color:#C2185B}
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 22px;transition:background .15s}
+.action-btn:hover{background:#A3144E}
+.action-btn:disabled{background:#E2DDD8;color:#A8A29E;cursor:default}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover:not(:disabled){background:#F0EDE9}
+.sec-btn:disabled{opacity:.4;cursor:default}
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:6px 8px;text-align:left;border-bottom:2px solid #E2DDD8;white-space:nowrap;cursor:pointer}
+.data-table th:hover{color:#C2185B}
+.data-table td{padding:5px 8px;border-top:1px solid #EDE9E5;font-family:"IBM Plex Mono",monospace;font-size:11px;vertical-align:middle;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table tr:nth-child(even) td{background:#FAFAF9}
+.data-table tr:hover td{background:#FFF8F9}
+.table-wrap{overflow-x:auto;border:1px solid #E2DDD8;border-radius:6px;max-height:520px;overflow-y:auto}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.tag-SE{background:#EEF2FF;color:#3730A3}
+.tag-MXE{background:#FEF3C7;color:#92400E}
+.tag-A3SS{background:#ECFDF5;color:#065F46}
+.tag-A5SS{background:#F0FDF4;color:#166534}
+.tag-RI{background:#FFF1F2;color:#9F1239}
+.search-box{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:7px 10px;font-size:12px;outline:none;width:220px}
+.search-box:focus{border-color:#C2185B}
+input[type=range]{accent-color:#C2185B}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+
+/* Frame prediction badges */
+.pred-inframe{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.pred-frameshift{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.pred-nmd{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.pred-nonmd{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.pred-utr{background:#F5F4F1;border:1px solid #E2DDD8;color:#78716C;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.inspect-btn{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:5px;color:#3730A3;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:700;padding:4px 12px;transition:background .15s}
+.inspect-btn:hover{background:#C7D2FE}
+
+/* Protein panel */
+.protein-panel{border:2px solid #C2185B;border-radius:8px;overflow:hidden;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.protein-header{background:#FFF1F5;padding:14px 20px;border-bottom:1px solid #FECDD3}
+.protein-header-title{font-size:15px;font-weight:700;color:#C2185B;margin-bottom:4px}
+.protein-header-meta{font-size:11px;color:#78716C;display:flex;gap:12px;flex-wrap:wrap}
+.svg-wrap{overflow-x:auto;margin-bottom:12px}
+.domain-tip{display:none;position:fixed;background:#1C1917;color:#fff;border-radius:7px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:300;line-height:1.6;font-family:"IBM Plex Mono",monospace;max-width:280px;word-break:break-word;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+/* Sequence zoom panels */
+.seq-zoom{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:14px 16px;margin-bottom:12px;overflow-x:auto}
+.seq-zoom-label{font-size:11px;font-weight:700;color:#1C1917;margin-bottom:3px}
+.seq-zoom-meta{font-size:10px;color:#78716C;margin-bottom:10px}
+.seq-line{display:flex;gap:8px;margin-bottom:1px;align-items:baseline}
+.seq-pos{color:#A8A29E;width:52px;text-align:right;flex-shrink:0;font-size:10px;font-family:"IBM Plex Mono",monospace;user-select:none}
+.seq-nts{letter-spacing:.5px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;line-height:1.6;word-break:break-all}
+.nt-ctx{color:#44403C}
+.nt-ev{color:#B45309;background:#FEF3C7;font-weight:700;border-radius:1px}
+.nt-new{color:#065F46;background:#D1FAE5;font-weight:700;border-radius:1px}
+/* AA zoom */
+.aa-row{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:10px;align-items:flex-end}
+.aa-block{display:inline-flex;flex-direction:column;align-items:center;gap:1px}
+.aa-letter{font-size:13px;font-weight:700;width:19px;text-align:center;line-height:1.3;border-radius:2px;font-family:"IBM Plex Mono",monospace}
+.aa-num{font-size:7.5px;color:#A8A29E;width:19px;text-align:center;font-family:"IBM Plex Mono",monospace}
+.aa-ctx{}
+.aa-ev{color:#B45309;background:#FEF3C7}
+.aa-new{color:#065F46;background:#D1FAE5}
+.aa-del{color:#9F1239;background:#FFF1F2;font-style:italic}
+.aa-stop{color:#fff;background:#DC2626}
+.aa-sep{width:2px;height:18px;background:#E2DDD8;align-self:center;flex-shrink:0}
+/* AlphaFold section */
+.af-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:8px}
+.af-viewer-box{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;overflow:hidden;position:relative;height:360px}
+.af-viewer-hdr{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:#F0EDE9;border-bottom:1px solid #E2DDD8;font-size:11px;font-weight:600}
+.af-legend{display:flex;flex-wrap:wrap;gap:10px;padding:7px 12px;background:#FAFAF9;border-top:1px solid #E2DDD8;font-size:9px;color:#78716C;position:absolute;bottom:0;left:0;right:0}
+.af-leg{display:flex;align-items:center;gap:3px}
+.af-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.af-viewer-ctrl{position:absolute;top:34px;right:6px;display:flex;flex-direction:column;gap:4px;z-index:10}
+.af-ctrl-btn{background:rgba(255,255,255,.85);border:1px solid #E2DDD8;border-radius:4px;font-size:10px;padding:3px 6px;cursor:pointer;backdrop-filter:blur(2px)}
+.af-ctrl-btn:hover{background:#fff}
+.af-fasta-box{display:flex;flex-direction:column;gap:6px}
+.af-fasta-hdr{font-size:11px;font-weight:700;color:#1C1917}
+.af-fasta-meta{font-size:10px;color:#78716C;line-height:1.4}
+.af-fasta-area{font-family:"IBM Plex Mono",monospace;font-size:9.5px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px;resize:none;flex:1;min-height:260px;color:#44403C;outline:none;line-height:1.5}
+.af-fasta-area:focus{border-color:#C2185B}
+.af-fasta-note{font-size:9px;color:#A8A29E;line-height:1.4}
+/* TM topology section */
+.tm-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#78716C;margin-bottom:8px}
+.tm-leg{display:flex;align-items:center;gap:4px}
+.tm-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+  <div>
+    <div class="topbar-logo"><em>Splice</em>&#8594;Protein Impact</div>
+    <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; rMATS JC &rarr; frame analysis &rarr; protein domain mapping</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Card 1: Upload & Parameters -->
+  <div class="vcard">
+    <div class="vcard-title">Upload rMATS JC Files &amp; Parameters</div>
+    <div class="vcard-sub">Upload any combination of 5 rMATS JC output files. Frame analysis is instant (no API). Click Inspect on individual events for protein domain mapping.</div>
+
+    <div class="banner banner-info">
+      Expected: <strong>SE.MATS.JC.txt</strong>, <strong>MXE.MATS.JC.txt</strong>, <strong>A3SS.MATS.JC.txt</strong>, <strong>A5SS.MATS.JC.txt</strong>, <strong>RI.MATS.JC.txt</strong>
+      &mdash; Frame predictions use exon coordinates only (instant). Protein impact uses Ensembl + UniProt APIs (per event).
+    </div>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="handleDrop(event)">
+      <div class="drop-zone-title">&#128196; Drop rMATS JC files here or click to browse</div>
+      <div class="drop-zone-sub">SE.MATS.JC.txt, MXE.MATS.JC.txt, A3SS.MATS.JC.txt, A5SS.MATS.JC.txt, RI.MATS.JC.txt</div>
+    </div>
+    <input type="file" id="file-input" multiple accept=".txt" style="display:none" onchange="handleFiles(this.files)">
+    <div class="file-chips" id="file-chips"></div>
+
+    <div style="margin-top:14px">
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Condition 1</span>
+        <input type="text" id="cond1" value="Control" placeholder="e.g. WT" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:160px">
+        <span class="ctrl-lbl" style="margin-left:16px">Condition 2</span>
+        <input type="text" id="cond2" value="Treatment" placeholder="e.g. KD" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:160px">
+        <span class="ctrl-lbl" style="margin-left:16px">Genome</span>
+        <select id="ref-genome" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 8px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+          <option value="hg38">hg38 (GRCh38)</option>
+          <option value="hg19">hg19 (GRCh37)</option>
+          <option value="mm10">mm10 (GRCm38)</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Min Reads (avg)</span>
+        <input type="range" id="sl-reads" min="0" max="100" value="20" oninput="syncSlider('reads',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-reads">20</span>
+        <span class="ctrl-lbl" style="margin-left:16px">FDR &le;</span>
+        <input type="range" id="sl-fdr" min="0" max="1" step="0.01" value="0.05" oninput="syncSlider('fdr',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-fdr">0.05</span>
+        <span class="ctrl-lbl" style="margin-left:16px">|&Delta;PSI| &ge;</span>
+        <input type="range" id="sl-dpsi" min="0" max="1" step="0.01" value="0.1" oninput="syncSlider('dpsi',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-dpsi">0.10</span>
+      </div>
+      <button class="action-btn" onclick="analyze()" id="btn-analyze" disabled>Analyze</button>
+    </div>
+  </div>
+
+  <!-- Card 2: Summary -->
+  <div id="summary-card" style="display:none">
+    <div class="vcard">
+      <div class="vcard-title">Summary</div>
+      <div class="pills" id="summary-pills"></div>
+      <div id="summary-chart" style="margin-bottom:12px"></div>
+      <button class="sec-btn" onclick="exportCSV()">&#128229; Export filtered events (CSV)</button>
+    </div>
+  </div>
+
+  <!-- Card 3: Event Table -->
+  <div id="table-card" style="display:none">
+    <div class="vcard">
+      <div class="vcard-title">Splicing Events &mdash; Frame &amp; Protein Impact</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <input type="text" class="search-box" id="table-search" placeholder="Search gene..." oninput="filterTable()">
+        <div style="font-size:11px;color:#78716C" id="table-count"></div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="sec-btn" onclick="sortTable('dpsi')">Sort |&#916;PSI|</button>
+          <button class="sec-btn" onclick="sortTable('frame')">Sort Frame</button>
+          <button class="sec-btn" onclick="sortTable('fdr')">Sort FDR</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="events-table">
+          <thead><tr>
+            <th onclick="sortTable('type')">Type</th>
+            <th onclick="sortTable('gene')">Gene</th>
+            <th onclick="sortTable('deltaNt')">&#916;nt</th>
+            <th onclick="sortTable('frame')">Frame &#916;</th>
+            <th>Prediction</th>
+            <th onclick="sortTable('dpsi')">&#916;PSI</th>
+            <th>PSI&#8321;</th>
+            <th>PSI&#8322;</th>
+            <th onclick="sortTable('fdr')">FDR</th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Protein Domain Panel -->
+  <div id="protein-card" style="display:none"></div>
+
+</div>
+</div>
+
+<!-- Tooltip -->
+<div class="domain-tip" id="dtip"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = {
+  files: {},
+  allEvents: [],
+  filtEvents: [],
+  sortKey: 'dpsi', sortDir: -1,
+  inspectedIdx: null,
+  geneCache: {}
+};
+
+const EVENT_TYPES = ['SE','MXE','A3SS','A5SS','RI'];
+const TYPE_COLORS = { SE:'#818CF8', MXE:'#F59E0B', A3SS:'#34D399', A5SS:'#10B981', RI:'#F87171' };
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function syncSlider(k,v){document.getElementById('sv-'+k).textContent=k==='reads'?v:parseFloat(v).toFixed(2);}
+function downloadText(text,name,mime='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;a.click();}
+function arrMin(a){let m=Infinity;for(let i=0;i<a.length;i++)if(a[i]<m)m=a[i];return m;}
+function arrMax(a){let m=-Infinity;for(let i=0;i<a.length;i++)if(a[i]>m)m=a[i];return m;}
+
+// ─── Genome config ────────────────────────────────────────────────────────────
+function getEnsemblBase(){
+  const g=document.getElementById('ref-genome').value;
+  if(g==='hg19') return 'https://grch37.rest.ensembl.org';
+  return 'https://rest.ensembl.org';
+}
+function getSpecies(){
+  const g=document.getElementById('ref-genome').value;
+  return g==='mm10'?'mus_musculus':'homo_sapiens';
+}
+function getOrganismId(){
+  return document.getElementById('ref-genome').value==='mm10'?10090:9606;
+}
+
+// ─── Codon table ──────────────────────────────────────────────────────────────
+const CODONS = {
+  'TTT':'F','TTC':'F','TTA':'L','TTG':'L','CTT':'L','CTC':'L','CTA':'L','CTG':'L',
+  'ATT':'I','ATC':'I','ATA':'I','ATG':'M','GTT':'V','GTC':'V','GTA':'V','GTG':'V',
+  'TCT':'S','TCC':'S','TCA':'S','TCG':'S','CCT':'P','CCC':'P','CCA':'P','CCG':'P',
+  'ACT':'T','ACC':'T','ACA':'T','ACG':'T','GCT':'A','GCC':'A','GCA':'A','GCG':'A',
+  'TAT':'Y','TAC':'Y','TAA':'*','TAG':'*','CAT':'H','CAC':'H','CAA':'Q','CAG':'Q',
+  'AAT':'N','AAC':'N','AAA':'K','AAG':'K','GAT':'D','GAC':'D','GAA':'E','GAG':'E',
+  'TGT':'C','TGC':'C','TGA':'*','TGG':'W','CGT':'R','CGC':'R','CGA':'R','CGG':'R',
+  'AGT':'S','AGC':'S','AGA':'R','AGG':'R','GGT':'G','GGC':'G','GGA':'G','GGG':'G'
+};
+
+function translate(cds) {
+  cds = cds.toUpperCase();
+  for (let i = 0; i < cds.length - 2; i += 3) {
+    const codon = cds.substring(i, i + 3);
+    const aa = CODONS[codon];
+    if (aa === '*') return { ptcPos: Math.floor(i / 3), stopped: true };
+  }
+  return { ptcPos: Math.floor(cds.length / 3), stopped: false };
+}
+
+// ─── File handling ────────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(fileList) {
+  for (const f of fileList) {
+    const name = f.name.toUpperCase();
+    for (const t of EVENT_TYPES) {
+      if (name.includes(t + '.MATS.JC') || name.includes(t.toLowerCase() + '.MATS.JC') || name.startsWith(t)) {
+        S.files[t] = f;
+        break;
+      }
+    }
+  }
+  renderChips();
+  document.getElementById('btn-analyze').disabled = Object.keys(S.files).length === 0;
+}
+
+function removeFile(t) {
+  delete S.files[t];
+  renderChips();
+  document.getElementById('btn-analyze').disabled = Object.keys(S.files).length === 0;
+}
+
+function renderChips() {
+  const el = document.getElementById('file-chips');
+  let h = '';
+  for (const t of EVENT_TYPES) {
+    if (S.files[t]) {
+      h += `<div class="chip">${t}.MATS.JC.txt <button class="chip-rm" onclick="removeFile('${t}')">&times;</button></div>`;
+    }
+  }
+  el.innerHTML = h;
+}
+
+// ─── Parsing ──────────────────────────────────────────────────────────────────
+function parseMATSFile(text, type) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const header = lines[0].split('\t');
+  const h = Object.fromEntries(header.map((k, i) => [k.trim(), i]));
+  const events = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split('\t');
+    if (cols.length < 10) continue;
+
+    const gene = (cols[h['geneSymbol'] || h['GeneID'] || 2] || '?').trim().replace(/^"|"$/g, '');
+    const chr = (cols[h['chr'] || 3] || '').trim();
+    const strand = (cols[h['strand'] || 4] || '.').trim();
+    const pval = parseFloat(cols[h['PValue'] || 18]);
+    const fdr = parseFloat(cols[h['FDR'] || 19]);
+
+    const inc1raw = cols[h['IncLevel1'] || 20] || '';
+    const inc2raw = cols[h['IncLevel2'] || 21] || '';
+    const dpsiRaw = parseFloat(cols[h['IncLevelDifference'] || 22]);
+
+    const parsePSI = s => {
+      const vals = s.split(',').map(Number).filter(v => !isNaN(v) && v >= 0);
+      return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : NaN;
+    };
+    const psi1 = parsePSI(inc1raw);
+    const psi2 = parsePSI(inc2raw);
+    const dpsi = isNaN(dpsiRaw) ? psi2 - psi1 : dpsiRaw;
+
+    const ijc1 = (cols[h['IJC_SAMPLE_1'] || 12] || '').split(',').map(Number).filter(n => !isNaN(n));
+    const sjc1 = (cols[h['SJC_SAMPLE_1'] || 13] || '').split(',').map(Number).filter(n => !isNaN(n));
+    const ijc2 = (cols[h['IJC_SAMPLE_2'] || 14] || '').split(',').map(Number).filter(n => !isNaN(n));
+    const sjc2 = (cols[h['SJC_SAMPLE_2'] || 15] || '').split(',').map(Number).filter(n => !isNaN(n));
+    const avgCov = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+    const coverage = (avgCov(ijc1) + avgCov(sjc1) + avgCov(ijc2) + avgCov(sjc2)) / 2;
+
+    const exStart = parseInt(cols[h['exonStart_0base'] || h['longExonStart_0base'] || h['riExonStart_0base'] || h['1stExonStart_0base'] || 5]) || 0;
+    const exEnd = parseInt(cols[h['exonEnd'] || h['longExonEnd'] || h['riExonEnd'] || h['1stExonEnd'] || 6]) || 0;
+
+    let ex2Start = 0, ex2End = 0;
+    let shortES = 0, shortEE = 0;
+    let upstreamEE = 0, downstreamES = 0;
+
+    if (type === 'SE') {
+      upstreamEE = parseInt(cols[h['upstreamEE'] || 8]) || 0;
+      downstreamES = parseInt(cols[h['downstreamES'] || 9]) || 0;
+    } else if (type === 'MXE') {
+      ex2Start = parseInt(cols[h['2ndExonStart_0base'] || 7]) || 0;
+      ex2End = parseInt(cols[h['2ndExonEnd'] || 8]) || 0;
+      upstreamEE = parseInt(cols[h['upstreamEE'] || 10]) || 0;
+      downstreamES = parseInt(cols[h['downstreamES'] || 11]) || 0;
+    } else if (type === 'A3SS' || type === 'A5SS') {
+      shortES = parseInt(cols[h['shortES'] || 7]) || 0;
+      shortEE = parseInt(cols[h['shortEE'] || 8]) || 0;
+    } else if (type === 'RI') {
+      upstreamEE = parseInt(cols[h['upstreamEE'] || 8]) || 0;
+      downstreamES = parseInt(cols[h['downstreamES'] || 9]) || 0;
+    }
+
+    if (isNaN(fdr) || isNaN(dpsi)) continue;
+    events.push({ type, gene, chr, strand, psi1, psi2, dpsi, fdr, pval, coverage,
+                  exStart, exEnd, ex2Start, ex2End, shortES, shortEE, upstreamEE, downstreamES });
+  }
+  return events;
+}
+
+// ─── Frame analysis ───────────────────────────────────────────────────────────
+function computeFrame(ev) {
+  let deltaNt = 0;
+  switch (ev.type) {
+    case 'SE':  deltaNt = ev.exEnd - ev.exStart; break;
+    case 'RI':  deltaNt = ev.downstreamES - ev.upstreamEE; break;
+    case 'A3SS': case 'A5SS':
+      deltaNt = Math.abs((ev.exEnd - ev.exStart) - (ev.shortEE - ev.shortES)); break;
+    case 'MXE':
+      deltaNt = Math.abs((ev.exEnd - ev.exStart) - (ev.ex2End - ev.ex2Start)); break;
+  }
+  const fc = deltaNt % 3;
+  return {
+    deltaNt,
+    frameChange: fc,
+    inFrame: fc === 0,
+    cls: fc === 0 ? 'inframe' : 'frameshift'
+  };
+}
+
+// ─── Analyze ──────────────────────────────────────────────────────────────────
+async function analyze() {
+  const btn = document.getElementById('btn-analyze');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Parsing...';
+  await sleep(30);
+
+  S.allEvents = [];
+  const entries = Object.entries(S.files);
+  for (let fi = 0; fi < entries.length; fi++) {
+    const [type, file] = entries[fi];
+    btn.innerHTML = `<span class="spinner"></span>Parsing ${type} (${fi + 1}/${entries.length})...`;
+    await sleep(10);
+    const text = await file.text();
+    const evts = parseMATSFile(text, type);
+    for (let k = 0; k < evts.length; k++) S.allEvents.push(evts[k]);
+  }
+
+  // Compute frame for every event
+  for (const ev of S.allEvents) {
+    ev.frame = computeFrame(ev);
+  }
+
+  filterAndRender();
+  btn.innerHTML = 'Analyze';
+  btn.disabled = false;
+}
+
+function filterAndRender() {
+  const minReads = parseInt(document.getElementById('sl-reads').value);
+  const maxFDR = parseFloat(document.getElementById('sl-fdr').value);
+  const minDPSI = parseFloat(document.getElementById('sl-dpsi').value);
+
+  S.filtEvents = S.allEvents.filter(e =>
+    e.coverage >= minReads &&
+    e.fdr <= maxFDR &&
+    Math.abs(e.dpsi) >= minDPSI
+  );
+
+  S.sortKey = 'dpsi';
+  S.sortDir = -1;
+  sortEvents();
+  renderSummary();
+  renderBarChart();
+  renderTable();
+  document.getElementById('summary-card').style.display = '';
+  document.getElementById('table-card').style.display = '';
+  document.getElementById('protein-card').style.display = 'none';
+  S.inspectedIdx = null;
+}
+
+function sortEvents() {
+  const k = S.sortKey, d = S.sortDir;
+  S.filtEvents.sort((a, b) => {
+    let va, vb;
+    switch (k) {
+      case 'dpsi': va = Math.abs(a.dpsi); vb = Math.abs(b.dpsi); break;
+      case 'fdr': va = a.fdr; vb = b.fdr; break;
+      case 'frame': va = a.frame.frameChange; vb = b.frame.frameChange; break;
+      case 'deltaNt': va = a.frame.deltaNt; vb = b.frame.deltaNt; break;
+      case 'gene': va = a.gene.toLowerCase(); vb = b.gene.toLowerCase();
+        return d * (va < vb ? -1 : va > vb ? 1 : 0);
+      case 'type': va = a.type; vb = b.type;
+        return d * (va < vb ? -1 : va > vb ? 1 : 0);
+      default: va = Math.abs(a.dpsi); vb = Math.abs(b.dpsi);
+    }
+    return d * (vb - va);
+  });
+}
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+function renderSummary() {
+  const total = S.filtEvents.length;
+  const sig = S.filtEvents.length;
+  const inFrame = S.filtEvents.filter(e => e.frame.inFrame).length;
+  const fs = S.filtEvents.filter(e => !e.frame.inFrame).length;
+  const genes = new Set(S.filtEvents.map(e => e.gene)).size;
+
+  document.getElementById('summary-pills').innerHTML = `
+    <div class="pill"><span class="pill-num" style="color:#1C1917">${total}</span><span class="pill-lbl">Total Events</span></div>
+    <div class="pill"><span class="pill-num" style="color:#C2185B">${sig}</span><span class="pill-lbl">Significant</span></div>
+    <div class="pill"><span class="pill-num" style="color:#065F46">${inFrame}</span><span class="pill-lbl">In-frame</span></div>
+    <div class="pill"><span class="pill-num" style="color:#9F1239">${fs}</span><span class="pill-lbl">Frameshift~NMD</span></div>
+    <div class="pill"><span class="pill-num" style="color:#3730A3">${genes}</span><span class="pill-lbl">Genes</span></div>
+  `;
+}
+
+function renderBarChart() {
+  const counts = {};
+  for (const t of EVENT_TYPES) counts[t] = { inframe: 0, frameshift: 0 };
+  for (const e of S.filtEvents) {
+    if (!counts[e.type]) continue;
+    counts[e.type][e.frame.cls]++;
+  }
+
+  const types = EVENT_TYPES.filter(t => counts[t].inframe + counts[t].frameshift > 0);
+  const traceIn = {
+    x: types, y: types.map(t => counts[t].inframe),
+    name: 'In-frame', type: 'bar',
+    marker: { color: '#34D399' }
+  };
+  const traceFS = {
+    x: types, y: types.map(t => counts[t].frameshift),
+    name: 'Frameshift', type: 'bar',
+    marker: { color: '#F87171' }
+  };
+
+  Plotly.newPlot('summary-chart', [traceIn, traceFS], {
+    barmode: 'stack',
+    font: { family: 'IBM Plex Sans' },
+    margin: { l: 50, r: 20, t: 30, b: 40 },
+    height: 220,
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    xaxis: { title: 'Event Type' },
+    yaxis: { title: 'Count' },
+    legend: { orientation: 'h', y: 1.15 }
+  }, { responsive: true, displayModeBar: false });
+}
+
+// ─── Table ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  const q = (document.getElementById('table-search').value || '').trim().toLowerCase();
+  let evts = S.filtEvents;
+  if (q) evts = evts.filter(e => e.gene.toLowerCase().includes(q));
+
+  const show = evts.slice(0, 2000);
+  document.getElementById('table-count').textContent = `${show.length} of ${evts.length} events`;
+
+  const cond1 = document.getElementById('cond1').value || 'Cond1';
+  const cond2 = document.getElementById('cond2').value || 'Cond2';
+
+  let h = '';
+  for (let i = 0; i < show.length; i++) {
+    const e = show[i];
+    const fc = e.frame.frameChange;
+    const frameStr = fc === 0 ? '0 (in-frame)' : `+${fc} (frameshift)`;
+    let predClass, predLabel;
+    if (e.frame.inFrame) { predClass = 'pred-inframe'; predLabel = 'In-frame &#10003;'; }
+    else { predClass = 'pred-frameshift'; predLabel = 'Frameshift ~NMD'; }
+
+    // Find the actual index in filtEvents
+    const realIdx = S.filtEvents.indexOf(e);
+
+    h += `<tr>
+      <td><span class="tag tag-${e.type}">${e.type}</span></td>
+      <td style="font-weight:700;color:#1C1917">${escH(e.gene)}</td>
+      <td>${e.frame.deltaNt}</td>
+      <td>${frameStr}</td>
+      <td><span class="${predClass}">${predLabel}</span></td>
+      <td style="color:${e.dpsi>0?'#C2185B':'#1D4ED8'};font-weight:700">${e.dpsi>0?'+':''}${e.dpsi.toFixed(3)}</td>
+      <td>${isNaN(e.psi1)?'—':e.psi1.toFixed(3)}</td>
+      <td>${isNaN(e.psi2)?'—':e.psi2.toFixed(3)}</td>
+      <td>${e.fdr < 0.001 ? e.fdr.toExponential(1) : e.fdr.toFixed(4)}</td>
+      <td><button class="inspect-btn" onclick="inspectEvent(${realIdx})">Inspect</button></td>
+    </tr>`;
+  }
+  document.getElementById('table-body').innerHTML = h;
+}
+
+function filterTable() { renderTable(); }
+
+function sortTable(key) {
+  if (S.sortKey === key) S.sortDir *= -1;
+  else { S.sortKey = key; S.sortDir = key === 'fdr' ? 1 : -1; }
+  sortEvents();
+  renderTable();
+}
+
+// ─── Export CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const cond1 = document.getElementById('cond1').value || 'Cond1';
+  const cond2 = document.getElementById('cond2').value || 'Cond2';
+  let csv = `Type,Gene,Chr,Strand,DeltaNt,FrameChange,Prediction,DPSI,PSI_${cond1},PSI_${cond2},FDR,Coverage\n`;
+  for (const e of S.filtEvents) {
+    const pred = e.frame.inFrame ? 'In-frame' : 'Frameshift~NMD';
+    csv += `${e.type},${e.gene},${e.chr},${e.strand},${e.frame.deltaNt},${e.frame.frameChange},${pred},${e.dpsi.toFixed(4)},${(isNaN(e.psi1)?'':e.psi1.toFixed(4))},${(isNaN(e.psi2)?'':e.psi2.toFixed(4))},${e.fdr},${Math.round(e.coverage)}\n`;
+  }
+  downloadText(csv, 'splice_protein_events.csv', 'text/csv');
+}
+
+// ─── Ensembl API ──────────────────────────────────────────────────────────────
+async function ensemblGet(path, retries = 3) {
+  const base = getEnsemblBase();
+  for (let i = 0; i < retries; i++) {
+    try {
+      const r = await fetch(base + path, { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
+      if (r.ok) return r.json();
+      if (r.status === 429) { await sleep(2000 * (i + 1)); continue; }
+      if (r.status === 400 || r.status === 404) return null;
+      throw new Error('HTTP ' + r.status);
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await sleep(1000 * (i + 1));
+    }
+  }
+}
+
+async function ensemblSeq(path) {
+  const base = getEnsemblBase();
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch(base + path, { headers: { 'Content-Type': 'text/plain', 'Accept': 'text/plain' } });
+      if (r.ok) return r.text();
+      if (r.status === 429) { await sleep(2000 * (i + 1)); continue; }
+      return null;
+    } catch (e) {
+      if (i === 2) return null;
+      await sleep(1000 * (i + 1));
+    }
+  }
+}
+
+// ─── Inspect event ────────────────────────────────────────────────────────────
+async function inspectEvent(idx) {
+  S.inspectedIdx = idx;
+  const ev = S.filtEvents[idx];
+  const card = document.getElementById('protein-card');
+  card.style.display = '';
+  card.innerHTML = `<div class="vcard protein-panel">
+    <div class="protein-header">
+      <div class="protein-header-title"><span class="spinner"></span> Fetching data for ${escH(ev.gene)}...</div>
+      <div class="protein-header-meta">
+        <span><span class="tag tag-${ev.type}">${ev.type}</span></span>
+        <span>&#916;PSI = ${ev.dpsi > 0 ? '+' : ''}${ev.dpsi.toFixed(3)}</span>
+        <span>&#916;nt = ${ev.frame.deltaNt}</span>
+        <span>${ev.frame.inFrame ? 'In-frame' : 'Frameshift'}</span>
+      </div>
+    </div>
+    <div style="padding:20px" id="inspect-body"><div class="banner banner-info"><span class="spinner"></span> Looking up gene in Ensembl...</div></div>
+  </div>`;
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const geneData = await fetchGeneData(ev);
+    if (!geneData) {
+      document.getElementById('inspect-body').innerHTML = `<div class="banner banner-err">Gene <strong>${escH(ev.gene)}</strong> not found in Ensembl, or no protein-coding transcript available.</div>`;
+      return;
+    }
+
+    // NMD prediction
+    const nmdResult = predictNMD(ev, geneData);
+    ev.frame.nmdPredicted = nmdResult.nmd;
+    ev.frame.ptcAA = nmdResult.ptcAA;
+    ev.frame.finalCls = nmdResult.finalCls;
+    ev.frame.affectedAAstart = nmdResult.affectedAAstart;
+    ev.frame.affectedAAend = nmdResult.affectedAAend;
+    ev.frame.eventInCanonical = nmdResult.eventInCanonical;
+
+    renderProteinPanel(ev, geneData, nmdResult);
+  } catch (e) {
+    document.getElementById('inspect-body').innerHTML = `<div class="banner banner-err">Error inspecting ${escH(ev.gene)}: ${escH(e.message)}</div>`;
+    console.error(e);
+  }
+}
+
+// ─── Fetch gene data pipeline ─────────────────────────────────────────────────
+async function fetchGeneData(ev) {
+  const gene = ev.gene;
+  if (S.geneCache[gene]) return S.geneCache[gene];
+
+  const species = getSpecies();
+  const body = document.getElementById('inspect-body');
+
+  // Step 1: Gene lookup
+  body.innerHTML = `<div class="banner banner-info"><span class="spinner"></span> Step 1/4: Looking up <strong>${escH(gene)}</strong> in Ensembl...</div>`;
+  const data = await ensemblGet(`/lookup/symbol/${species}/${encodeURIComponent(gene)}?expand=1`);
+  if (!data || !data.Transcript) return null;
+
+  // Pick canonical protein-coding transcript
+  let tx = null;
+  for (const t of data.Transcript) {
+    if (t.is_canonical && t.biotype === 'protein_coding' && t.Translation) { tx = t; break; }
+  }
+  if (!tx) {
+    for (const t of data.Transcript) {
+      if (t.biotype === 'protein_coding' && t.Translation) { tx = t; break; }
+    }
+  }
+  if (!tx) return null;
+
+  const transcriptId = tx.id;
+  const enspId = tx.Translation.id;
+  const strand = tx.strand;
+  const exons = (tx.Exon || []).map(e => ({
+    start: e.start, end: e.end, rank: e.rank || 0,
+    seqRegion: e.seq_region_name
+  })).sort((a, b) => strand === 1 ? a.start - b.start : b.start - a.start);
+  const cdsStart = Math.min(tx.Translation.start, tx.Translation.end);
+  const cdsEnd   = Math.max(tx.Translation.start, tx.Translation.end);
+
+  // Step 2: CDS sequence
+  body.innerHTML = `<div class="banner banner-info"><span class="spinner"></span> Step 2/4: Fetching CDS sequence for ${escH(transcriptId)}...</div>`;
+  const cdsSeq = await ensemblSeq(`/sequence/id/${transcriptId}?type=cds`);
+
+  // Step 3: UniProt xref via ENSP
+  body.innerHTML = `<div class="banner banner-info"><span class="spinner"></span> Step 3/4: Looking up UniProt via ${escH(enspId)}...</div>`;
+  let uniprotAcc = null;
+  const xrefs = await ensemblGet(`/xrefs/id/${enspId}?external_db=Uniprot_swissprot`);
+  if (xrefs && xrefs.length > 0) {
+    uniprotAcc = xrefs[0].primary_id;
+  }
+
+  // Fallback UniProt search
+  if (!uniprotAcc) {
+    try {
+      const orgId = getOrganismId();
+      const r = await fetch(`https://rest.uniprot.org/uniprotkb/search?query=gene_exact:${encodeURIComponent(gene)}+AND+organism_id:${orgId}+AND+reviewed:true&fields=accession&format=json`);
+      if (r.ok) {
+        const j = await r.json();
+        if (j.results && j.results.length > 0) {
+          uniprotAcc = j.results[0].primaryAccession;
+        }
+      }
+    } catch (e) { /* ignore fallback failure */ }
+  }
+
+  // Step 4: UniProt features
+  let proteinLen = cdsSeq ? Math.floor(cdsSeq.length / 3) : 0;
+  let domains = [];
+
+  if (uniprotAcc) {
+    body.innerHTML = `<div class="banner banner-info"><span class="spinner"></span> Step 4/4: Fetching UniProt features for ${escH(uniprotAcc)}...</div>`;
+    try {
+      const r = await fetch(`https://rest.uniprot.org/uniprotkb/${uniprotAcc}.json`, { headers: { 'Accept': 'application/json' } });
+      if (r.ok) {
+        const upData = await r.json();
+        if (upData.sequence && upData.sequence.length) {
+          proteinLen = upData.sequence.length;
+        }
+        const featureTypes = new Set(['Domain', 'Region', 'Motif', 'Active site', 'Binding site']);
+        if (upData.features) {
+          for (const f of upData.features) {
+            if (featureTypes.has(f.type) && f.location && f.location.start && f.location.end) {
+              domains.push({
+                type: f.type,
+                description: f.description || f.type,
+                start: f.location.start.value,
+                end: f.location.end.value
+              });
+            }
+          }
+        }
+      }
+    } catch (e) { /* proceed without domains */ }
+  }
+
+  const result = { transcriptId, enspId, strand, exons, cdsStart, cdsEnd, cdsSeq, proteinLen, uniprotAcc, domains };
+  S.geneCache[gene] = result;
+  return result;
+}
+
+// ─── NMD Prediction ───────────────────────────────────────────────────────────
+function predictNMD(ev, geneData) {
+  const result = {
+    nmd: false, ptcAA: null, finalCls: ev.frame.inFrame ? 'inframe' : 'frameshift_noNMD',
+    affectedAAstart: null, affectedAAend: null, eventInCanonical: true
+  };
+
+  if (!geneData.cdsSeq || !geneData.exons.length) return result;
+
+  const strand = geneData.strand;
+  const exons = geneData.exons.slice().sort((a, b) => strand === 1 ? a.start - b.start : b.start - a.start);
+
+  // Build CDS map: which genomic regions contribute to CDS
+  // CDS runs from cdsStart to cdsEnd within the exonic regions
+  const cdsStart = geneData.cdsStart;
+  const cdsEnd = geneData.cdsEnd;
+  const cdsMap = []; // { gStart, gEnd, cdsOffset }
+  let cdsOffset = 0;
+
+  // Sort exons in transcript order (5' to 3')
+  const sortedExons = exons.slice().sort((a, b) => strand === 1 ? a.start - b.start : b.start - a.start);
+
+  for (const exon of sortedExons) {
+    let eStart = exon.start;
+    let eEnd = exon.end;
+
+    // Intersect with CDS (cdsStart/cdsEnd are already normalized min/max)
+    const cStart = Math.max(eStart, cdsStart);
+    const cEnd   = Math.min(eEnd, cdsEnd);
+    if (cStart >= cEnd) continue;
+
+    const segLen = cEnd - cStart;
+    cdsMap.push({ gStart: cStart, gEnd: cEnd, cdsOffset, len: segLen });
+    cdsOffset += segLen;
+  }
+
+  // Find event exon coordinates (add 1 to rMATS 0-based start)
+  const evStart1 = ev.exStart + 1; // convert to 1-based
+  const evEnd = ev.exEnd;
+  const chrStripped = ev.chr.replace(/^chr/, '');
+
+  // Check if event exon matches a canonical exon (with fuzz)
+  const FUZZ = 10;
+  let eventInCanonical = false;
+  let matchedExonIdx = -1;
+  for (let i = 0; i < sortedExons.length; i++) {
+    const ex = sortedExons[i];
+    if (Math.abs(ex.start - evStart1) <= FUZZ && Math.abs(ex.end - evEnd) <= FUZZ) {
+      eventInCanonical = true;
+      matchedExonIdx = i;
+      break;
+    }
+  }
+  result.eventInCanonical = eventInCanonical;
+
+  // Find CDS offset of event
+  let eventCDSoffset = -1;
+  for (const seg of cdsMap) {
+    if (evStart1 >= seg.gStart - FUZZ && evStart1 <= seg.gEnd + FUZZ) {
+      const localOffset = Math.max(0, evStart1 - seg.gStart);
+      eventCDSoffset = seg.cdsOffset + localOffset;
+      break;
+    }
+  }
+
+  if (eventCDSoffset < 0) {
+    // Event exon not in CDS — could be UTR
+    result.finalCls = 'UTR';
+    return result;
+  }
+
+  // Compute affected AA range
+  result.affectedAAstart = Math.floor(eventCDSoffset / 3) + 1;
+  result.affectedAAend = Math.floor((eventCDSoffset + ev.frame.deltaNt) / 3) + 1;
+
+  // For frameshifts: modify CDS and find PTC
+  if (!ev.frame.inFrame && geneData.cdsSeq) {
+    let modCDS = geneData.cdsSeq;
+    if (ev.type === 'SE') {
+      // Skipping: remove deltaNt chars
+      const before = modCDS.substring(0, eventCDSoffset);
+      const after = modCDS.substring(eventCDSoffset + ev.frame.deltaNt);
+      modCDS = before + after;
+    } else if (ev.type === 'RI') {
+      // Retention: insert N's
+      const before = modCDS.substring(0, eventCDSoffset);
+      const after = modCDS.substring(eventCDSoffset);
+      modCDS = before + 'N'.repeat(ev.frame.deltaNt) + after;
+    } else {
+      // A3SS/A5SS/MXE: simulate by removing or inserting at offset
+      if (eventInCanonical) {
+        const before = modCDS.substring(0, eventCDSoffset);
+        const after = modCDS.substring(eventCDSoffset + ev.frame.deltaNt);
+        modCDS = before + after;
+      } else {
+        const before = modCDS.substring(0, eventCDSoffset);
+        const after = modCDS.substring(eventCDSoffset);
+        modCDS = before + 'N'.repeat(ev.frame.deltaNt) + after;
+      }
+    }
+
+    const txResult = translate(modCDS);
+    if (txResult.stopped) {
+      result.ptcAA = txResult.ptcPos;
+
+      // Compute last exon-exon junction position in CDS
+      let totalCDSlen = 0;
+      for (const seg of cdsMap) totalCDSlen += seg.len;
+      const lastSeg = cdsMap[cdsMap.length - 1];
+      const lastEJCpos = totalCDSlen - (lastSeg ? lastSeg.len : 0);
+
+      // NMD: PTC > 50nt upstream of last EJC
+      if (result.ptcAA * 3 < lastEJCpos - 50) {
+        result.nmd = true;
+        result.finalCls = 'frameshift_NMD';
+      } else {
+        result.finalCls = 'frameshift_noNMD';
+      }
+    } else {
+      result.finalCls = 'frameshift_noNMD';
+    }
+  }
+
+  return result;
+}
+
+// ─── Render Protein Panel ─────────────────────────────────────────────────────
+function renderProteinPanel(ev, geneData, nmdResult) {
+  const cond1 = document.getElementById('cond1').value || 'Cond1';
+  const cond2 = document.getElementById('cond2').value || 'Cond2';
+
+  let finalPredBadge;
+  switch (nmdResult.finalCls) {
+    case 'inframe': finalPredBadge = '<span class="pred-inframe">In-frame &#10003;</span>'; break;
+    case 'frameshift_NMD': finalPredBadge = '<span class="pred-nmd">Frameshift &#8594; NMD predicted</span>'; break;
+    case 'frameshift_noNMD': finalPredBadge = '<span class="pred-nonmd">Frameshift (no NMD)</span>'; break;
+    case 'UTR': finalPredBadge = '<span class="pred-utr">UTR region</span>'; break;
+    default: finalPredBadge = '<span class="pred-utr">Unknown</span>';
+  }
+
+  const card = document.getElementById('protein-card');
+  card.innerHTML = `<div class="vcard protein-panel">
+    <div class="protein-header">
+      <div class="protein-header-title">${escH(ev.gene)} &mdash; ${ev.type} Splicing Event</div>
+      <div class="protein-header-meta">
+        <span>&#916;PSI = ${ev.dpsi > 0 ? '+' : ''}${ev.dpsi.toFixed(3)}</span>
+        <span>&#916;nt = ${ev.frame.deltaNt}</span>
+        <span>${finalPredBadge}</span>
+        <span>Transcript: <strong>${escH(geneData.transcriptId)}</strong></span>
+        ${geneData.uniprotAcc ? `<span>UniProt: <a href="https://www.uniprot.org/uniprot/${geneData.uniprotAcc}" target="_blank" style="color:#3730A3;font-weight:700">${escH(geneData.uniprotAcc)}</a></span>` : '<span style="color:#78716C">UniProt: not found</span>'}
+        ${nmdResult.ptcAA !== null ? `<span>PTC at AA ${nmdResult.ptcAA}</span>` : ''}
+      </div>
+    </div>
+    <div style="padding:20px">
+      <div class="vcard-title" style="margin-bottom:10px">A. RNA Isoform Diagram</div>
+      <div class="svg-wrap" id="rna-svg-wrap"></div>
+
+      <div class="vcard-title" style="margin-bottom:10px;margin-top:16px">B. Protein Domain Map</div>
+      <div class="svg-wrap" id="protein-svg-wrap"></div>
+
+      ${geneData.domains.length > 0 ? renderDomainTable(ev, geneData, nmdResult) : ''}
+
+      <div id="seq-zoom-section"></div>
+      <div id="af-section"></div>
+      <div id="tm-section"></div>
+
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="sec-btn" onclick="exportInspectSVG()">&#128229; Export SVG</button>
+      </div>
+    </div>
+  </div>`;
+
+  // Cache for SVG export and TM copy buttons
+  ev._nmd = nmdResult;
+  _lastEv = ev; _lastGeneData = geneData;
+
+  // Draw SVGs
+  drawRNADiagram(ev, geneData, nmdResult);
+  drawProteinDiagram(ev, geneData, nmdResult);
+  // Fetch + render zoomed sequence panels (async, non-blocking)
+  fetchAndRenderSeqZoom(ev, geneData, nmdResult);
+}
+
+// ─── RNA Isoform Diagram ──────────────────────────────────────────────────────
+function drawRNADiagram(ev, geneData, nmdResult) {
+  const wrap = document.getElementById('rna-svg-wrap');
+  if (!wrap) return;
+
+  const cond1 = document.getElementById('cond1').value || 'Cond1';
+  const cond2 = document.getElementById('cond2').value || 'Cond2';
+  const strand = geneData.strand;
+
+  // Build canonical exon list (sorted in genomic 5'→3')
+  const canonExons = geneData.exons.slice().sort((a, b) => a.start - b.start);
+
+  // Build alt exons
+  const altExons = buildAltExons(ev, canonExons, geneData);
+
+  // Collect all boundaries for compressed coordinate system
+  const allBounds = [];
+  for (const e of canonExons) { allBounds.push(e.start, e.end); }
+  for (const e of altExons) { allBounds.push(e.start, e.end); }
+  allBounds.sort((a, b) => a - b);
+
+  const gmin = arrMin(allBounds);
+  const gmax = arrMax(allBounds);
+
+  // Build segments
+  function isExonic(s, e) {
+    for (const arr of [canonExons, altExons])
+      for (const ex of arr)
+        if (ex.start < e && ex.end > s) return true;
+    return false;
+  }
+
+  const pts = [...new Set(allBounds)].sort((a, b) => a - b);
+  const breakPts = [gmin, ...pts.filter(p => p > gmin && p < gmax), gmax];
+  const segs = [];
+  for (let i = 0; i < breakPts.length - 1; i++) {
+    const s = breakPts[i], e = breakPts[i + 1];
+    segs.push({ start: s, end: e, exon: isExonic(s, e) });
+  }
+
+  const INTRON_PX = 16;
+  const exonBp = segs.filter(s => s.exon).reduce((a, s) => a + (s.end - s.start), 0) || 1;
+  const W = 900, padL = 120, padR = 20, padT = 16, padB = 30;
+  const drawW = W - padL - padR;
+  const intronPxTotal = segs.filter(s => !s.exon).length * INTRON_PX;
+  const exonPxTotal = Math.max(drawW - intronPxTotal, 100);
+
+  let cumPx = 0;
+  for (const seg of segs) {
+    seg.dispStart = cumPx;
+    seg.dispW = seg.exon ? (seg.end - seg.start) / exonBp * exonPxTotal : INTRON_PX;
+    cumPx += seg.dispW;
+  }
+  const totalDispW = cumPx || 1;
+
+  function px(g) {
+    for (const seg of segs) {
+      if (g >= seg.start && g <= seg.end) {
+        const frac = seg.end > seg.start ? (g - seg.start) / (seg.end - seg.start) : 0;
+        return padL + (seg.dispStart + frac * seg.dispW) / totalDispW * drawW;
+      }
+    }
+    return padL;
+  }
+
+  const trackH = 40;
+  const trackGap = 30;
+  const H = padT + trackH * 2 + trackGap + padB + 30;
+
+  const cdsStart = geneData.cdsStart;
+  const cdsEnd = geneData.cdsEnd;
+
+  // Event exon coords (1-based)
+  const evStart1 = ev.exStart + 1;
+  const evEnd = ev.exEnd;
+  const FUZZ = 10;
+
+  function isEventExon(exon) {
+    return Math.abs(exon.start - evStart1) <= FUZZ && Math.abs(exon.end - evEnd) <= FUZZ;
+  }
+
+  function classifyExonCDS(exon) {
+    if (!cdsStart || !cdsEnd) return 'utr';
+    const cds_s = Math.min(cdsStart, cdsEnd);
+    const cds_e = Math.max(cdsStart, cdsEnd);
+    if (exon.end <= cds_s || exon.start >= cds_e) return 'utr';
+    if (exon.start >= cds_s && exon.end <= cds_e) return 'cds';
+    return 'mixed';
+  }
+
+  function drawTrack(exons, yTop, color, label, psiVal, condName, isEvent) {
+    const cy = yTop + trackH / 2;
+    let s = '';
+
+    // Label
+    s += `<text x="${padL - 8}" y="${cy - 6}" font-size="11" fill="${color}" font-weight="700" text-anchor="end" font-family="IBM Plex Mono,monospace">${escH(condName)}</text>`;
+    const psiStr = isNaN(psiVal) ? '—' : `PSI = ${psiVal.toFixed(2)}`;
+    s += `<text x="${padL - 8}" y="${cy + 8}" font-size="10" fill="#78716C" text-anchor="end">${psiStr}</text>`;
+
+    // Backbone
+    s += `<line x1="${padL}" y1="${cy}" x2="${W - padR}" y2="${cy}" stroke="#8B949E" stroke-width="1.5"/>`;
+
+    // Exons
+    for (const exon of exons) {
+      const cls = classifyExonCDS(exon);
+      const isEv = isEvent && isEventExon(exon);
+      const hFrac = cls === 'cds' || cls === 'mixed' ? 0.85 : 0.4;
+      const fill = isEv ? '#FF9F1C' : (exon.isInserted ? '#FF9F1C' : color);
+      const opacity = cls === 'utr' ? 0.5 : 0.85;
+      const x1 = px(exon.start), x2 = px(exon.end);
+      const w = Math.max(x2 - x1, 3);
+      const h = trackH * hFrac;
+      const y = cy - h / 2;
+
+      const tipParts = [
+        `Exon ${exon.rank || '?'}`,
+        `chr${exon.seqRegion || ''}:${exon.start.toLocaleString()}-${exon.end.toLocaleString()}`,
+        `Length: ${(exon.end - exon.start).toLocaleString()} bp`,
+        cls === 'cds' ? 'CDS' : cls === 'mixed' ? 'CDS+UTR' : 'UTR',
+        isEv ? '** EVENT EXON **' : ''
+      ].filter(Boolean).join('\\n');
+
+      s += `<rect x="${x1.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${fill}" opacity="${opacity}" stroke="${isEv ? '#92400E' : 'none'}" stroke-width="${isEv ? 2 : 0}" data-tip="${encodeURIComponent(tipParts)}" style="cursor:crosshair"/>`;
+
+      if (w > 12) {
+        s += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="${cy.toFixed(1)}" font-size="8" fill="white" text-anchor="middle" dominant-baseline="middle" font-weight="700" font-family="IBM Plex Mono,monospace">${exon.rank || ''}</text>`;
+      }
+
+      if (isEv) {
+        s += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="${(y - 3).toFixed(1)}" font-size="8" fill="#FF9F1C" text-anchor="middle" font-weight="700">event</text>`;
+      }
+    }
+
+    return s;
+  }
+
+  // Determine which track has the event and which PSI to show
+  // Track 1 = canonical transcript (more included = higher PSI condition)
+  // Track 2 = alternative isoform
+  const track1Y = padT;
+  const track2Y = padT + trackH + trackGap;
+
+  // Assign PSI labels so the highlighted-event track shows the condition with higher event-form PSI.
+  // If canonical HAS the event (e.g. SE, canonical includes the exon): high PSI = more canonical-like
+  //   → high-PSI condition on canonical (red) track.
+  // If canonical LACKS the event (e.g. A3SS canonical=short exon): high PSI = more alternative-like
+  //   → high-PSI condition on alternative (blue) track so the event highlight matches its PSI label.
+  let track1Psi, track2Psi, track1Cond, track2Cond;
+  const eventInCanon = nmdResult.eventInCanonical;
+  const _p1 = ev.psi1 || 0, _p2 = ev.psi2 || 0;
+  const _p1Hi = _p1 >= _p2;
+  const _hiPsi = _p1Hi ? _p1 : _p2, _loPsi = _p1Hi ? _p2 : _p1;
+  const _hiCond = _p1Hi ? cond1 : cond2, _loCond = _p1Hi ? cond2 : cond1;
+  if (eventInCanon) {
+    // Canonical contains the event → high PSI = canonical-like
+    track1Psi = _hiPsi; track1Cond = _hiCond;
+    track2Psi = _loPsi; track2Cond = _loCond;
+  } else {
+    // Canonical lacks the event → low PSI = canonical-like; high PSI = alternative (event) form
+    track1Psi = _loPsi; track1Cond = _loCond;
+    track2Psi = _hiPsi; track2Cond = _hiCond;
+  }
+
+  const canonHasEvent = eventInCanon;
+  const track1svg = drawTrack(canonExons, track1Y, '#E84855', 'Canonical', track1Psi, track1Cond, canonHasEvent);
+  const track2svg = drawTrack(altExons, track2Y, '#3A86FF', 'Alternative', track2Psi, track2Cond, !canonHasEvent);
+
+  // Legend
+  let legend = `
+    <circle cx="${padL}" cy="${H - 12}" r="5" fill="#E84855"/>
+    <text x="${padL + 9}" y="${H - 8}" font-size="10" fill="#1C1917">Canonical (${escH(geneData.transcriptId)})</text>
+    <circle cx="${padL + 260}" cy="${H - 12}" r="5" fill="#3A86FF"/>
+    <text x="${padL + 269}" y="${H - 8}" font-size="10" fill="#1C1917">Alternative</text>
+    <rect x="${padL + 430}" y="${H - 17}" width="10" height="10" rx="1" fill="#FF9F1C"/>
+    <text x="${padL + 444}" y="${H - 8}" font-size="10" fill="#1C1917">Event exon</text>
+  `;
+
+  const svg = `<svg id="rna-diagram-svg" width="${W}" height="${H}" style="overflow:visible;font-family:IBM Plex Sans,sans-serif"
+    onmousemove="rnaTip(event,this)" onmouseleave="tipHide()">
+    <rect width="${W}" height="${H}" fill="#FAFAF9" rx="6"/>
+    ${track1svg}${track2svg}${legend}
+  </svg>`;
+
+  wrap.innerHTML = svg;
+}
+
+function buildAltExons(ev, canonExons, geneData) {
+  const alt = canonExons.map(e => ({ ...e }));
+  const evStart1 = ev.exStart + 1;
+  const evEnd = ev.exEnd;
+  const FUZZ = 10;
+
+  const findIdx = (exons, s, e) => {
+    for (let i = 0; i < exons.length; i++) {
+      if (Math.abs(exons[i].start - s) <= FUZZ && Math.abs(exons[i].end - e) <= FUZZ) return i;
+    }
+    return -1;
+  };
+
+  switch (ev.type) {
+    case 'SE': {
+      const idx = findIdx(alt, evStart1, evEnd);
+      if (idx >= 0) {
+        // Canonical has the exon -> alt removes it (skipped)
+        alt.splice(idx, 1);
+      } else {
+        // Canonical doesn't have it -> alt adds it
+        const newExon = { start: evStart1, end: evEnd, rank: '?', seqRegion: canonExons[0]?.seqRegion || '', isInserted: true };
+        // Insert in correct position
+        let insertAt = alt.length;
+        for (let i = 0; i < alt.length; i++) {
+          if (alt[i].start > evStart1) { insertAt = i; break; }
+        }
+        alt.splice(insertAt, 0, newExon);
+      }
+      break;
+    }
+    case 'RI': {
+      // Alt includes the intron as a fused exon segment
+      const upEE = ev.upstreamEE;
+      const downES = ev.downstreamES + 1;
+      // Find upstream and downstream exons and merge them with intron
+      let mergeStart = -1, mergeEnd = -1;
+      const toRemove = [];
+      for (let i = 0; i < alt.length; i++) {
+        if (Math.abs(alt[i].end - upEE) <= FUZZ) { mergeStart = i; }
+        if (Math.abs(alt[i].start - downES) <= FUZZ) { mergeEnd = i; }
+      }
+      if (mergeStart >= 0 && mergeEnd >= 0 && mergeStart < mergeEnd) {
+        const newExon = { start: alt[mergeStart].start, end: alt[mergeEnd].end, rank: alt[mergeStart].rank + '-' + alt[mergeEnd].rank, seqRegion: alt[0]?.seqRegion || '', isInserted: true };
+        alt.splice(mergeStart, mergeEnd - mergeStart + 1, newExon);
+      }
+      break;
+    }
+    case 'A3SS': case 'A5SS': {
+      // Long exon vs short exon: find long in canonical, replace with short (or vice versa)
+      const longIdx = findIdx(alt, evStart1, evEnd);
+      if (longIdx >= 0) {
+        alt[longIdx] = { start: ev.shortES, end: ev.shortEE, rank: alt[longIdx].rank, seqRegion: alt[longIdx].seqRegion, isInserted: true };
+      } else {
+        const shortIdx = findIdx(alt, ev.shortES, ev.shortEE);
+        if (shortIdx >= 0) {
+          alt[shortIdx] = { start: evStart1, end: evEnd, rank: alt[shortIdx].rank, seqRegion: alt[shortIdx].seqRegion, isInserted: true };
+        }
+      }
+      break;
+    }
+    case 'MXE': {
+      const idx1 = findIdx(alt, evStart1, evEnd);
+      if (idx1 >= 0) {
+        alt[idx1] = { start: ev.ex2Start + 1, end: ev.ex2End, rank: alt[idx1].rank, seqRegion: alt[idx1].seqRegion, isInserted: true };
+      } else {
+        const idx2 = findIdx(alt, ev.ex2Start + 1, ev.ex2End);
+        if (idx2 >= 0) {
+          alt[idx2] = { start: evStart1, end: evEnd, rank: alt[idx2].rank, seqRegion: alt[idx2].seqRegion, isInserted: true };
+        }
+      }
+      break;
+    }
+  }
+
+  return alt.sort((a, b) => a.start - b.start);
+}
+
+// ─── Protein Domain Diagram ───────────────────────────────────────────────────
+function drawProteinDiagram(ev, geneData, nmdResult) {
+  const wrap = document.getElementById('protein-svg-wrap');
+  if (!wrap) return;
+
+  const proteinLen = geneData.proteinLen || 100;
+  const domains = geneData.domains || [];
+  const W = 900, padL = 80, padR = 30, padT = 60, padB = 50;
+  const drawW = W - padL - padR;
+  const barH = 22, barGap = 10;
+  const domainLaneH = 40;
+
+  const aaStart = nmdResult.affectedAAstart;
+  const aaEnd = nmdResult.affectedAAend;
+  const ptcAA = nmdResult.ptcAA;
+
+  function px(aa) { return padL + (aa / proteinLen) * drawW; }
+
+  const H = padT + domainLaneH + barH * 2 + barGap + padB + 30;
+
+  // Domain lane
+  const DOMAIN_COLORS = {
+    'Domain': '#3730A3',
+    'Region': '#0891B2',
+    'Motif': '#7C3AED',
+    'Active site': '#D97706',
+    'Binding site': '#16A34A'
+  };
+
+  let domainSvg = '';
+  const domY = padT;
+
+  for (const d of domains) {
+    const x1 = px(d.start), x2 = px(d.end);
+    const w = Math.max(x2 - x1, 3);
+    const fill = DOMAIN_COLORS[d.type] || '#78716C';
+    const overlap = aaStart && aaEnd && d.start <= aaEnd && d.end >= aaStart;
+
+    const tipParts = [
+      `${d.type}: ${d.description}`,
+      `AA ${d.start}-${d.end}`,
+      overlap ? 'OVERLAPS affected region' : ''
+    ].filter(Boolean).join('\\n');
+
+    domainSvg += `<rect x="${x1.toFixed(1)}" y="${domY}" width="${w.toFixed(1)}" height="16" rx="3" fill="${fill}" opacity="${overlap ? 1 : 0.7}" stroke="${overlap ? '#C2185B' : 'none'}" stroke-width="${overlap ? 2 : 0}" data-tip="${encodeURIComponent(tipParts)}" style="cursor:crosshair"/>`;
+
+    // Label inside or above
+    const label = d.description.length > 20 ? d.description.substring(0, 18) + '...' : d.description;
+    if (w > 40) {
+      domainSvg += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="${domY + 11}" font-size="8" fill="white" text-anchor="middle" font-weight="600" font-family="IBM Plex Mono,monospace">${escH(label)}</text>`;
+    } else {
+      domainSvg += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="${domY - 3}" font-size="7" fill="${fill}" text-anchor="middle" font-weight="600" transform="rotate(-20,${((x1 + x2) / 2).toFixed(1)},${domY - 3})" font-family="IBM Plex Mono,monospace">${escH(label)}</text>`;
+    }
+  }
+
+  // Protein bars
+  const bar1Y = padT + domainLaneH + 4;
+  const bar2Y = bar1Y + barH + barGap;
+
+  const cond1 = document.getElementById('cond1').value || 'Cond1';
+  const cond2 = document.getElementById('cond2').value || 'Cond2';
+
+  // Bar 1: Canonical protein (full length)
+  let bar1 = '';
+  bar1 += `<text x="${padL - 8}" y="${bar1Y + 14}" font-size="10" fill="#E84855" font-weight="700" text-anchor="end">Canon</text>`;
+  bar1 += `<rect x="${padL}" y="${bar1Y}" width="${drawW}" height="${barH}" rx="4" fill="#E84855" opacity="0.2"/>`;
+  bar1 += `<rect x="${padL}" y="${bar1Y}" width="${drawW}" height="${barH}" rx="4" fill="none" stroke="#E84855" stroke-width="1.2"/>`;
+
+  // Highlight affected region on bar 1
+  if (aaStart && aaEnd && nmdResult.eventInCanonical) {
+    const ax1 = px(aaStart), ax2 = px(Math.min(aaEnd, proteinLen));
+    const aw = Math.max(ax2 - ax1, 3);
+    bar1 += `<rect x="${ax1.toFixed(1)}" y="${bar1Y}" width="${aw.toFixed(1)}" height="${barH}" fill="#C2185B" opacity="0.5"/>`;
+    bar1 += `<rect x="${ax1.toFixed(1)}" y="${bar1Y}" width="${aw.toFixed(1)}" height="${barH}" fill="none" stroke="#C2185B" stroke-width="2" rx="2"/>`;
+  }
+
+  // Bar 2: Alternative protein
+  let bar2 = '';
+  bar2 += `<text x="${padL - 8}" y="${bar2Y + 14}" font-size="10" fill="#3A86FF" font-weight="700" text-anchor="end">Alt</text>`;
+
+  if (ev.frame.inFrame && aaStart && aaEnd) {
+    // In-frame: show gap or extension
+    if (nmdResult.eventInCanonical) {
+      // Canonical has the exon — alt lacks it (shorter protein with gap)
+      const gapStart = px(aaStart), gapEnd = px(Math.min(aaEnd, proteinLen));
+      // Left part
+      bar2 += `<rect x="${padL}" y="${bar2Y}" width="${Math.max(gapStart - padL, 0).toFixed(1)}" height="${barH}" rx="4" fill="#3A86FF" opacity="0.2"/>`;
+      bar2 += `<rect x="${padL}" y="${bar2Y}" width="${Math.max(gapStart - padL, 0).toFixed(1)}" height="${barH}" rx="4" fill="none" stroke="#3A86FF" stroke-width="1.2"/>`;
+      // Gap region (dashed)
+      bar2 += `<rect x="${gapStart.toFixed(1)}" y="${bar2Y}" width="${Math.max(gapEnd - gapStart, 3).toFixed(1)}" height="${barH}" fill="none" stroke="#C2185B" stroke-width="1.5" stroke-dasharray="4,3" rx="2"/>`;
+      // Right part
+      const rightW = drawW - (gapEnd - padL);
+      if (rightW > 0) {
+        bar2 += `<rect x="${gapEnd.toFixed(1)}" y="${bar2Y}" width="${rightW.toFixed(1)}" height="${barH}" rx="4" fill="#3A86FF" opacity="0.2"/>`;
+        bar2 += `<rect x="${gapEnd.toFixed(1)}" y="${bar2Y}" width="${rightW.toFixed(1)}" height="${barH}" rx="4" fill="none" stroke="#3A86FF" stroke-width="1.2"/>`;
+      }
+    } else {
+      // Canonical lacks the exon — alt has it (longer protein with insertion)
+      bar2 += `<rect x="${padL}" y="${bar2Y}" width="${drawW}" height="${barH}" rx="4" fill="#3A86FF" opacity="0.2"/>`;
+      bar2 += `<rect x="${padL}" y="${bar2Y}" width="${drawW}" height="${barH}" rx="4" fill="none" stroke="#3A86FF" stroke-width="1.2"/>`;
+      if (aaStart && aaEnd) {
+        const ax1 = px(aaStart), ax2 = px(Math.min(aaEnd, proteinLen));
+        bar2 += `<rect x="${ax1.toFixed(1)}" y="${bar2Y}" width="${Math.max(ax2 - ax1, 3).toFixed(1)}" height="${barH}" fill="#FF9F1C" opacity="0.5"/>`;
+      }
+    }
+  } else {
+    // Frameshift: full bar, but truncated at PTC if predicted
+    bar2 += `<rect x="${padL}" y="${bar2Y}" width="${drawW}" height="${barH}" rx="4" fill="#3A86FF" opacity="0.2"/>`;
+    bar2 += `<rect x="${padL}" y="${bar2Y}" width="${drawW}" height="${barH}" rx="4" fill="none" stroke="#3A86FF" stroke-width="1.2"/>`;
+
+    // Affected region highlight
+    if (aaStart && aaEnd) {
+      const ax1 = px(aaStart), ax2 = px(Math.min(aaEnd, proteinLen));
+      bar2 += `<rect x="${ax1.toFixed(1)}" y="${bar2Y}" width="${Math.max(ax2 - ax1, 3).toFixed(1)}" height="${barH}" fill="#C2185B" opacity="0.3" stroke="#C2185B" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    }
+
+    // PTC/STOP marker
+    if (ptcAA !== null && ptcAA < proteinLen) {
+      const stopX = px(ptcAA);
+      bar2 += `<line x1="${stopX.toFixed(1)}" y1="${bar2Y - 4}" x2="${stopX.toFixed(1)}" y2="${bar2Y + barH + 4}" stroke="#DC2626" stroke-width="3"/>`;
+      bar2 += `<text x="${stopX.toFixed(1)}" y="${bar2Y - 7}" font-size="9" fill="#DC2626" text-anchor="middle" font-weight="700">STOP</text>`;
+      // Gray out beyond stop
+      const beyondW = drawW - (stopX - padL);
+      if (beyondW > 0) {
+        bar2 += `<rect x="${stopX.toFixed(1)}" y="${bar2Y}" width="${beyondW.toFixed(1)}" height="${barH}" fill="#A8A29E" opacity="0.3"/>`;
+      }
+    }
+  }
+
+  // Scale axis
+  let axis = `<line x1="${padL}" y1="${bar2Y + barH + 12}" x2="${padL + drawW}" y2="${bar2Y + barH + 12}" stroke="#E2DDD8"/>`;
+  const nTicks = Math.min(10, proteinLen);
+  for (let i = 0; i <= nTicks; i++) {
+    const aa = Math.round(proteinLen * i / nTicks);
+    const x = px(aa);
+    axis += `<line x1="${x.toFixed(1)}" y1="${bar2Y + barH + 12}" x2="${x.toFixed(1)}" y2="${bar2Y + barH + 17}" stroke="#78716C"/>`;
+    axis += `<text x="${x.toFixed(1)}" y="${bar2Y + barH + 27}" font-size="9" fill="#78716C" text-anchor="middle" font-family="IBM Plex Mono,monospace">${aa}</text>`;
+  }
+  axis += `<text x="${padL + drawW / 2}" y="${bar2Y + barH + 42}" font-size="10" fill="#1C1917" text-anchor="middle">Amino acid position</text>`;
+
+  // Domain legend
+  let dlegend = '';
+  const usedTypes = [...new Set(domains.map(d => d.type))];
+  let lx = padL;
+  for (const t of usedTypes) {
+    const col = DOMAIN_COLORS[t] || '#78716C';
+    dlegend += `<rect x="${lx}" y="6" width="10" height="10" rx="2" fill="${col}"/>`;
+    dlegend += `<text x="${lx + 14}" y="15" font-size="9" fill="#1C1917">${escH(t)}</text>`;
+    lx += t.length * 7 + 28;
+  }
+
+  const svg = `<svg id="protein-diagram-svg" width="${W}" height="${H}" style="overflow:visible;font-family:IBM Plex Sans,sans-serif"
+    onmousemove="proteinTip(event,this)" onmouseleave="tipHide()">
+    <rect width="${W}" height="${H}" fill="#FAFAF9" rx="6"/>
+    ${dlegend}
+    ${domainSvg}
+    ${bar1}${bar2}${axis}
+  </svg>`;
+
+  wrap.innerHTML = svg;
+}
+
+// ─── Domain overlap table ─────────────────────────────────────────────────────
+function renderDomainTable(ev, geneData, nmdResult) {
+  const aaStart = nmdResult.affectedAAstart;
+  const aaEnd = nmdResult.affectedAAend;
+  const domains = geneData.domains || [];
+
+  if (!domains.length) return '';
+
+  const sorted = domains.slice().sort((a, b) => {
+    const oa = aaStart && aaEnd && a.start <= aaEnd && a.end >= aaStart ? 1 : 0;
+    const ob = aaStart && aaEnd && b.start <= aaEnd && b.end >= aaStart ? 1 : 0;
+    return ob - oa || a.start - b.start;
+  });
+
+  let h = `<div class="vcard-title" style="margin-top:16px;margin-bottom:8px">Domain Overlap Analysis</div>`;
+  if (aaStart && aaEnd) {
+    h += `<div class="banner banner-info" style="margin-bottom:10px">Affected protein region: AA ${aaStart}&ndash;${aaEnd} (${ev.frame.deltaNt} nt / ${Math.abs(Math.round(ev.frame.deltaNt / 3))} AA)</div>`;
+  }
+  h += `<div class="table-wrap"><table class="data-table"><thead><tr>
+    <th>Name</th><th>Type</th><th>AA Range</th><th>Overlaps Event?</th>
+  </tr></thead><tbody>`;
+
+  for (const d of sorted) {
+    const overlap = aaStart && aaEnd && d.start <= aaEnd && d.end >= aaStart;
+    h += `<tr>
+      <td style="font-weight:600">${escH(d.description)}</td>
+      <td>${escH(d.type)}</td>
+      <td>${d.start}&ndash;${d.end}</td>
+      <td>${overlap ? '<span style="color:#065F46;font-weight:700">Yes &#10003;</span>' : '<span style="color:#78716C">No</span>'}</td>
+    </tr>`;
+  }
+
+  h += '</tbody></table></div>';
+  return h;
+}
+
+// ─── Tooltip helpers ──────────────────────────────────────────────────────────
+function rnaTip(e, svg) { genericTip(e, svg); }
+function proteinTip(e, svg) { genericTip(e, svg); }
+
+function genericTip(e, svg) {
+  const tip = document.getElementById('dtip');
+  const target = e.target;
+  if (target.tagName === 'rect' && target.dataset.tip) {
+    tip.innerHTML = decodeURIComponent(target.dataset.tip).replace(/\\n/g, '<br>');
+    tip.style.display = 'block';
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top = (e.clientY - 10) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+}
+
+function tipHide() {
+  document.getElementById('dtip').style.display = 'none';
+}
+
+// ─── Sequence Zoom ────────────────────────────────────────────────────────────
+async function fetchAndRenderSeqZoom(ev, geneData, nmdResult) {
+  const section = document.getElementById('seq-zoom-section');
+  if (!section) return;
+  section.innerHTML = '<div class="banner banner-info" style="margin-top:8px"><span class="spinner"></span> Fetching nucleotide sequences for zoom panels…</div>';
+  try {
+    const seqData = await fetchEventNtSeqs(ev, geneData);
+    ev._seqData = seqData; // cache for SVG export
+    const rnaHtml = buildRNASeqZoomHTML(ev, geneData, seqData);
+    const aaHtml  = buildAASeqZoomHTML(ev, geneData, nmdResult, seqData);
+    section.innerHTML = rnaHtml + aaHtml;
+    renderAlphaFoldSection(ev, geneData, nmdResult, seqData); // async, non-blocking
+    renderTMSection(ev, geneData, nmdResult, seqData);        // async, non-blocking
+  } catch(e) {
+    section.innerHTML = `<div class="banner banner-warn" style="margin-top:8px">Sequence zoom unavailable: ${escH(e.message)}</div>`;
+    console.error(e);
+  }
+}
+
+async function fetchSeqRegion(species, chr, start, end, strand) {
+  const base = getEnsemblBase();
+  const strNum = strand === 1 ? 1 : -1;
+  const r = await fetch(`${base}/sequence/region/${species}/${chr}:${start}..${end}:${strNum}`,
+    { headers: { 'Accept': 'text/plain' } });
+  if (!r.ok) return null;
+  return (await r.text()).trim().toUpperCase();
+}
+
+async function fetchEventNtSeqs(ev, geneData) {
+  const species = getSpecies();
+  const chr = ev.chr.replace(/^chr/, '');
+  const strand = geneData.strand;
+
+  switch (ev.type) {
+    case 'SE': {
+      const seq = await fetchSeqRegion(species, chr, ev.exStart + 1, ev.exEnd, strand);
+      return { type: 'SE', eventSeq: seq };
+    }
+    case 'RI': {
+      const intronLen = ev.downstreamES - ev.upstreamEE;
+      const MAX = 300;
+      if (intronLen > MAX) {
+        const seqHead = await fetchSeqRegion(species, chr, ev.upstreamEE + 1, ev.upstreamEE + 120, strand);
+        const seqTail = await fetchSeqRegion(species, chr, ev.downstreamES - 119, ev.downstreamES, strand);
+        return { type: 'RI', seqHead, seqTail, intronLen };
+      }
+      const seq = await fetchSeqRegion(species, chr, ev.upstreamEE + 1, ev.downstreamES, strand);
+      return { type: 'RI', eventSeq: seq, intronLen };
+    }
+    case 'A3SS': case 'A5SS': {
+      const longSeq  = await fetchSeqRegion(species, chr, ev.exStart + 1, ev.exEnd, strand);
+      const shortSeq = await fetchSeqRegion(species, chr, ev.shortES + 1, ev.shortEE, strand);
+      const deltaLen = ev.frame.deltaNt;
+      // Extra nts are at the 5′ end of longSeq for A3SS, 3′ end for A5SS (in transcript order)
+      return { type: ev.type, longSeq, shortSeq, deltaLen, extraAt: ev.type === 'A3SS' ? 'start' : 'end' };
+    }
+    case 'MXE': {
+      const ex1Seq = await fetchSeqRegion(species, chr, ev.exStart + 1, ev.exEnd, strand);
+      const ex2Seq = await fetchSeqRegion(species, chr, ev.ex2Start + 1, ev.ex2End, strand);
+      return { type: 'MXE', ex1Seq, ex2Seq };
+    }
+  }
+  return null;
+}
+
+// ─── RNA nucleotide zoom HTML ─────────────────────────────────────────────────
+function buildRNASeqZoomHTML(ev, geneData, seqData) {
+  const strandChar = geneData.strand === 1 ? '+' : '−';
+  let inner = '';
+
+  if (!seqData) {
+    inner = '<div class="banner banner-warn">Could not fetch sequence from Ensembl.</div>';
+  } else {
+    switch (seqData.type) {
+      case 'SE': {
+        const seq = seqData.eventSeq || '';
+        inner += `<div class="seq-zoom-label">Cassette exon — ${seq.length} nt (${strandChar} strand)</div>`;
+        inner += `<div class="seq-zoom-meta">Exon is <strong>present in canonical</strong> and <strong>absent in skipped isoform</strong>. Entire sequence shown in amber.</div>`;
+        inner += formatNtSeq(seq, 1, 'ev', 0);
+        break;
+      }
+      case 'RI': {
+        if (seqData.eventSeq) {
+          inner += `<div class="seq-zoom-label">Retained intron — ${seqData.intronLen} nt</div>`;
+          inner += `<div class="seq-zoom-meta">Sequence <strong>inserted into mRNA</strong> in the retention isoform. Green = retained intron nucleotides.</div>`;
+          inner += formatNtSeq(seqData.eventSeq, 1, 'new', 0);
+        } else {
+          inner += `<div class="seq-zoom-label">Retained intron — ${seqData.intronLen} nt (truncated: first/last 120 nt shown)</div>`;
+          inner += `<div class="seq-zoom-meta">Sequence <strong>inserted into mRNA</strong> in the retention isoform. Green = retained intron nucleotides.</div>`;
+          inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin-bottom:3px">5′ end:</div>`;
+          inner += formatNtSeq(seqData.seqHead, 1, 'new', 0);
+          inner += `<div style="font-size:10px;color:#A8A29E;margin:6px 0">… ${seqData.intronLen - 240} nt omitted …</div>`;
+          inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin-bottom:3px">3′ end:</div>`;
+          inner += formatNtSeq(seqData.seqTail, seqData.intronLen - 119, 'new', 0);
+        }
+        break;
+      }
+      case 'A3SS': case 'A5SS': {
+        const { longSeq, shortSeq, deltaLen, extraAt } = seqData;
+        const endLabel = extraAt === 'start' ? '5′ extension' : '3′ extension';
+        inner += `<div class="seq-zoom-label">${ev.type} — long exon (${(longSeq||'').length} nt) vs short exon (${(shortSeq||'').length} nt) · Δ${deltaLen} nt</div>`;
+        inner += `<div class="seq-zoom-meta">Green = ${deltaLen} extra nucleotides in long form (${endLabel}) · Shared region shown in normal weight</div>`;
+        if (longSeq) {
+          inner += `<div style="font-size:10px;font-weight:600;color:#065F46;margin-bottom:3px">Long exon:</div>`;
+          inner += formatNtSeq(longSeq, 1, extraAt === 'start' ? 'new-start' : 'new-end', deltaLen);
+        }
+        if (shortSeq) {
+          inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin:8px 0 3px">Short exon (no extra nts):</div>`;
+          inner += formatNtSeq(shortSeq, 1, 'ctx', 0);
+        }
+        break;
+      }
+      case 'MXE': {
+        inner += `<div class="seq-zoom-label">Mutually exclusive exons</div>`;
+        inner += `<div class="seq-zoom-meta">Exactly one exon is included. Exon 1 = canonical (amber). Exon 2 = alternative (green).</div>`;
+        if (seqData.ex1Seq) {
+          inner += `<div style="font-size:10px;font-weight:600;color:#E84855;margin-bottom:3px">Exon 1 — ${seqData.ex1Seq.length} nt (canonical):</div>`;
+          inner += formatNtSeq(seqData.ex1Seq, 1, 'ev', 0);
+        }
+        if (seqData.ex2Seq) {
+          inner += `<div style="font-size:10px;font-weight:600;color:#3A86FF;margin:8px 0 3px">Exon 2 — ${seqData.ex2Seq.length} nt (alternative):</div>`;
+          inner += formatNtSeq(seqData.ex2Seq, 1, 'new', 0);
+        }
+        break;
+      }
+    }
+  }
+
+  return `<div class="vcard-title" style="margin-top:20px;margin-bottom:8px">C. Nucleotide Sequence at Event</div>
+<div class="seq-zoom">${inner}</div>`;
+}
+
+// Format a nucleotide sequence as colored HTML lines (60 nt per line)
+// mode: 'ev' (all amber), 'new' (all green), 'ctx' (all normal),
+//       'ev-start' (first deltaLen amber), 'ev-end' (last deltaLen amber)
+function formatNtSeq(seq, startPos, mode, deltaLen) {
+  if (!seq) return '<span style="color:#A8A29E;font-size:11px">—</span>';
+  const LINE = 60;
+  let html = '';
+  for (let i = 0; i < seq.length; i += LINE) {
+    const chunk = seq.substring(i, Math.min(i + LINE, seq.length));
+    const posLabel = startPos + i;
+    html += `<div class="seq-line"><span class="seq-pos">${posLabel}</span><span class="seq-nts">`;
+    for (let j = 0; j < chunk.length; j++) {
+      const absJ = i + j;
+      let cls;
+      if (mode === 'ev') cls = 'nt-ev';
+      else if (mode === 'new') cls = 'nt-new';
+      else if (mode === 'ev-start')  cls = absJ < deltaLen ? 'nt-ev'  : 'nt-ctx';
+      else if (mode === 'ev-end')    cls = absJ >= seq.length - deltaLen ? 'nt-ev'  : 'nt-ctx';
+      else if (mode === 'new-start') cls = absJ < deltaLen ? 'nt-new' : 'nt-ctx';
+      else if (mode === 'new-end')   cls = absJ >= seq.length - deltaLen ? 'nt-new' : 'nt-ctx';
+      else cls = 'nt-ctx';
+      if (j > 0 && j % 10 === 0) html += ' ';
+      html += `<span class="${cls}">${chunk[j]}</span>`;
+    }
+    html += '</span></div>';
+  }
+  return html;
+}
+
+// ─── Protein AA zoom HTML ─────────────────────────────────────────────────────
+function buildAASeqZoomHTML(ev, geneData, nmdResult, seqData) {
+  const cdsSeq = geneData.cdsSeq;
+  const aaStart = nmdResult.affectedAAstart;
+  const aaEnd   = nmdResult.affectedAAend;
+  if (!cdsSeq || !aaStart) return '';
+
+  const CONTEXT = 6; // flanking AAs to show
+  const deltaNt  = ev.frame.deltaNt;
+  const deltaAA  = Math.floor(deltaNt / 3);
+  const cdsOff   = (aaStart - 1) * 3; // 0-based CDS offset of event
+
+  // Window: CONTEXT AAs before + event + CONTEXT AAs after (canonical)
+  const winCDSstart = Math.max(0, cdsOff - CONTEXT * 3);
+  const winCDSend   = Math.min(cdsSeq.length, cdsOff + deltaNt + CONTEXT * 3);
+  const canonSlice  = cdsSeq.substring(winCDSstart, winCDSend);
+  const canonAAs    = ntToAAs(canonSlice);
+  const ctxBefore   = Math.floor((cdsOff - winCDSstart) / 3);
+  const firstAA     = Math.floor(winCDSstart / 3) + 1;
+
+  let inner = '';
+  inner += `<div class="seq-zoom-meta">Affected region: AA <strong>${aaStart}–${aaEnd}</strong> (${deltaNt} nt · ${deltaAA} aa) &middot; ${ev.frame.inFrame ? 'In-frame' : 'Frameshift'}</div>`;
+
+  // ── Canonical ──
+  inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin-bottom:4px">Canonical (event region in amber):</div>`;
+  inner += buildAARow(canonAAs, firstAA, ctxBefore, ctxBefore + deltaAA, 'ev');
+
+  // ── Alternative ──
+  if (ev.frame.inFrame) {
+    if (nmdResult.eventInCanonical) {
+      // Alt = canonical with event region deleted
+      const altSlice = cdsSeq.substring(winCDSstart, cdsOff) +
+                       cdsSeq.substring(cdsOff + deltaNt, Math.min(cdsSeq.length, cdsOff + deltaNt + CONTEXT * 3));
+      const altAAs = ntToAAs(altSlice);
+      inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin:10px 0 4px">Alternative (<strong>${deltaAA} aa deleted</strong> when exon skipped — marked as gap):</div>`;
+      inner += buildAARow(altAAs, firstAA, ctxBefore, ctxBefore, 'del', deltaAA);
+    } else {
+      // Alt = canonical with event region inserted — translate the fetched nt seq if available
+      const insertedSeq = (seqData && seqData.eventSeq) ? seqData.eventSeq :
+                          (seqData && seqData.longSeq && seqData.extraAt === 'start') ? seqData.longSeq.substring(0, deltaNt) :
+                          (seqData && seqData.longSeq && seqData.extraAt === 'end')   ? seqData.longSeq.substring(seqData.longSeq.length - deltaNt) : null;
+      if (insertedSeq) {
+        const insertedAAs = ntToAAs(insertedSeq);
+        inner += `<div style="font-size:10px;font-weight:600;color:#065F46;margin:10px 0 4px">Alternative (<strong>${deltaAA} aa inserted</strong> — highlighted in green):</div>`;
+        // Show context before + inserted AAs + context after
+        const ctxBeforeSlice = cdsSeq.substring(winCDSstart, cdsOff);
+        const ctxAfterSlice  = cdsSeq.substring(cdsOff, Math.min(cdsSeq.length, cdsOff + CONTEXT * 3));
+        const altAAs = [...ntToAAs(ctxBeforeSlice), ...insertedAAs, ...ntToAAs(ctxAfterSlice)];
+        inner += buildAARow(altAAs, firstAA, ctxBefore, ctxBefore + deltaAA, 'new');
+      } else {
+        inner += `<div class="banner banner-info" style="margin-top:6px">Inserted sequence not available. Translate the highlighted codons in the nucleotide zoom above.</div>`;
+      }
+    }
+    // For MXE: also show exon 2 AAs
+    if (ev.type === 'MXE' && seqData && seqData.ex2Seq) {
+      const ex2AAs = ntToAAs(seqData.ex2Seq);
+      inner += `<div style="font-size:10px;font-weight:600;color:#3A86FF;margin:10px 0 4px">Exon 2 amino acids (alternative):</div>`;
+      inner += buildAARow(ex2AAs, aaStart, 0, ex2AAs.length, 'new');
+    }
+  } else {
+    // Frameshift: show new reading frame AAs from event point onward
+    const modCDS = nmdResult.eventInCanonical
+      ? cdsSeq.substring(0, cdsOff) + cdsSeq.substring(cdsOff + deltaNt)
+      : cdsSeq.substring(0, cdsOff) + 'N'.repeat(deltaNt) + cdsSeq.substring(cdsOff);
+    const fsSlice = modCDS.substring(winCDSstart, Math.min(modCDS.length, cdsOff + 15 * 3));
+    const fsAAs   = ntToAAs(fsSlice);
+    inner += `<div style="font-size:10px;font-weight:600;color:#78716C;margin:10px 0 4px">Alternative (frameshift — new reading frame in green from AA ${aaStart}):</div>`;
+    inner += buildAARow(fsAAs, firstAA, ctxBefore, ctxBefore, 'new');
+    if (nmdResult.ptcAA) {
+      const nmdMsg = nmdResult.nmd
+        ? `NMD predicted — PTC &gt; 50 nt upstream of last exon-exon junction`
+        : `PTC in last exon region — transcript may escape NMD`;
+      inner += `<div class="banner ${nmdResult.nmd ? 'banner-err' : 'banner-warn'}" style="margin-top:8px">Stop codon at AA <strong>${nmdResult.ptcAA}</strong> · ${nmdMsg}</div>`;
+    }
+  }
+
+  return `<div class="vcard-title" style="margin-top:16px;margin-bottom:8px">D. Amino Acid Changes at Event</div>
+<div class="seq-zoom">${inner}</div>`;
+}
+
+// Translate a CDS substring to an array of 1-letter AA codes (stops as '*')
+function ntToAAs(seq) {
+  seq = seq.toUpperCase();
+  const out = [];
+  for (let i = 0; i + 2 < seq.length; i += 3) {
+    out.push(CODONS[seq.substring(i, i + 3)] || '?');
+  }
+  return out;
+}
+
+// Render an AA row with position numbers below each letter
+// highlightMode: 'ev' (amber), 'new' (green), 'del' (show deletion gap), 'ctx' (none)
+// eventStart/eventEnd: indices (0-based) in the aas array of the highlighted region
+// delCount: number of AAs deleted (for 'del' mode)
+function buildAARow(aas, firstAA, eventStart, eventEnd, highlightMode, delCount) {
+  let html = '<div class="aa-row">';
+  let i = 0;
+
+  // Insert deletion gap marker before eventStart position if mode is 'del'
+  const insertGapAt = highlightMode === 'del' ? eventStart : -1;
+
+  while (i < aas.length) {
+    if (i === insertGapAt && delCount > 0) {
+      html += `<div class="aa-block"><span class="aa-letter aa-del" style="width:auto;padding:0 4px;font-size:10px">${delCount > 1 ? '▲' + delCount + 'aa' : '▲1aa'}</span><span class="aa-num">del</span></div>`;
+    }
+    // Separator at event boundary
+    if (i === eventStart && highlightMode !== 'del' && eventStart > 0)
+      html += '<div class="aa-sep"></div>';
+    if (i === eventEnd && highlightMode !== 'del' && eventEnd < aas.length)
+      html += '<div class="aa-sep"></div>';
+
+    const aa = aas[i];
+    let cls = 'aa-letter';
+    if (aa === '*')                                   cls += ' aa-stop';
+    else if (highlightMode === 'ev'  && i >= eventStart && i < eventEnd) cls += ' aa-ev';
+    else if (highlightMode === 'new' && i >= eventStart && i < eventEnd) cls += ' aa-new';
+
+    html += `<div class="aa-block"><span class="${cls}">${aa === '*' ? '■' : aa}</span><span class="aa-num">${firstAA + i}</span></div>`;
+    i++;
+    if (aa === '*') break;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// ─── AlphaFold integration ────────────────────────────────────────────────────
+
+// Lazy-load 3Dmol.js on first use
+function load3Dmol() {
+  return new Promise((resolve, reject) => {
+    if (window.$3Dmol) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://3dmol.csb.pitt.edu/build/3Dmol-min.js';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// Build the alternative protein amino-acid sequence
+function buildAltProtein(ev, geneData, nmdResult, seqData) {
+  const cdsSeq = geneData.cdsSeq;
+  if (!cdsSeq || !nmdResult.affectedAAstart) return null;
+  const cdsOff = (nmdResult.affectedAAstart - 1) * 3;
+  const deltaNt = ev.frame.deltaNt;
+  let altCDS;
+  if (nmdResult.eventInCanonical) {
+    altCDS = cdsSeq.substring(0, cdsOff) + cdsSeq.substring(cdsOff + deltaNt);
+  } else {
+    const ins = seqData && (
+      seqData.eventSeq ? seqData.eventSeq :
+      (seqData.longSeq && seqData.extraAt === 'start') ? seqData.longSeq.substring(0, deltaNt) :
+      (seqData.longSeq && seqData.extraAt === 'end')   ? seqData.longSeq.substring(seqData.longSeq.length - deltaNt) : null
+    );
+    if (!ins) return null;
+    altCDS = cdsSeq.substring(0, cdsOff) + ins + cdsSeq.substring(cdsOff);
+  }
+  const aas = ntToAAs(altCDS);
+  const stopIdx = aas.indexOf('*');
+  return (stopIdx >= 0 ? aas.slice(0, stopIdx) : aas).join('');
+}
+
+// Format as FASTA (60 chars/line)
+function toFasta(header, seq) {
+  if (!seq) return '';
+  const lines = [];
+  for (let i = 0; i < seq.length; i += 60) lines.push(seq.substring(i, i + 60));
+  return `>${header}\n${lines.join('\n')}`;
+}
+
+// Main AlphaFold section renderer — writes into #af-section
+async function renderAlphaFoldSection(ev, geneData, nmdResult, seqData) {
+  const wrap = document.getElementById('af-section');
+  if (!wrap) return;
+  const acc = geneData.uniprotAcc;
+  const altSeq = buildAltProtein(ev, geneData, nmdResult, seqData);
+  if (!acc && !altSeq) return;
+
+  const aaS = nmdResult.affectedAAstart || '?', aaE = nmdResult.affectedAAend || '?';
+  const eventDesc = ev.frame.inFrame
+    ? (nmdResult.eventInCanonical ? `${Math.floor(ev.frame.deltaNt/3)} aa deletion` : `${Math.floor(ev.frame.deltaNt/3)} aa insertion`)
+    : 'frameshift';
+
+  wrap.innerHTML = `<div class="vcard-title" style="margin-top:20px;margin-bottom:8px">E. AlphaFold Structure &amp; Alternative Sequence</div>
+<div class="af-grid">
+  <div style="display:flex;flex-direction:column;gap:0">
+    <div class="af-viewer-box">
+      <div class="af-viewer-hdr">
+        <span>Canonical protein &mdash; pLDDT confidence</span>
+        <span id="af-entry-lbl" style="font-weight:400;font-size:10px;color:#78716C">${acc ? escH(acc) : 'No UniProt ID'}</span>
+      </div>
+      <div id="af-viewer" style="position:absolute;top:34px;left:0;right:0;bottom:34px"></div>
+      <div class="af-viewer-ctrl">
+        <button class="af-ctrl-btn" title="Zoom to event region" onclick="afZoomEvent()">&#8982; Event</button>
+        <button class="af-ctrl-btn" title="Reset view" onclick="afResetView()">&#8635; All</button>
+        <button class="af-ctrl-btn" title="Toggle spin" onclick="afToggleSpin()">&#9684; Spin</button>
+        <button class="af-ctrl-btn" id="af-topo-btn" title="Color by transmembrane topology" onclick="afColorTopology()" disabled>&#9636; Topo</button>
+      </div>
+      <div class="af-legend">
+        <span class="af-leg"><span class="af-dot" style="background:#003f8a"></span>&gt;90</span>
+        <span class="af-leg"><span class="af-dot" style="background:#65cbf3"></span>70–90</span>
+        <span class="af-leg"><span class="af-dot" style="background:#f8db70"></span>50–70</span>
+        <span class="af-leg"><span class="af-dot" style="background:#ff7d45"></span>&lt;50</span>
+        <span class="af-leg"><span class="af-dot" style="background:#FF9F1C;border:1px solid #92400E"></span>Event AA ${escH(String(aaS))}–${escH(String(aaE))}</span>
+      </div>
+    </div>
+    <div id="af-load-msg" style="font-size:10px;color:#78716C;padding:5px 2px;min-height:18px"></div>
+  </div>
+  <div class="af-fasta-box">
+    <div class="af-fasta-hdr">Alternative isoform FASTA</div>
+    <div class="af-fasta-meta">${altSeq
+      ? `${altSeq.length} aa &middot; ${escH(ev.type)} &middot; ${escH(eventDesc)} at AA ${escH(String(aaS))}–${escH(String(aaE))}`
+      : '<span style="color:#9F1239">Sequence unavailable — nucleotide data missing</span>'}</div>
+    <textarea class="af-fasta-area" id="af-fasta-area" readonly spellcheck="false">${altSeq ? escH(toFasta(`${ev.gene}_alt_${ev.type}_dpsi${ev.dpsi.toFixed(3)}`, altSeq)) : ''}</textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="sec-btn" onclick="afCopyFasta()"     ${altSeq?'':'disabled'}>&#128203; Copy FASTA</button>
+      <button class="sec-btn" onclick="afDownloadFasta()" ${altSeq?'':'disabled'}>&#128229; Download FASTA</button>
+      <a href="https://alphafoldserver.com" target="_blank" rel="noopener" class="sec-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px">&#8599; AlphaFold Server</a>
+    </div>
+    <div class="af-fasta-note" style="margin-top:4px">Paste this FASTA into AlphaFold Server or ColabFold to predict the alternative isoform structure. The ${escH(eventDesc)} is at AA ${escH(String(aaS))}.</div>
+  </div>
+</div>`;
+
+  const msg = document.getElementById('af-load-msg');
+
+  // Resolve UniProt accession: use cached value or search by gene name + organism
+  let resolvedAcc = acc;
+  if (!resolvedAcc) {
+    try {
+      msg.innerHTML = '<span class="spinner"></span> Searching UniProt for gene…';
+      const taxId = (geneData.genome || '').toLowerCase().includes('mm') ? 10090 : 9606;
+      const gene = encodeURIComponent(ev.gene);
+      const uniUrl = `https://rest.uniprot.org/uniprotkb/search?query=gene_exact:${gene}+AND+organism_id:${taxId}+AND+reviewed:true&fields=accession&format=json&size=1`;
+      const ur = await fetch(uniUrl);
+      if (ur.ok) {
+        const uj = await ur.json();
+        if (uj.results && uj.results.length) {
+          resolvedAcc = uj.results[0].primaryAccession;
+          // Cache on geneData for future calls
+          geneData.uniprotAcc = resolvedAcc;
+          document.getElementById('af-entry-lbl').textContent = resolvedAcc;
+        }
+      }
+    } catch(_) {}
+  }
+
+  if (!resolvedAcc) {
+    msg.innerHTML = '<span style="color:#9F1239">Structure unavailable: no UniProt accession found for this gene</span>';
+    return;
+  }
+
+  try {
+    msg.innerHTML = '<span class="spinner"></span> Loading AlphaFold structure…';
+    await load3Dmol();
+    await initAlphaFoldViewer(resolvedAcc, nmdResult.affectedAAstart, nmdResult.affectedAAend);
+    const entryLink = `https://alphafold.ebi.ac.uk/entry/${resolvedAcc}`;
+    msg.innerHTML = `<a href="${entryLink}" target="_blank" rel="noopener" style="color:#57534E">${escH(resolvedAcc)}</a> — AlphaFold canonical structure`;
+  } catch(e) {
+    msg.innerHTML = `<span style="color:#9F1239">Structure unavailable: ${escH(e.message)}</span>`;
+    console.warn('AlphaFold:', e);
+  }
+}
+
+// Initialize 3Dmol.js viewer with pLDDT coloring and event region highlight
+let _afViewer = null, _afSpinning = false, _afEventAAs = null;
+let _afTMRegions = null, _afColorMode = 'plddt';
+let _lastEv = null, _lastGeneData = null;
+
+function _applyPLDDTColoring() {
+  if (!_afViewer) return;
+  _afViewer.setStyle({}, { cartoon: { color: '#ff7d45' } });
+  _afViewer.setStyle({ b: { min: 50, max: 70  } }, { cartoon: { color: '#f8db70' } });
+  _afViewer.setStyle({ b: { min: 70, max: 90  } }, { cartoon: { color: '#65cbf3' } });
+  _afViewer.setStyle({ b: { min: 90, max: 100 } }, { cartoon: { color: '#003f8a' } });
+  if (_afEventAAs) {
+    const resis = [];
+    for (let i = _afEventAAs.start; i <= _afEventAAs.end; i++) resis.push(i);
+    _afViewer.addStyle({ resi: resis }, { cartoon: { color: '#FF9F1C', opacity: 0.95 } });
+    _afViewer.addStyle({ resi: resis }, { stick: { radius: 0.18, color: '#FF9F1C' } });
+  }
+  _afViewer.render();
+}
+
+function _topoRegionColor(desc) {
+  const d = (desc || '').toLowerCase();
+  if (d.includes('extracellular') || d.includes('periplasm') || d.includes('lumen')) return '#6EE7B7';
+  if (d.includes('cytoplasm') || d.includes('intracellular')) return '#93C5FD';
+  return '#E5E7EB';
+}
+
+function _applyTopologyColoring() {
+  if (!_afViewer || !_afTMRegions) return;
+  _afViewer.setStyle({}, { cartoon: { color: '#93C5FD' } }); // default: cytoplasmic/blue
+  for (const d of _afTMRegions.topoDomains || []) {
+    const resis = [];
+    for (let i = d.start; i <= d.end; i++) resis.push(i);
+    _afViewer.setStyle({ resi: resis }, { cartoon: { color: _topoRegionColor(d.desc) } });
+  }
+  for (const t of _afTMRegions.transmem || []) {
+    const resis = [];
+    for (let i = t.start; i <= t.end; i++) resis.push(i);
+    _afViewer.setStyle({ resi: resis }, { cartoon: { color: '#FCD34D' } });
+    _afViewer.addStyle({ resi: resis }, { stick: { radius: 0.12, color: '#92400E' } });
+  }
+  for (const t of _afTMRegions.intramem || []) {
+    const resis = [];
+    for (let i = t.start; i <= t.end; i++) resis.push(i);
+    _afViewer.setStyle({ resi: resis }, { cartoon: { color: '#D8B4FE' } });
+  }
+  if (_afEventAAs) {
+    const resis = [];
+    for (let i = _afEventAAs.start; i <= _afEventAAs.end; i++) resis.push(i);
+    _afViewer.addStyle({ resi: resis }, { cartoon: { color: '#FF9F1C', opacity: 0.95 } });
+    _afViewer.addStyle({ resi: resis }, { stick: { radius: 0.18, color: '#FF9F1C' } });
+  }
+  _afViewer.render();
+}
+
+function initAlphaFoldViewer(uniprotAcc, aaStart, aaEnd) {
+  _afColorMode = 'plddt';
+  return new Promise((resolve, reject) => {
+    const el = document.getElementById('af-viewer');
+    if (!el || !window.$3Dmol) return reject(new Error('3Dmol not loaded'));
+
+    if (_afViewer) { try { _afViewer.clear(); } catch(_){} }
+    const viewer = $3Dmol.createViewer(el, { backgroundColor: '#FAFAF9', antialias: true });
+    _afViewer = viewer; _afSpinning = false;
+    _afEventAAs = aaStart && aaEnd ? { start: aaStart, end: aaEnd } : null;
+
+    const timeout = setTimeout(() => reject(new Error('Structure load timed out')), 30000);
+
+    $3Dmol.download('af:' + uniprotAcc, viewer, {}, function() {
+      clearTimeout(timeout);
+      _applyPLDDTColoring();
+      viewer.zoomTo();
+      resolve();
+    });
+  });
+}
+
+function afZoomEvent() {
+  if (!_afViewer || !_afEventAAs) return;
+  const resis = [];
+  for (let i = _afEventAAs.start; i <= _afEventAAs.end; i++) resis.push(i);
+  _afViewer.zoomTo({ resi: resis }, 400);
+  _afViewer.render();
+}
+function afResetView()  { if (_afViewer) { _afViewer.zoomTo({}, 400); _afViewer.render(); } }
+function afToggleSpin() {
+  if (!_afViewer) return;
+  _afSpinning = !_afSpinning;
+  _afViewer.spin(_afSpinning ? 'y' : false);
+}
+function afColorTopology() {
+  if (!_afViewer || !_afTMRegions) return;
+  _afColorMode = _afColorMode === 'plddt' ? 'topology' : 'plddt';
+  const btn = document.getElementById('af-topo-btn');
+  if (btn) btn.innerHTML = _afColorMode === 'topology' ? '&#9636;&nbsp;pLDDT' : '&#9636;&nbsp;Topo';
+  if (_afColorMode === 'topology') _applyTopologyColoring();
+  else _applyPLDDTColoring();
+}
+
+// ─── Transmembrane Topology ────────────────────────────────────────────────────
+async function fetchTMTopology(uniprotAcc) {
+  const url = `https://rest.uniprot.org/uniprotkb/${uniprotAcc}?fields=ft_transmem,ft_topo_dom,ft_intramem&format=json`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`UniProt ${r.status}`);
+  const j = await r.json();
+  const features = j.features || [];
+  const topo = { transmem: [], topoDomains: [], intramem: [] };
+  for (const f of features) {
+    const start = f.location && f.location.start && f.location.start.value;
+    const end   = f.location && f.location.end   && f.location.end.value;
+    if (!start || !end) continue;
+    if (f.type === 'Transmembrane')          topo.transmem.push({ start, end, desc: f.description || 'Helical' });
+    else if (f.type === 'Topological domain') topo.topoDomains.push({ start, end, desc: f.description || '' });
+    else if (f.type === 'Intramembrane')     topo.intramem.push({ start, end, desc: f.description || '' });
+  }
+  return topo;
+}
+
+function buildTMDiagramSVG(topo, protLen, evAAstart, evAAend) {
+  const W = 700, BAR_Y = 20, BAR_H = 28, H = 70;
+  const sc = aa => Math.round((aa - 1) / protLen * W);
+  let svg = '';
+  svg += `<rect x="0" y="${BAR_Y}" width="${W}" height="${BAR_H}" rx="3" fill="#F5F4F1" stroke="#E2DDD8" stroke-width="0.5"/>`;
+  for (const d of topo.topoDomains) {
+    const x = sc(d.start), w = Math.max(2, sc(d.end + 1) - sc(d.start));
+    svg += `<rect x="${x}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="${_topoRegionColor(d.desc)}" stroke="none"/>`;
+  }
+  for (const t of topo.intramem) {
+    const x = sc(t.start), w = Math.max(4, sc(t.end + 1) - sc(t.start));
+    svg += `<rect x="${x}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="#D8B4FE" stroke="#7E22CE" stroke-width="0.5"/>`;
+  }
+  let tmIdx = 0;
+  for (const t of topo.transmem) {
+    tmIdx++;
+    const x = sc(t.start), w = Math.max(6, sc(t.end + 1) - sc(t.start));
+    svg += `<rect x="${x}" y="${BAR_Y}" width="${w}" height="${BAR_H}" fill="#FCD34D" stroke="#92400E" stroke-width="0.8" rx="1"/>`;
+    svg += `<text x="${x + w/2}" y="${BAR_Y + BAR_H/2 + 4}" text-anchor="middle" font-size="9" font-weight="700" fill="#78350F" font-family="IBM Plex Sans,sans-serif">TM${tmIdx}</text>`;
+  }
+  if (evAAstart && evAAend) {
+    const ex = sc(evAAstart), ew = Math.max(3, sc(Math.min(evAAend, protLen) + 1) - sc(evAAstart));
+    svg += `<rect x="${ex}" y="${BAR_Y-3}" width="${ew}" height="${BAR_H+6}" rx="2" fill="none" stroke="#FF9F1C" stroke-width="2.5"/>`;
+    svg += `<text x="${ex + ew/2}" y="${BAR_Y-6}" text-anchor="middle" font-size="9" fill="#D97706" font-weight="600" font-family="IBM Plex Sans,sans-serif">event</text>`;
+  }
+  const tickStep = protLen <= 200 ? 50 : protLen <= 600 ? 100 : 200;
+  for (let aa = tickStep; aa < protLen; aa += tickStep) {
+    const x = sc(aa);
+    svg += `<line x1="${x}" y1="${BAR_Y+BAR_H}" x2="${x}" y2="${BAR_Y+BAR_H+5}" stroke="#A8A29E" stroke-width="0.8"/>`;
+    svg += `<text x="${x}" y="${BAR_Y+BAR_H+13}" text-anchor="middle" font-size="8" fill="#A8A29E" font-family="IBM Plex Mono,monospace">${aa}</text>`;
+  }
+  svg += `<text x="0"   y="${BAR_Y+BAR_H+13}" text-anchor="start" font-size="8" fill="#A8A29E" font-family="IBM Plex Mono,monospace">1</text>`;
+  svg += `<text x="${W}" y="${BAR_Y+BAR_H+13}" text-anchor="end"   font-size="8" fill="#A8A29E" font-family="IBM Plex Mono,monospace">${protLen}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible">${svg}</svg>`;
+}
+
+function _topoOfAA(aa, topo) {
+  for (const t of topo.transmem)    { if (aa >= t.start && aa <= t.end) return { type: 'TM helix',      desc: t.desc }; }
+  for (const t of topo.intramem)    { if (aa >= t.start && aa <= t.end) return { type: 'Intramembrane', desc: t.desc }; }
+  for (const d of topo.topoDomains) { if (aa >= d.start && aa <= d.end) return { type: d.desc,          desc: d.desc }; }
+  return null;
+}
+
+async function renderTMSection(ev, geneData, nmdResult, seqData) {
+  const wrap = document.getElementById('tm-section');
+  if (!wrap) return;
+
+  let acc = geneData.uniprotAcc;
+  if (!acc) {
+    try {
+      const taxId = (geneData.genome || '').toLowerCase().includes('mm') ? 10090 : 9606;
+      const gene  = encodeURIComponent(ev.gene);
+      const ur = await fetch(`https://rest.uniprot.org/uniprotkb/search?query=gene_exact:${gene}+AND+organism_id:${taxId}+AND+reviewed:true&fields=accession&format=json&size=1`);
+      if (ur.ok) {
+        const uj = await ur.json();
+        if (uj.results && uj.results.length) { acc = uj.results[0].primaryAccession; geneData.uniprotAcc = acc; }
+      }
+    } catch(_) {}
+  }
+
+  const altSeq  = buildAltProtein(ev, geneData, nmdResult, seqData);
+  const aaStart = nmdResult.affectedAAstart;
+  const aaEnd   = nmdResult.affectedAAend;
+  const deltaAA = Math.floor(ev.frame.deltaNt / 3);
+  const protLen = geneData.cdsSeq ? Math.floor(geneData.cdsSeq.length / 3) : null;
+
+  wrap.innerHTML = `<div class="vcard-title" style="margin-top:20px;margin-bottom:8px">F. Transmembrane Topology</div><div id="tm-inner"><div class="banner banner-info"><span class="spinner"></span> ${acc ? `Fetching topology for ${escH(acc)} from UniProt…` : 'No UniProt accession — showing prediction options.'}</div></div>`;
+
+  if (!acc) {
+    document.getElementById('tm-inner').innerHTML = _tmFallbackHTML(ev, geneData, altSeq);
+    return;
+  }
+
+  let topo;
+  try {
+    topo = await fetchTMTopology(acc);
+    geneData._tmTopo = topo;
+  } catch(e) {
+    document.getElementById('tm-inner').innerHTML = `<div class="banner banner-warn" style="margin-bottom:6px">UniProt topology fetch failed: ${escH(e.message)}</div>` + _tmFallbackHTML(ev, geneData, altSeq);
+    return;
+  }
+
+  const hasAnno = topo.transmem.length > 0 || topo.intramem.length > 0 || topo.topoDomains.length > 0;
+  if (!hasAnno) {
+    document.getElementById('tm-inner').innerHTML =
+      `<div class="banner banner-info" style="margin-bottom:6px">No transmembrane regions annotated in UniProt for <strong>${escH(acc)}</strong>. This protein may be soluble.</div>` +
+      _tmFallbackHTML(ev, geneData, altSeq);
+    return;
+  }
+
+  // Enable topology button in 3D viewer
+  _afTMRegions = topo;
+  const topoBtn = document.getElementById('af-topo-btn');
+  if (topoBtn) topoBtn.disabled = false;
+
+  // ── Event topology overlap ──
+  let impactHTML = '';
+  if (aaStart && aaEnd) {
+    const hitTypes = new Set();
+    for (let aa = aaStart; aa <= aaEnd; aa++) {
+      const r = _topoOfAA(aa, topo);
+      if (r) hitTypes.add(r.type);
+    }
+    const hitArr  = [...hitTypes];
+    const inTM    = hitArr.some(t => t === 'TM helix' || t === 'Intramembrane');
+    const hitStr  = hitArr.length > 0 ? hitArr.map(t => `<strong>${escH(t)}</strong>`).join(', ') : 'uncharacterized region';
+    impactHTML += `<div class="banner ${inTM ? 'banner-err' : 'banner-info'}" style="margin-bottom:8px">Canonical event (AA <strong>${aaStart}–${aaEnd}</strong>) falls in: ${hitStr}${inTM ? ' — <strong>transmembrane topology likely disrupted.</strong>' : '.'}</div>`;
+
+    if (ev.frame.inFrame && topo.transmem.length > 0) {
+      const nBefore  = topo.transmem.filter(t => t.end < aaStart).length;
+      const inEvTM   = topo.transmem.filter(t => !(t.end < aaStart || t.start > aaEnd));
+      const afterTM  = topo.transmem.filter(t => t.start > aaEnd);
+      const shift    = nmdResult.eventInCanonical ? -deltaAA : deltaAA;
+      if (inEvTM.length > 0) {
+        const names = inEvTM.map((t, i) => `TM${nBefore+i+1}`).join(', ');
+        impactHTML += `<div class="banner banner-warn" style="margin-bottom:8px">Alternative isoform: <strong>${names}</strong> directly disrupted.</div>`;
+      }
+      if (afterTM.length > 0 && shift !== 0) {
+        const names = afterTM.map((t, i) => `TM${nBefore+inEvTM.length+i+1}`).join(', ');
+        const dir   = shift > 0 ? `+${shift}` : `${shift}`;
+        impactHTML += `<div class="banner banner-info" style="margin-bottom:8px">Alternative isoform: helices <strong>${names}</strong> shift by <strong>${dir} aa</strong> (approx. new positions: ${afterTM.map(t => `${t.start+shift}–${t.end+shift}`).join(', ')}).</div>`;
+      }
+    }
+  }
+
+  // ── Legend ──
+  const legend = `<div class="tm-legend">
+  <span class="tm-leg"><span class="tm-dot" style="background:#93C5FD;border:1px solid #1E40AF"></span>Cytoplasmic</span>
+  <span class="tm-leg"><span class="tm-dot" style="background:#FCD34D;border:1px solid #92400E"></span>TM helix</span>
+  <span class="tm-leg"><span class="tm-dot" style="background:#6EE7B7;border:1px solid #065F46"></span>Extracellular</span>
+  <span class="tm-leg"><span class="tm-dot" style="background:#D8B4FE;border:1px solid #7E22CE"></span>Intramembrane</span>
+  <span class="tm-leg"><span class="tm-dot" style="border:2px solid #FF9F1C"></span>Splice event</span>
+</div>`;
+
+  // ── Diagram ──
+  const diagram = protLen
+    ? `<div style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 14px;margin-bottom:8px">${buildTMDiagramSVG(topo, protLen, aaStart, aaEnd)}</div>`
+    : '';
+
+  // ── TM helix table ──
+  let tmTable = '';
+  if (topo.transmem.length > 0) {
+    const nBefore = aaStart ? topo.transmem.filter(t => t.end < aaStart).length : 0;
+    const inEvTM  = aaStart ? topo.transmem.filter(t => !(t.end < aaStart || t.start > aaEnd)) : [];
+    const rows = topo.transmem.map((t, i) => {
+      let rel = '';
+      if (aaStart) {
+        if (t.end < aaStart)  rel = 'Before event';
+        else if (t.start > (aaEnd || aaStart)) rel = 'After event';
+        else rel = `<span style="color:#9F1239;font-weight:700">Overlaps event</span>`;
+      }
+      const shift = ev.frame.inFrame && aaStart && t.start > (aaEnd||aaStart)
+        ? nmdResult.eventInCanonical ? -deltaAA : deltaAA : 0;
+      const altPos = shift ? `${t.start+shift}–${t.end+shift}` : '—';
+      return `<tr><td><strong>TM${i+1}</strong></td><td>${t.start}</td><td>${t.end}</td><td>${t.end-t.start+1}</td><td>${escH(t.desc)}</td><td>${rel}</td><td style="color:#78716C">${altPos}</td></tr>`;
+    }).join('');
+    tmTable = `<div style="overflow-x:auto;margin-bottom:8px"><table class="data-table">
+<thead><tr><th>Helix</th><th>Start</th><th>End</th><th>Length</th><th>Type</th><th>Rel. to event</th><th>Alt. position</th></tr></thead>
+<tbody>${rows}</tbody></table></div>`;
+  }
+
+  const nSummary = `${topo.transmem.length} TM helix${topo.transmem.length!==1?'es':''}${topo.intramem.length?` · ${topo.intramem.length} intramembrane`:''}${topo.topoDomains.length?` · ${topo.topoDomains.length} topological domains`:''}`;
+
+  document.getElementById('tm-inner').innerHTML = `
+<div style="margin-bottom:6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+  <span style="font-size:11px;color:#78716C">UniProt <strong>${escH(acc)}</strong> &middot; ${nSummary}</span>
+  <a href="https://www.uniprot.org/uniprot/${acc}#subcellular_location" target="_blank" rel="noopener" style="color:#3730A3;font-size:10px">View in UniProt ↗</a>
+</div>
+${impactHTML}${legend}${diagram}${tmTable}${_tmFallbackHTML(ev, geneData, altSeq)}`;
+}
+
+function _tmFallbackHTML(ev, geneData, altSeq) {
+  const canonSeq = geneData && geneData.cdsSeq && ev ? ntToAAs(geneData.cdsSeq).join('') : '';
+  const canonFasta = canonSeq ? toFasta((ev ? ev.gene : 'protein') + '_canonical', canonSeq) : '';
+  return `<div style="margin-top:8px">
+<div style="font-size:11px;font-weight:600;color:#78716C;margin-bottom:4px">Run DeepTMHMM for TM prediction (Hallgren <em>et al.</em> 2022, DTU)</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+  ${canonFasta ? `<button class="sec-btn" onclick="_tmOpenDTU('canonical',this)">&#128203; Copy canonical &amp; open DeepTMHMM ↗</button>` : ''}
+  ${altSeq     ? `<button class="sec-btn" onclick="_tmOpenDTU('alt',this)">&#128203; Copy alternative isoform &amp; open DeepTMHMM ↗</button>` : ''}
+</div>
+<div style="font-size:9px;color:#A8A29E">DeepTMHMM uses a protein language model (ESM2) to predict TM helices and topology. Copy FASTA above, then paste into the form at <em>dtu.biolib.com/DeepTMHMM</em>.</div>
+</div>`;
+}
+
+// Clipboard helper — works on HTTP (no secure context required)
+function _copyText(text, btn) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch(_) {}
+  document.body.removeChild(ta);
+  // Also try modern API if available (HTTPS / localhost)
+  if (!ok && navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    ok = true;
+  }
+  if (btn) {
+    const orig = btn.innerHTML;
+    btn.textContent = ok ? '✓ Copied!' : '✗ Copy failed';
+    setTimeout(() => { btn.innerHTML = orig; }, 1600);
+  }
+  return ok;
+}
+
+function _tmOpenDTU(which, btn) {
+  // Open the tab synchronously (must happen directly in click handler, not after async)
+  const tab = window.open('https://dtu.biolib.com/DeepTMHMM', '_blank', 'noopener');
+  let fasta = '';
+  if (which === 'canonical') {
+    if (_lastGeneData && _lastGeneData.cdsSeq && _lastEv)
+      fasta = toFasta(_lastEv.gene + '_canonical', ntToAAs(_lastGeneData.cdsSeq).join(''));
+  } else {
+    const faEl = document.getElementById('af-fasta-area');
+    if (faEl) fasta = faEl.value;
+  }
+  if (fasta) _copyText(fasta, btn || null);
+}
+
+function afCopyFasta() {
+  const el = document.getElementById('af-fasta-area');
+  if (!el || !el.value) return;
+  const btn = document.querySelector('[onclick="afCopyFasta()"]');
+  _copyText(el.value, btn);
+}
+function afDownloadFasta() {
+  const el = document.getElementById('af-fasta-area');
+  if (!el || !el.value) return;
+  const ev = S.filtEvents[S.inspectedIdx];
+  const name = ev ? `${ev.gene}_alt_${ev.type}.fasta` : 'alt_isoform.fasta';
+  downloadText(el.value, name, 'text/plain');
+}
+
+// ─── Export SVG — native SVG rendering for Sections C + D ────────────────────
+
+// Compact SVG text helper: _et(x, y, text, {sz, fw, fill, mono, anchor})
+function _et(x, y, txt, o) {
+  const {sz=11,fw=400,fill='#1C1917',mono=false,anchor='start'} = o||{};
+  const ff = mono ? 'IBM Plex Mono,monospace' : 'IBM Plex Sans,sans-serif';
+  return `<text x="${x}" y="${y}" font-size="${sz}" font-weight="${fw}" fill="${fill}" text-anchor="${anchor}" font-family="${ff}">${txt}</text>`;
+}
+
+// Section C: render nucleotide sequence zoom as native SVG
+function exportNtZoomSVG(ev, seqData, y0) {
+  if (!seqData) return { svg: '', height: 0 };
+  const PL=20, BP=12, PW=44, W=900; // left pad, box pad, pos column width, total width
+  const AMBER='#B45309', GREEN='#065F46', CTX='#44403C';
+  const LH=17; // line height per nt row
+  let svg='', y=y0;
+
+  svg += _et(PL, y+13, 'C. Nucleotide Sequence at Event', {sz:14,fw:700}); y+=26;
+  const boxY=y; y+=BP;
+
+  const ntX = PL+BP+PW+6; // x where nucleotide text begins
+
+  function charMode(absJ, mode, deltaLen, seqLen) {
+    if (mode==='ev')         return 'ev';
+    if (mode==='new')        return 'new';
+    if (mode==='ev-start')   return absJ < deltaLen ? 'ev'  : 'ctx';
+    if (mode==='ev-end')     return absJ >= seqLen - deltaLen ? 'ev'  : 'ctx';
+    if (mode==='new-start')  return absJ < deltaLen ? 'new' : 'ctx';
+    if (mode==='new-end')    return absJ >= seqLen - deltaLen ? 'new' : 'ctx';
+    return 'ctx';
+  }
+
+  function renderLines(seq, startPos, mode, deltaLen) {
+    const LINE=60;
+    for (let ls=0; ls<seq.length; ls+=LINE) {
+      const chunk = seq.substring(ls, Math.min(ls+LINE, seq.length));
+      svg += _et(PL+BP+PW, y+12, String(startPos+ls), {sz:9,fill:'#A8A29E',mono:true,anchor:'end'});
+      // Build char groups (consecutive same-mode)
+      const chars=[];
+      for (let j=0; j<chunk.length; j++) {
+        if (j>0 && j%10===0) chars.push({c:' ',m:'ctx'});
+        chars.push({c:chunk[j], m:charMode(ls+j, mode, deltaLen, seq.length)});
+      }
+      const groups=[]; let gm=null,gt='';
+      for (const {c,m} of chars) {
+        if (m!==gm) { if(gt) groups.push({m:gm,t:gt}); gm=m; gt=c; } else gt+=c;
+      }
+      if (gt) groups.push({m:gm,t:gt});
+      const tspans=groups.map(g=>{
+        const fill=g.m==='ev'?AMBER:g.m==='new'?GREEN:CTX;
+        const fw=g.m!=='ctx'?' font-weight="700"':'';
+        return `<tspan fill="${fill}"${fw}>${escH(g.t)}</tspan>`;
+      }).join('');
+      svg += `<text x="${ntX}" y="${y+12}" font-size="11" font-family="IBM Plex Mono,monospace">${tspans}</text>`;
+      y += LH;
+    }
+  }
+
+  function subLbl(txt, fill='#78716C') { svg+=_et(PL+BP,y+11,txt,{sz:10,fw:600,fill}); y+=LH; }
+  function meta(txt)                   { svg+=_et(PL+BP,y+10,txt,{sz:9,fill:'#78716C'}); y+=LH; }
+
+  switch (seqData.type) {
+    case 'SE': {
+      const seq=seqData.eventSeq||'';
+      subLbl(`Cassette exon \u2014 ${seq.length} nt`);
+      meta('Present in canonical, absent in skipped isoform. Amber = cassette exon sequence.');
+      renderLines(seq, 1, 'ev', 0); break;
+    }
+    case 'RI': {
+      const trunc=!seqData.eventSeq;
+      subLbl(`Retained intron \u2014 ${seqData.intronLen} nt${trunc?' (truncated: first/last 120 nt)':''}`);
+      meta('Inserted into mRNA in retention isoform. Green = intron sequence.');
+      if (seqData.eventSeq) {
+        renderLines(seqData.eventSeq, 1, 'new', 0);
+      } else {
+        subLbl("5\u2032 end:"); renderLines(seqData.seqHead, 1, 'new', 0);
+        svg+=_et(PL+BP,y+10,`\u2026 ${seqData.intronLen-240} nt omitted \u2026`,{sz:9,fill:'#A8A29E'}); y+=LH;
+        subLbl("3\u2032 end:"); renderLines(seqData.seqTail, seqData.intronLen-119, 'new', 0);
+      }
+      break;
+    }
+    case 'A3SS': case 'A5SS': {
+      const {longSeq,shortSeq,deltaLen,extraAt}=seqData;
+      const endLabel=extraAt==='start'?"5\u2032 extension":"3\u2032 extension";
+      subLbl(`${ev.type} \u2014 long exon (${(longSeq||'').length} nt) vs short exon (${(shortSeq||'').length} nt) \u00b7 \u0394${deltaLen} nt`);
+      meta(`Green = ${deltaLen} extra nucleotides in long form (${endLabel}). Shared region shown in normal weight.`);
+      if (longSeq) { subLbl('Long exon:', '#065F46'); renderLines(longSeq,1,extraAt==='start'?'new-start':'new-end',deltaLen); }
+      if (shortSeq) { subLbl('Short exon (no extra nts):'); renderLines(shortSeq,1,'ctx',0); }
+      break;
+    }
+    case 'MXE': {
+      subLbl('Mutually exclusive exons');
+      meta('Exactly one exon included. Exon 1 = canonical (amber). Exon 2 = alternative (green).');
+      if (seqData.ex1Seq) { subLbl(`Exon 1 \u2014 ${seqData.ex1Seq.length} nt (canonical):`, '#E84855'); renderLines(seqData.ex1Seq,1,'ev',0); }
+      if (seqData.ex2Seq) { subLbl(`Exon 2 \u2014 ${seqData.ex2Seq.length} nt (alternative):`, '#3A86FF'); renderLines(seqData.ex2Seq,1,'new',0); }
+      break;
+    }
+  }
+  y += BP;
+  const boxH=y-boxY;
+  svg = `<rect x="${PL}" y="${boxY}" width="${W-PL*2}" height="${boxH}" rx="6" fill="#FAFAF9" stroke="#E2DDD8" stroke-width="1"/>` + svg;
+  return { svg, height: y-y0 };
+}
+
+// Section D: render amino acid zoom as native SVG
+function exportAAZoomSVG(ev, geneData, nmdResult, seqData, y0) {
+  const cdsSeq=geneData&&geneData.cdsSeq;
+  const aaStart=nmdResult&&nmdResult.affectedAAstart;
+  const aaEnd=nmdResult&&nmdResult.affectedAAend;
+  if (!cdsSeq||!aaStart) return { svg:'', height:0 };
+
+  const CONTEXT=6, BW=22, LH=20, NH=12, ROWGAP=14;
+  const AMBER_BG='#FEF3C7', AMBER='#B45309';
+  const GREEN_BG='#D1FAE5', GREEN='#065F46';
+  const DEL_BG='#FFF1F2', DEL='#9F1239';
+  const STOP_BG='#DC2626', STOP_TXT='#fff';
+  const PL=20, LBL_W=220, W=900;
+
+  const deltaNt=ev.frame.deltaNt, deltaAA=Math.floor(deltaNt/3);
+  const cdsOff=(aaStart-1)*3;
+  const winS=Math.max(0,cdsOff-CONTEXT*3), winE=Math.min(cdsSeq.length,cdsOff+deltaNt+CONTEXT*3);
+  const canonAAs=ntToAAs(cdsSeq.substring(winS,winE));
+  const ctxBefore=Math.floor((cdsOff-winS)/3), firstAA=Math.floor(winS/3)+1;
+
+  let svg='', y=y0;
+  svg+=_et(PL,y+13,'D. Amino Acid Changes at Event',{sz:14,fw:700}); y+=26;
+  svg+=_et(PL,y+10,`Affected region: AA ${aaStart}\u2013${aaEnd} (${deltaNt} nt \u00b7 ${deltaAA} aa) \u00b7 ${ev.frame.inFrame?'In-frame':'Frameshift'}`,{sz:10,fill:'#78716C'}); y+=16;
+  const boxY=y; y+=10;
+
+  function drawRow(aas, startAA, evS, evE, mode, delCount) {
+    let x=PL+10+LBL_W; const rt=y; let i=0;
+    const gapAt=mode==='del'?evS:-1;
+    while (i<aas.length) {
+      if (i===gapAt&&(delCount||0)>0) {
+        const gw=Math.max(delCount*BW,36);
+        svg+=`<rect x="${x}" y="${rt}" width="${gw}" height="${LH}" rx="2" fill="${DEL_BG}"/>`;
+        svg+=_et(x+gw/2,rt+LH-5,`\u25b2${delCount}aa`,{sz:8,fill:DEL,anchor:'middle'});
+        svg+=_et(x+gw/2,rt+LH+NH-2,'del',{sz:7,fill:'#A8A29E',anchor:'middle'});
+        x+=gw+2;
+      }
+      if (i===evS&&mode!=='del'&&evS>0)
+        svg+=`<line x1="${x}" y1="${rt-2}" x2="${x}" y2="${rt+LH+2}" stroke="#D6D3D1" stroke-width="1"/>`;
+      if (i===evE&&mode!=='del'&&evE<aas.length&&evE>evS)
+        svg+=`<line x1="${x}" y1="${rt-2}" x2="${x}" y2="${rt+LH+2}" stroke="#D6D3D1" stroke-width="1"/>`;
+      const aa=aas[i]; let bg=null, txtC='#1C1917';
+      if (aa==='*')                          { bg=STOP_BG; txtC=STOP_TXT; }
+      else if (mode==='ev'&&i>=evS&&i<evE)  { bg=AMBER_BG; txtC=AMBER; }
+      else if (mode==='new'&&i>=evS&&i<evE) { bg=GREEN_BG; txtC=GREEN; }
+      if (bg) svg+=`<rect x="${x+1}" y="${rt}" width="${BW-2}" height="${LH}" rx="2" fill="${bg}"/>`;
+      svg+=_et(x+BW/2,rt+LH-5,aa==='*'?'\u25a0':aa,{sz:12,fw:700,fill:txtC,anchor:'middle',mono:true});
+      svg+=_et(x+BW/2,rt+LH+NH-2,String(startAA+i),{sz:7,fill:'#A8A29E',anchor:'middle',mono:true});
+      x+=BW; i++;
+      if (aa==='*') break;
+    }
+    y+=LH+NH+ROWGAP;
+  }
+
+  function rowLbl(l1,l2,fill='#78716C') {
+    svg+=_et(PL+10,y+LH-5,l1,{sz:10,fw:600,fill});
+    if(l2) svg+=_et(PL+10,y+LH+NH-2,l2,{sz:8,fill:'#A8A29E'});
+  }
+
+  rowLbl('Canonical:','(amber = event region)');
+  drawRow(canonAAs, firstAA, ctxBefore, ctxBefore+deltaAA, 'ev');
+
+  if (ev.frame.inFrame) {
+    if (nmdResult.eventInCanonical) {
+      const altAAs=ntToAAs(cdsSeq.substring(winS,cdsOff)+cdsSeq.substring(cdsOff+deltaNt,Math.min(cdsSeq.length,cdsOff+deltaNt+CONTEXT*3)));
+      rowLbl('Alternative:',`(${deltaAA} aa deleted \u2014 gap marker)`);
+      drawRow(altAAs, firstAA, ctxBefore, ctxBefore, 'del', deltaAA);
+    } else {
+      const ins=(seqData&&seqData.eventSeq)?seqData.eventSeq:
+                (seqData&&seqData.longSeq&&seqData.extraAt==='start')?seqData.longSeq.substring(0,deltaNt):
+                (seqData&&seqData.longSeq&&seqData.extraAt==='end')?seqData.longSeq.substring(seqData.longSeq.length-deltaNt):null;
+      if (ins) {
+        const bef=ntToAAs(cdsSeq.substring(winS,cdsOff));
+        const aft=ntToAAs(cdsSeq.substring(cdsOff,Math.min(cdsSeq.length,cdsOff+CONTEXT*3)));
+        const altAAs=[...bef,...ntToAAs(ins),...aft];
+        rowLbl('Alternative:',`(${deltaAA} aa inserted \u2014 green)`);
+        drawRow(altAAs, firstAA, ctxBefore, ctxBefore+deltaAA, 'new');
+      }
+    }
+    if (ev.type==='MXE'&&seqData&&seqData.ex2Seq) {
+      rowLbl('Exon 2 (alt):','',  '#3A86FF');
+      drawRow(ntToAAs(seqData.ex2Seq), aaStart, 0, ntToAAs(seqData.ex2Seq).length, 'new');
+    }
+  } else {
+    const modCDS=nmdResult.eventInCanonical
+      ?cdsSeq.substring(0,cdsOff)+cdsSeq.substring(cdsOff+deltaNt)
+      :cdsSeq.substring(0,cdsOff)+'N'.repeat(deltaNt)+cdsSeq.substring(cdsOff);
+    const fsAAs=ntToAAs(modCDS.substring(winS,Math.min(modCDS.length,cdsOff+15*3)));
+    rowLbl('Alternative:','(frameshift \u2014 new reading frame in green)');
+    drawRow(fsAAs, firstAA, ctxBefore, fsAAs.length, 'new');
+    if (nmdResult.ptcAA) {
+      const msg=nmdResult.nmd?`NMD predicted \u2014 PTC at AA ${nmdResult.ptcAA}`:`PTC at AA ${nmdResult.ptcAA} \u2014 may escape NMD`;
+      svg+=`<rect x="${PL+10}" y="${y}" width="${W-PL*2-20}" height="22" rx="4" fill="${nmdResult.nmd?'#FFF1F2':'#FFFBEB'}"/>`;
+      svg+=_et(PL+20,y+14,escH(msg),{sz:10,fw:600,fill:nmdResult.nmd?'#9F1239':'#92400E'});
+      y+=30;
+    }
+  }
+  y+=8;
+  const boxH=y-boxY;
+  svg=`<rect x="${PL}" y="${boxY}" width="${W-PL*2}" height="${boxH}" rx="6" fill="#FAFAF9" stroke="#E2DDD8" stroke-width="1"/>` + svg;
+  return { svg, height: y-y0 };
+}
+
+function exportInspectSVG() {
+  const rna = document.getElementById('rna-diagram-svg');
+  const prot = document.getElementById('protein-diagram-svg');
+  if (!rna || !prot) return;
+  const ev = S.filtEvents[S.inspectedIdx];
+  if (!ev) return;
+
+  const rnaH  = parseInt(rna.getAttribute('height'))  || 200;
+  const protH = parseInt(prot.getAttribute('height')) || 200;
+  const W = 900;
+
+  const geneData  = ev.gene ? S.geneCache[ev.gene] : null;
+  const nmdResult = ev._nmd    || {};
+  const seqData   = ev._seqData || null;
+
+  const ntZ  = exportNtZoomSVG(ev, seqData, 0);
+  const aaZ  = exportAAZoomSVG(ev, geneData, nmdResult, seqData, ntZ.height + 16);
+  const zoomH = ntZ.height + aaZ.height + 16;
+  const zoomSVG = ntZ.svg + aaZ.svg;
+
+  const diagramsH = rnaH + protH + 46;
+  const totalH    = diagramsH + (zoomH > 0 ? zoomH + 20 : 0);
+
+  const combined = `<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${totalH}" style="font-family:IBM Plex Sans,sans-serif">
+  <rect width="${W}" height="${totalH}" fill="#F5F4F1"/>
+  <text x="20" y="20" font-size="14" font-weight="700" fill="#1C1917">RNA Isoform Diagram</text>
+  <g transform="translate(0,28)">${rna.innerHTML}</g>
+  <text x="20" y="${rnaH + 38}" font-size="14" font-weight="700" fill="#1C1917">Protein Domain Map</text>
+  <g transform="translate(0,${rnaH + 46})">${prot.innerHTML}</g>
+  ${zoomH > 0 ? `<g transform="translate(0,${diagramsH + 10})">${zoomSVG}</g>` : ''}
+</svg>`;
+
+  const name = ev.gene + '_splice_protein.svg';
+  downloadText(combined, name, 'image/svg+xml');
+}
+
+</script>
+<script src="/js/site.js"></script>
+<script src="/js/sessions.js"></script>
+<script>
+// ─── Session persistence ───────────────────────────────────────────────────────
+async function getSpliceProteinState() {
+  const ui = {
+    cond1:     document.getElementById('cond1').value,
+    cond2:     document.getElementById('cond2').value,
+    refGenome: document.getElementById('ref-genome').value,
+    slReads:   document.getElementById('sl-reads').value,
+    slFdr:     document.getElementById('sl-fdr').value,
+    slDpsi:    document.getElementById('sl-dpsi').value,
+    sortKey:   S.sortKey,
+    sortDir:   S.sortDir,
+    allEvents: S.allEvents,   // includes ev._nmd and ev._seqData cached results
+    geneCache: S.geneCache,
+    fileNames: Object.fromEntries(Object.entries(S.files).map(([k,v]) => [k, v.name])),
+  };
+  const files = [];
+  for (const [slot, fileObj] of Object.entries(S.files)) {
+    const data = await fileObj.arrayBuffer();
+    files.push({ slot, fileName: fileObj.name, data });
+  }
+  return { stateJson: JSON.stringify(ui), files };
+}
+
+function loadSpliceProteinState(stateJson, files) {
+  let ui; try { ui = JSON.parse(stateJson); } catch(_) { ui = {}; }
+
+  if (ui.cond1     !== undefined) document.getElementById('cond1').value = ui.cond1;
+  if (ui.cond2     !== undefined) document.getElementById('cond2').value = ui.cond2;
+  if (ui.refGenome !== undefined) document.getElementById('ref-genome').value = ui.refGenome;
+  if (ui.slReads   !== undefined) { document.getElementById('sl-reads').value = ui.slReads; syncSlider('reads', ui.slReads); }
+  if (ui.slFdr     !== undefined) { document.getElementById('sl-fdr').value   = ui.slFdr;   syncSlider('fdr',   ui.slFdr);   }
+  if (ui.slDpsi    !== undefined) { document.getElementById('sl-dpsi').value  = ui.slDpsi;  syncSlider('dpsi',  ui.slDpsi);  }
+
+  S.files = {};
+  for (const [slot, f] of Object.entries(files)) {
+    S.files[slot] = new File([f.data], f.fileName, { type: 'text/plain' });
+  }
+
+  S.allEvents  = ui.allEvents  || [];
+  S.sortKey    = ui.sortKey    || 'dpsi';
+  S.sortDir    = ui.sortDir    || -1;
+  S.geneCache  = ui.geneCache  || {};
+
+  renderChips();
+  document.getElementById('btn-analyze').disabled = Object.keys(S.files).length === 0;
+
+  if (S.allEvents.length) {
+    S.filtEvents = S.allEvents.filter(e => {
+      const minReads = parseFloat(document.getElementById('sl-reads').value) || 0;
+      const maxFDR   = parseFloat(document.getElementById('sl-fdr').value)   || 1;
+      const minDPSI  = parseFloat(document.getElementById('sl-dpsi').value)  || 0;
+      return e.coverage >= minReads && e.fdr <= maxFDR && Math.abs(e.dpsi) >= minDPSI;
+    });
+    renderSummary();
+    renderBarChart();
+    renderTable();
+    document.getElementById('summary-card').style.display = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  SessionManager.mount('splice-protein', getSpliceProteinState, loadSpliceProteinState);
+});
+</script>
+</body>
+</html>

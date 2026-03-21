@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base Editor Design — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;height:100vh}
+
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+
+.body-split{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:280px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:16px}
+.sb-heading{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:10px;margin-top:16px}
+.sb-heading:first-child{margin-top:0}
+
+/* Input mode tabs */
+.mode-bar{display:flex;background:#F5F4F1;border-radius:6px;padding:3px;gap:2px;margin-bottom:12px}
+.mode-btn{flex:1;background:none;border:none;border-radius:4px;padding:6px;font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:#78716C;transition:all .15s;text-align:center}
+.mode-btn.active{background:#fff;color:#C2185B;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ctrl-lbl{font-size:11px;font-weight:600;color:#78716C;min-width:86px;flex-shrink:0}
+.ctrl-row select,.ctrl-row input[type=number],.ctrl-row input[type=text]{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s;min-width:0}
+.ctrl-row select:focus,.ctrl-row input:focus{border-color:#C2185B}
+.ckbox{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px;color:#44403C;cursor:pointer}
+.ckbox input{accent-color:#C2185B;width:14px;height:14px}
+
+textarea.seq-input{width:100%;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:8px 10px;outline:none;resize:vertical;transition:border-color .15s;min-height:120px}
+textarea.seq-input:focus{border-color:#C2185B}
+
+.run-btn{width:100%;background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:600;padding:10px;transition:background .15s;margin-top:8px}
+.run-btn:hover{background:#A3144E}
+.run-btn:disabled{background:#D4A0B0;cursor:not-allowed}
+
+.custom-pam-section{display:none;margin-top:8px;padding:10px 12px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px}
+.custom-pam-section.visible{display:block}
+
+/* Main */
+.main-panel{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:0}
+
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:12px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+#status-bar{margin-bottom:12px}
+
+/* Results toolbar */
+.results-toolbar{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E2DDD8;border-radius:8px 8px 0 0;padding:10px 16px;flex-wrap:wrap}
+.results-toolbar h3{font-size:14px;font-weight:700;margin-right:auto}
+.filter-input{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;font-family:"IBM Plex Sans",sans-serif;font-size:12px;padding:5px 10px;outline:none;transition:border-color .15s;width:160px}
+.filter-input:focus{border-color:#C2185B}
+.filter-select{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;font-family:"IBM Plex Sans",sans-serif;font-size:12px;padding:5px 8px;outline:none;cursor:pointer}
+.download-btn{background:#1C1917;border:none;border-radius:5px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;padding:6px 12px;transition:background .15s;white-space:nowrap}
+.download-btn:hover{background:#44403C}
+
+/* Table */
+.table-wrap{background:#fff;border:1px solid #E2DDD8;border-top:none;border-radius:0 0 8px 8px;overflow:auto;flex:1}
+table{border-collapse:collapse;width:100%;font-size:12px}
+thead th{background:#F5F4F1;border-bottom:2px solid #E2DDD8;font-size:10px;font-weight:700;letter-spacing:.8px;padding:8px 12px;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:1;text-transform:uppercase;color:#78716C;cursor:pointer;user-select:none}
+thead th:hover{background:#E2DDD8}
+thead th.sorted-asc::after{content:' ↑';color:#C2185B}
+thead th.sorted-desc::after{content:' ↓';color:#C2185B}
+tbody tr{border-bottom:1px solid #F5F4F1;transition:background .1s}
+tbody tr:hover{background:#FAFAF9}
+tbody td{padding:7px 12px;white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis;font-family:"IBM Plex Mono",monospace;font-size:11px;color:#44403C}
+tbody td.text{font-family:"IBM Plex Sans",sans-serif;font-size:12px;color:#1C1917}
+
+/* Category badges */
+.badge{display:inline-block;border-radius:4px;font-size:10px;font-weight:700;padding:2px 7px;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.badge-silent{background:#D1FAE5;color:#065F46}
+.badge-missense{background:#FEF3C7;color:#92400E}
+.badge-nonsense{background:#FEE2E2;color:#991B1B}
+.badge-splice{background:#EDE9FE;color:#5B21B6}
+.badge-intron{background:#F1F5F9;color:#475569}
+.badge-utr{background:#E0F2FE;color:#075985}
+.badge-flanking{background:#F5F5F5;color:#737373}
+.badge-other{background:#F3F4F6;color:#374151}
+
+/* Empty state */
+.empty-state{padding:60px 24px;text-align:center;color:#A8A29E}
+.empty-state svg{margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:14px;margin-bottom:4px;color:#78716C}
+.empty-state small{font-size:12px}
+
+/* Spinner */
+.spinner{display:inline-block;width:18px;height:18px;border:2.5px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Guide highlight in results */
+.sgrna-seq{font-size:11px;font-family:"IBM Plex Mono",monospace;letter-spacing:.5px}
+.window-hi{color:#C2185B;font-weight:700}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <a class="topbar-back" href="/">← Back</a>
+  <div>
+    <div class="topbar-logo">Base <em>Editor</em> Design</div>
+    <div class="topbar-sub">sgRNA design for any base editor · Biswas Lab</div>
+  </div>
+</div>
+
+<div class="body-split">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+  <div class="sb-heading">Input Mode</div>
+  <div class="mode-bar" id="mode-bar">
+    <button class="mode-btn active" onclick="setMode('fasta')">FASTA Sequence</button>
+    <button class="mode-btn" onclick="setMode('tid')">Ensembl Transcript ID</button>
+  </div>
+
+  <div id="panel-fasta">
+    <div class="sb-heading" style="margin-top:0">Nucleotide Sequence</div>
+    <textarea class="seq-input" id="fasta-input" placeholder=">Gene_Name&#10;ATGGCCatgccgATGCCC...&#10;&#10;Lowercase = introns, UPPERCASE = exons" style="min-height:160px"></textarea>
+    <div style="font-size:10px;color:#A8A29E;margin-top:4px;line-height:1.5">Provide FASTA format. Use <strong>UPPERCASE</strong> for exons and <strong>lowercase</strong> for introns. Multiple sequences allowed.</div>
+  </div>
+
+  <div id="panel-tid" style="display:none">
+    <div class="sb-heading" style="margin-top:0">Gene Symbol Lookup</div>
+    <div style="display:flex;gap:5px;margin-bottom:6px">
+      <input type="text" id="gene-sym-input" placeholder="e.g. SF1, TP53, BRCA1"
+        style="flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:IBM Plex Mono,monospace;font-size:12px;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='#C2185B'" onblur="this.style.borderColor='#E2DDD8'"
+        onkeydown="if(event.key==='Enter')lookupGeneForBE()">
+      <select id="be-species-select" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 6px;font-size:11px;color:#1C1917;outline:none">
+        <option value="homo_sapiens">Human</option>
+        <option value="mus_musculus">Mouse</option>
+      </select>
+    </div>
+    <button onclick="lookupGeneForBE()" id="btn-gene-lookup"
+      style="width:100%;background:#44403C;border:none;border-radius:5px;color:#fff;cursor:pointer;font-family:IBM Plex Sans,sans-serif;font-size:12px;font-weight:600;padding:6px;margin-bottom:8px;transition:background .15s"
+      onmouseover="this.style.background='#1C1917'" onmouseout="this.style.background='#44403C'">
+      Search Ensembl
+    </button>
+    <div id="gene-browser-be" style="display:none;max-height:220px;overflow-y:auto;border:1px solid #E2DDD8;border-radius:6px;margin-bottom:8px;background:#fff">
+    </div>
+    <div class="sb-heading" style="margin-top:0">Transcript IDs</div>
+    <textarea class="seq-input" id="tid-input" placeholder="ENST00000357654&#10;ENST00000369285&#10;..." style="min-height:80px"></textarea>
+    <div style="font-size:10px;color:#A8A29E;margin-top:4px;line-height:1.5">One ENST ID per line. Click a transcript above to add it, or paste IDs directly. ClinVar annotations included. ~1 min per gene.</div>
+  </div>
+
+  <div class="sb-heading">Base Editor Type</div>
+  <div class="ctrl-row">
+    <label class="ctrl-lbl">BE Type</label>
+    <select id="be-type-select" onchange="onBeTypeChange()">
+      <option value="">Loading…</option>
+    </select>
+  </div>
+
+  <div id="custom-pam-section" class="custom-pam-section">
+    <div style="font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Custom Parameters</div>
+    <div class="ctrl-row">
+      <label class="ctrl-lbl">PAM</label>
+      <input type="text" id="custom-pam" value="NGG" maxlength="12" style="text-transform:uppercase">
+    </div>
+    <div class="ctrl-row">
+      <label class="ctrl-lbl">Window</label>
+      <input type="text" id="custom-window" value="4-8" placeholder="e.g. 4-8">
+    </div>
+    <div class="ctrl-row">
+      <label class="ctrl-lbl">Guide length</label>
+      <input type="number" id="custom-sglen" value="20" min="17" max="25">
+    </div>
+    <div class="ctrl-row">
+      <label class="ctrl-lbl">Edited base</label>
+      <select id="custom-from-base" onchange="onFromBaseChange()">
+        <option value="C">C (cytosine editors)</option>
+        <option value="A">A (adenine editors)</option>
+        <option value="all">Both C and A</option>
+      </select>
+    </div>
+    <div class="ctrl-row" id="row-to-base">
+      <label class="ctrl-lbl">Result base</label>
+      <select id="custom-to-base">
+        <option value="T">T &nbsp;(C → T, standard CBE)</option>
+        <option value="G">G &nbsp;(C → G editor)</option>
+        <option value="A">A &nbsp;(C → A editor)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Preset info display -->
+  <div id="be-info" style="display:none;margin-top:8px;padding:8px 10px;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;font-size:11px;color:#9F1239;line-height:1.6"></div>
+
+  <div class="sb-heading">Options</div>
+  <div class="ctrl-row">
+    <label class="ctrl-lbl">Intron buffer</label>
+    <input type="number" id="intron-buf" value="30" min="0" max="200">
+  </div>
+  <label class="ckbox">
+    <input type="checkbox" id="filter-gc">Filter GC motifs (avoid C in 5'-GC context)
+  </label>
+
+  <button class="run-btn" id="run-btn" onclick="runDesign()">Design sgRNAs</button>
+</div>
+
+<!-- MAIN PANEL -->
+<div class="main-panel" id="main-panel">
+
+  <div id="status-bar"></div>
+
+  <!-- Results toolbar (hidden until results) -->
+  <div id="results-toolbar" class="results-toolbar" style="display:none">
+    <h3 id="results-count">0 guides</h3>
+    <input class="filter-input" id="filter-text" type="text" placeholder="Search…" oninput="applyFilters()">
+    <select class="filter-select" id="filter-cat" onchange="applyFilters()">
+      <option value="">All categories</option>
+      <option value="Silent">Silent</option>
+      <option value="Missense">Missense</option>
+      <option value="Nonsense">Nonsense</option>
+      <option value="Splice-acceptor">Splice-acceptor</option>
+      <option value="Splice-donor">Splice-donor</option>
+      <option value="Intron">Intron</option>
+      <option value="UTR">UTR</option>
+    </select>
+    <select class="filter-select" id="filter-edit" onchange="applyFilters()">
+      <option value="">All edits</option>
+      <option value="C-T" id="filt-ct">C→T</option>
+      <option value="A-G" id="filt-ag">A→G</option>
+    </select>
+    <select class="filter-select" id="filter-strand" onchange="applyFilters()">
+      <option value="">Both strands</option>
+      <option value="sense">Sense</option>
+      <option value="antisense">Antisense</option>
+    </select>
+    <button class="download-btn" onclick="downloadTSV()">⬇ Download TSV</button>
+  </div>
+
+  <div id="table-wrap" class="table-wrap" style="display:none">
+    <table id="results-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)">sgRNA Sequence</th>
+          <th onclick="sortBy(1)">Gene</th>
+          <th onclick="sortBy(2)">Strand</th>
+          <th onclick="sortBy(3)">PAM</th>
+          <th onclick="sortBy(4)">Edit</th>
+          <th onclick="sortBy(5)"># Edits</th>
+          <th onclick="sortBy(6)"># Silent</th>
+          <th onclick="sortBy(7)">Nucleotide Edits</th>
+          <th onclick="sortBy(8)">AA Edits</th>
+          <th onclick="sortBy(9)">Category</th>
+          <th onclick="sortBy(10)">ClinVar</th>
+          <th onclick="sortBy(11)">BsmBI</th>
+          <th onclick="sortBy(12)">4T Flag</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Empty state -->
+  <div id="empty-state" class="empty-state">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+      <rect x="8" y="8" width="40" height="40" rx="6" fill="#E2DDD8"/>
+      <rect x="16" y="18" width="24" height="3" rx="1.5" fill="#A8A29E"/>
+      <rect x="16" y="25" width="18" height="3" rx="1.5" fill="#A8A29E"/>
+      <rect x="16" y="32" width="22" height="3" rx="1.5" fill="#A8A29E"/>
+    </svg>
+    <p>Enter a sequence and click <strong>Design sgRNAs</strong></p>
+    <small>Supports both FASTA nucleotide sequences and Ensembl transcript IDs</small>
+  </div>
+
+</div><!-- /main-panel -->
+</div><!-- /body-split -->
+</div><!-- /shell -->
+
+<script>
+const API = '/api/baseedit';
+
+// ── State ──────────────────────────────────────────────────────
+let S = {
+  mode: 'fasta',
+  beTypes: [],
+  allResults: [],     // full unfiltered results
+  filtered: [],       // after filters
+  sortCol: -1,
+  sortDir: 1,
+  editLabel: null,    // e.g. 'C→G' when custom edit is set; null = use backend label
+};
+
+// ── Init ───────────────────────────────────────────────────────
+(async function init() {
+  try {
+    const res = await fetch(`${API}/be-types`);
+    S.beTypes = await res.json();
+    const sel = document.getElementById('be-type-select');
+    sel.innerHTML = '<option value="custom">Custom (manual PAM/window)</option>';
+    S.beTypes.forEach(be => {
+      const opt = document.createElement('option');
+      opt.value = be.name;
+      opt.textContent = `${be.name}  (${be.pam}, win ${be.window}, ${be.edit})`;
+      sel.appendChild(opt);
+    });
+    // Default to Custom
+    sel.value = 'custom';
+    onBeTypeChange();
+  } catch(e) {
+    setStatus('Could not load BE types from server. Is the API running?', 'err');
+  }
+})();
+
+// ── From-base change: update To-base options and visibility ────
+function onFromBaseChange() {
+  const from = document.getElementById('custom-from-base').value;
+  const toSel = document.getElementById('custom-to-base');
+  const toRow = document.getElementById('row-to-base');
+
+  if (from === 'all') {
+    toRow.style.display = 'none';
+    return;
+  }
+  toRow.style.display = '';
+  const prev = toSel.value;
+
+  if (from === 'C') {
+    toSel.innerHTML = `
+      <option value="T">T &nbsp;(C → T, standard CBE)</option>
+      <option value="G">G &nbsp;(C → G editor)</option>
+      <option value="A">A &nbsp;(C → A editor)</option>`;
+    // keep previous selection if it still makes sense
+    if (['T','G','A'].includes(prev)) toSel.value = prev;
+  } else {
+    toSel.innerHTML = `
+      <option value="G">G &nbsp;(A → G, standard ABE)</option>
+      <option value="C">C &nbsp;(A → C editor)</option>
+      <option value="T">T &nbsp;(A → T editor)</option>`;
+    if (['G','C','T'].includes(prev)) toSel.value = prev;
+  }
+}
+
+// ── Mode toggle ────────────────────────────────────────────────
+function setMode(mode) {
+  S.mode = mode;
+  document.querySelectorAll('.mode-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && mode==='fasta') || (i===1 && mode==='tid'));
+  });
+  document.getElementById('panel-fasta').style.display = mode === 'fasta' ? '' : 'none';
+  document.getElementById('panel-tid').style.display   = mode === 'tid'   ? '' : 'none';
+}
+
+// ── BE type change ─────────────────────────────────────────────
+function onBeTypeChange() {
+  const val = document.getElementById('be-type-select').value;
+  const customSection = document.getElementById('custom-pam-section');
+  const beInfo = document.getElementById('be-info');
+  if (val === 'custom') {
+    customSection.classList.add('visible');
+    beInfo.style.display = 'none';
+  } else {
+    customSection.classList.remove('visible');
+    const be = S.beTypes.find(b => b.name === val);
+    if (be) {
+      beInfo.style.display = 'block';
+      beInfo.innerHTML = `<strong>${be.name}</strong> &nbsp;·&nbsp; PAM: ${be.pam} &nbsp;·&nbsp; Window: ${be.window} &nbsp;·&nbsp; Guide: ${be.sg_len} nt &nbsp;·&nbsp; Edit: ${be.edit}`;
+    } else {
+      beInfo.style.display = 'none';
+    }
+  }
+}
+
+// ── Run ────────────────────────────────────────────────────────
+async function runDesign() {
+  const beType = document.getElementById('be-type-select').value;
+  const seqText = S.mode === 'fasta'
+    ? document.getElementById('fasta-input').value.trim()
+    : document.getElementById('tid-input').value.trim();
+
+  if (!seqText) {
+    setStatus('Please enter a sequence or transcript ID.', 'warn');
+    return;
+  }
+
+  const body = {
+    input_type: S.mode === 'fasta' ? 'nuc' : 'tid',
+    sequences: seqText,
+    intron_buffer: parseInt(document.getElementById('intron-buf').value) || 30,
+    filter_gc: document.getElementById('filter-gc').checked,
+  };
+
+  S.editLabel = null;  // reset
+
+  if (beType === 'custom') {
+    body.pam    = (document.getElementById('custom-pam').value || 'NGG').toUpperCase();
+    body.window = document.getElementById('custom-window').value || '4-8';
+    body.sg_len = parseInt(document.getElementById('custom-sglen').value) || 20;
+
+    const fromBase = document.getElementById('custom-from-base').value;
+    const toBase   = document.getElementById('custom-to-base').value;
+
+    if (fromBase === 'all') {
+      body.edit = 'all';
+    } else if (fromBase === 'C') {
+      body.edit = 'C-T';   // backend selects C-in-window guides
+      if (toBase !== 'T') S.editLabel = { from: 'C-T', label: `C→${toBase}` };
+    } else {
+      body.edit = 'A-G';   // backend selects A-in-window guides
+      if (toBase !== 'G') S.editLabel = { from: 'A-G', label: `A→${toBase}` };
+    }
+  } else {
+    body.be_type = beType;
+  }
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  hideResults();
+
+  const isTid = body.input_type === 'tid';
+  const timeNote = isTid ? ' (may take 1-2 min — loading ClinVar annotations)' : '';
+  setStatus(`<span class="spinner"></span>Designing sgRNAs${timeNote}…`, 'info');
+
+  try {
+    const res = await fetch(`${API}/design`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      setStatus(data.error || 'Server error', 'err');
+      return;
+    }
+
+    S.allResults = data.designs || [];
+    S.filtered   = [...S.allResults];
+
+    if (S.allResults.length === 0) {
+      setStatus('No sgRNA designs found. Check your sequence format and BE type.', 'warn');
+      return;
+    }
+
+    const errNote = data.errors && data.errors.length > 1
+      ? ` · ${data.errors.length - 1} transcript error(s)` : '';
+    setStatus(`Found <strong>${S.allResults.length}</strong> sgRNA designs${errNote}`, 'ok');
+
+    // Update filter-edit labels to reflect custom edit type
+    const ctOpt = document.getElementById('filt-ct');
+    const agOpt = document.getElementById('filt-ag');
+    if (S.editLabel && S.editLabel.from === 'C-T') {
+      ctOpt.textContent = S.editLabel.label;
+    } else {
+      ctOpt.textContent = 'C→T';
+    }
+    if (S.editLabel && S.editLabel.from === 'A-G') {
+      agOpt.textContent = S.editLabel.label;
+    } else {
+      agOpt.textContent = 'A→G';
+    }
+
+    renderTable();
+
+  } catch(e) {
+    setStatus('Request failed: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Render table ───────────────────────────────────────────────
+function renderTable() {
+  applyFilters();
+}
+
+function applyFilters() {
+  const txt    = document.getElementById('filter-text').value.toLowerCase();
+  const cat    = document.getElementById('filter-cat').value;
+  const edit   = document.getElementById('filter-edit').value;
+  const strand = document.getElementById('filter-strand').value;
+
+  S.filtered = S.allResults.filter(r => {
+    const catStr = (r['Mutation category'] || '').toLowerCase();
+    if (cat && !catStr.includes(cat.toLowerCase())) return false;
+    if (edit && r['Edit'] !== edit) return false;
+    if (strand && r['sgRNA Strand'] !== strand) return false;
+    if (txt) {
+      const hay = Object.values(r).join(' ').toLowerCase();
+      if (!hay.includes(txt)) return false;
+    }
+    return true;
+  });
+
+  if (S.sortCol >= 0) applySort();
+  drawRows();
+  document.getElementById('results-count').textContent = `${S.filtered.length} / ${S.allResults.length} guides`;
+  document.getElementById('results-toolbar').style.display = '';
+  document.getElementById('table-wrap').style.display = '';
+  document.getElementById('empty-state').style.display = 'none';
+}
+
+function drawRows() {
+  const tbody = document.getElementById('results-body');
+  if (S.filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:32px;color:#A8A29E">No results match the current filters</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = S.filtered.map(r => {
+    const cats = (r['Mutation category'] || '').split(';').filter(Boolean);
+    const catBadges = cats.map(c => categoryBadge(c.trim())).join(' ');
+    const clinvar = r['Clinical significance'] || '';
+    const clinClass = clinvar.toLowerCase().includes('pathogenic') ? 'color:#9F1239;font-weight:700' : 'color:#78716C';
+    const editRaw = r['Edit'] || '';
+    const editDisplay = (S.editLabel && editRaw === S.editLabel.from)
+      ? `<span title="Custom edit (backend: ${editRaw})">${S.editLabel.label}</span>`
+      : editRaw;
+    return `<tr>
+      <td class="sgrna-seq" title="${r['sgRNA sequence'] || ''}">${r['sgRNA sequence'] || ''}</td>
+      <td class="text">${r['Gene Symbol'] || ''}</td>
+      <td class="text">${r['sgRNA Strand'] || ''}</td>
+      <td>${r['PAM'] || ''}</td>
+      <td>${editDisplay}</td>
+      <td style="text-align:center">${r['# edits'] || '0'}</td>
+      <td style="text-align:center">${r['#silent edits'] || '0'}</td>
+      <td title="${r['Nucleotide edits'] || ''}">${truncate(r['Nucleotide edits'] || '', 24)}</td>
+      <td title="${r['Amino acid edits'] || ''}">${truncate(r['Amino acid edits'] || '', 24)}</td>
+      <td>${catBadges}</td>
+      <td style="${clinClass};font-size:10px">${truncate(clinvar, 30)}</td>
+      <td style="text-align:center">${r['BsmBI flag'] ? '⚠' : ''}</td>
+      <td style="text-align:center">${r['4T flag'] ? '⚠' : ''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function categoryBadge(cat) {
+  if (!cat) return '';
+  const cls = {
+    'Silent':         'badge-silent',
+    'Missense':       'badge-missense',
+    'Nonsense':       'badge-nonsense',
+    'Splice-acceptor':'badge-splice',
+    'Splice-donor':   'badge-splice',
+    'Intron':         'badge-intron',
+    'UTR':            'badge-utr',
+    'Flanking':       'badge-flanking',
+  }[cat] || 'badge-other';
+  return `<span class="badge ${cls}">${cat}</span>`;
+}
+
+function truncate(s, n) {
+  return s && s.length > n ? s.slice(0, n) + '…' : (s || '');
+}
+
+// ── Sort ───────────────────────────────────────────────────────
+const COL_KEYS = [
+  'sgRNA sequence','Gene Symbol','sgRNA Strand','PAM','Edit',
+  '# edits','#silent edits','Nucleotide edits','Amino acid edits',
+  'Mutation category','Clinical significance','BsmBI flag','4T flag'
+];
+function sortBy(col) {
+  const ths = document.querySelectorAll('thead th');
+  ths.forEach((th, i) => {
+    th.classList.remove('sorted-asc','sorted-desc');
+    if (i === col) th.classList.add(S.sortDir > 0 ? 'sorted-asc' : 'sorted-desc');
+  });
+  if (S.sortCol === col) S.sortDir *= -1;
+  else { S.sortCol = col; S.sortDir = 1; }
+  applySort();
+  drawRows();
+}
+function applySort() {
+  if (S.sortCol < 0) return;
+  const key = COL_KEYS[S.sortCol];
+  S.filtered.sort((a,b) => {
+    let av = a[key] || '', bv = b[key] || '';
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) return (an - bn) * S.sortDir;
+    return av.localeCompare(bv) * S.sortDir;
+  });
+}
+
+// ── Download ───────────────────────────────────────────────────
+function downloadTSV() {
+  if (!S.filtered.length) return;
+  const headers = Object.keys(S.filtered[0]);
+  const lines = [headers.join('\t'), ...S.filtered.map(r => headers.map(h => r[h] || '').join('\t'))];
+  const blob = new Blob([lines.join('\n')], {type: 'text/tab-separated-values'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'base_editor_designs.txt';
+  a.click();
+}
+
+// ── Gene Symbol → ENST Lookup ──────────────────────────────────
+const ENSEMBL_REST = 'https://rest.ensembl.org';
+
+async function lookupGeneForBE() {
+  const sym = document.getElementById('gene-sym-input').value.trim();
+  const sp  = document.getElementById('be-species-select').value;
+  if (!sym) return;
+  const btn = document.getElementById('btn-gene-lookup');
+  const browser = document.getElementById('gene-browser-be');
+  btn.textContent = '…'; btn.disabled = true;
+  browser.style.display = 'none';
+  try {
+    const url = `${ENSEMBL_REST}/lookup/symbol/${sp}/${encodeURIComponent(sym)}?expand=1&content-type=application/json`;
+    const resp = await fetch(url, {headers: {Accept: 'application/json'}});
+    if (!resp.ok) throw new Error(resp.status === 400 ? `Gene "${sym}" not found` : `Ensembl error ${resp.status}`);
+    const data = await resp.json();
+    if (!data.Transcript || !data.Transcript.length) throw new Error('No transcripts returned');
+
+    const transcripts = data.Transcript
+      .filter(t => t.id && t.id.startsWith('ENST'))
+      .sort((a, b) => {
+        if ((b.is_canonical||0) !== (a.is_canonical||0)) return (b.is_canonical||0)-(a.is_canonical||0);
+        const aPC = a.biotype === 'protein_coding' ? 1 : 0;
+        const bPC = b.biotype === 'protein_coding' ? 1 : 0;
+        if (bPC !== aPC) return bPC - aPC;
+        return (a.start||0) - (b.start||0);
+      });
+
+    const nPC = transcripts.filter(t => t.biotype === 'protein_coding').length;
+    let html = `<div style="background:#F5F4F1;padding:7px 10px;font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #E2DDD8">
+      ${escHtml(data.display_name || sym)} &mdash; ${transcripts.length} transcripts (${nPC} protein-coding)
+    </div>`;
+    for (const t of transcripts) {
+      const canon  = t.is_canonical  ? '<span style="background:#D1FAE5;color:#065F46;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px">★ canonical</span>' : '';
+      const pc     = t.biotype === 'protein_coding'
+        ? '<span style="background:#EDE9FE;color:#5B21B6;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px">protein-coding</span>'
+        : `<span style="background:#F1F5F9;color:#475569;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px">${escHtml(t.biotype||'?')}</span>`;
+      const nExons = t.Exon ? t.Exon.length : (t.exon_count || '?');
+      const span   = (t.end && t.start) ? `${((t.end - t.start)/1000).toFixed(1)} kb` : '';
+      html += `<div onclick="addEnstId('${escHtml(t.id)}')"
+        style="padding:7px 10px;cursor:pointer;border-bottom:1px solid #F5F4F1;transition:background .1s"
+        onmouseover="this.style.background='#FFF1F2'" onmouseout="this.style.background=''">
+        <div style="font-family:IBM Plex Mono,monospace;font-size:11px;font-weight:600;color:#C2185B;margin-bottom:3px">${escHtml(t.id)}</div>
+        <div>${canon}${pc}</div>
+        <div style="font-size:10px;color:#A8A29E;margin-top:2px">${nExons} exons &middot; ${span}</div>
+      </div>`;
+    }
+    browser.innerHTML = html;
+    browser.style.display = '';
+  } catch(e) {
+    setStatus(`Gene lookup failed: ${e.message}`, 'err');
+  }
+  btn.textContent = 'Search Ensembl'; btn.disabled = false;
+}
+
+function addEnstId(enst) {
+  const ta = document.getElementById('tid-input');
+  const existing = ta.value.trim();
+  const ids = existing ? existing.split('\n').map(s => s.trim()).filter(Boolean) : [];
+  if (!ids.includes(enst)) {
+    ids.push(enst);
+    ta.value = ids.join('\n');
+  }
+  // Switch to tid mode if not already there
+  if (S.mode !== 'tid') setMode('tid');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function setStatus(msg, type) {
+  const cls = type === 'err' ? 'banner-err' : type === 'warn' ? 'banner-warn' : type === 'ok' ? 'banner-ok' : 'banner-info';
+  document.getElementById('status-bar').innerHTML = `<div class="banner ${cls}">${msg}</div>`;
+}
+
+function hideResults() {
+  document.getElementById('results-toolbar').style.display = 'none';
+  document.getElementById('table-wrap').style.display = 'none';
+  document.getElementById('empty-state').style.display = '';
+}
+</script>
+</body>
+</html>

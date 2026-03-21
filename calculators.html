@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Calculators – Jeet Biswas</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 1.5rem; }
+.calc-box { background: var(--card-bg, #fff); border: 1px solid var(--border, #e0e0e0); border-radius: 8px; padding: 1.25rem 1.5rem; }
+.calc-box h3 { margin: 0 0 0.75rem; font-size: 1.05rem; border-bottom: 2px solid var(--accent, #3a6ea5); padding-bottom: 0.4rem; }
+.calc-box label { display: block; font-size: 0.85rem; color: #555; margin: 0.5rem 0 0.2rem; }
+.calc-box input, .calc-box select { width: 100%; padding: 0.35rem 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; box-sizing: border-box; }
+.calc-box button { margin-top: 0.85rem; padding: 0.4rem 1.1rem; background: var(--accent, #3a6ea5); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+.calc-box button:hover { opacity: 0.88; }
+.calc-result { margin-top: 0.75rem; padding: 0.6rem 0.85rem; background: #f0f4fa; border-left: 3px solid var(--accent, #3a6ea5); border-radius: 3px; font-size: 0.88rem; display: none; }
+.calc-result.show { display: block; }
+.calc-result table { width: 100%; border-collapse: collapse; margin-top: 0.4rem; }
+.calc-result table td { padding: 0.2rem 0.4rem; font-size: 0.85rem; }
+.calc-result table td:first-child { font-weight: 600; color: #333; width: 60%; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Transcriptomics &bull; Chemo-Proteomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/publications.html">Publications</a>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/people.html">People</a>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link active" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title">
+  <h2>Lab Calculators</h2>
+  <p>Quick-access calculators for common wet-lab and bioinformatics calculations</p>
+</div>
+<div class="container">
+
+<div class="calc-grid">
+
+<!-- ══ PCR Master Mix ══ -->
+<div class="calc-box">
+  <h3>PCR Master Mix</h3>
+  <label>Number of reactions (add 10% overage automatically)</label>
+  <input type="number" id="pcr-n" value="10" min="1">
+  <label>Polymerase</label>
+  <select id="pcr-poly">
+    <option value="q5">NEB Q5 (25 µL rxn)</option>
+    <option value="phusion">NEB Phusion (25 µL rxn)</option>
+    <option value="taq">Taq (25 µL rxn)</option>
+    <option value="kapa">KAPA HiFi (25 µL rxn)</option>
+    <option value="custom">Custom (25 µL rxn)</option>
+  </select>
+  <button onclick="calcPCR()">Calculate</button>
+  <div class="calc-result" id="pcr-result"></div>
+</div>
+
+<!-- ══ Ligation ══ -->
+<div class="calc-box">
+  <h3>T4 Ligation Master Mix</h3>
+  <div class="row2">
+    <div>
+      <label>Backbone mass (ng)</label>
+      <input type="number" id="lig-bb-mass" value="50">
+    </div>
+    <div>
+      <label>Backbone size (bp)</label>
+      <input type="number" id="lig-bb-size" value="5000">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Insert size (bp)</label>
+      <input type="number" id="lig-ins-size" value="500">
+    </div>
+    <div>
+      <label>Insert:Backbone molar ratio</label>
+      <select id="lig-ratio">
+        <option value="3">3:1 (standard)</option>
+        <option value="5">5:1 (difficult inserts)</option>
+        <option value="1">1:1 (blunt-end)</option>
+      </select>
+    </div>
+  </div>
+  <label>Total reaction volume (µL)</label>
+  <input type="number" id="lig-vol" value="20">
+  <button onclick="calcLigation()">Calculate</button>
+  <div class="calc-result" id="lig-result"></div>
+</div>
+
+<!-- ══ Gibson Assembly ══ -->
+<div class="calc-box">
+  <h3>Gibson Assembly</h3>
+  <label>Backbone mass (ng)</label>
+  <input type="number" id="gib-bb-mass" value="100">
+  <label>Backbone size (bp)</label>
+  <input type="number" id="gib-bb-size" value="5000">
+  <div id="gib-inserts">
+    <label>Insert 1 size (bp)</label>
+    <input type="number" class="gib-ins-size" value="500">
+    <label>Insert 2 size (bp) — optional</label>
+    <input type="number" class="gib-ins-size" value="0">
+  </div>
+  <label>Insert:Backbone molar ratio</label>
+  <select id="gib-ratio">
+    <option value="2">2:1</option>
+    <option value="3" selected>3:1 (recommended)</option>
+    <option value="5">5:1</option>
+  </select>
+  <button onclick="calcGibson()">Calculate</button>
+  <div class="calc-result" id="gib-result"></div>
+</div>
+
+<!-- ══ Transfection ══ -->
+<div class="calc-box">
+  <h3>Transfection Calculator</h3>
+  <label>Reagent</label>
+  <select id="tx-reagent" onchange="updateTxUI()">
+    <option value="fugene">FuGENE HD</option>
+    <option value="lipo2000">Lipofectamine 2000</option>
+    <option value="lipo3000">Lipofectamine 3000</option>
+    <option value="jetprime">JetPRIME</option>
+    <option value="jetoptimus">JetOptimus</option>
+    <option value="capo4">Calcium Phosphate</option>
+  </select>
+  <label>Dish format</label>
+  <select id="tx-dish" onchange="updateTxUI()">
+    <option value="10cm">10 cm dish</option>
+    <option value="6cm">6 cm dish</option>
+    <option value="6well">6-well plate</option>
+    <option value="12well">12-well plate</option>
+    <option value="24well">24-well plate</option>
+    <option value="96well">96-well plate</option>
+  </select>
+  <div id="tx-ratio-row">
+    <label>Reagent:DNA ratio (µL : µg)</label>
+    <select id="tx-ratio" onchange="calcTx()">
+      <option value="2">2:1 (standard)</option>
+      <option value="3">3:1 (hard-to-transfect)</option>
+      <option value="3.5">3.5:1 (suspension cells)</option>
+    </select>
+  </div>
+  <div id="tx-dna-row">
+    <label>DNA per dish (µg)</label>
+    <input type="number" id="tx-dna" value="10" oninput="calcTx()">
+  </div>
+  <button onclick="calcTx()">Calculate</button>
+  <div class="calc-result" id="tx-result"></div>
+</div>
+
+<!-- ══ Dilution Calculator ══ -->
+<div class="calc-box">
+  <h3>Compound / Reagent Dilution</h3>
+  <div class="row2">
+    <div>
+      <label>Stock concentration</label>
+      <input type="number" id="dil-stock" value="50">
+    </div>
+    <div>
+      <label>Stock units</label>
+      <select id="dil-stock-units">
+        <option value="mM">mM</option>
+        <option value="µM">µM</option>
+        <option value="nM">nM</option>
+        <option value="mg/mL">mg/mL</option>
+      </select>
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Desired final concentration</label>
+      <input type="number" id="dil-final" value="200">
+    </div>
+    <div>
+      <label>Final units</label>
+      <select id="dil-final-units">
+        <option value="mM">mM</option>
+        <option value="µM">µM</option>
+        <option value="nM">nM</option>
+        <option value="mg/mL">mg/mL</option>
+      </select>
+    </div>
+  </div>
+  <label>Final volume (µL)</label>
+  <input type="number" id="dil-vol" value="1000">
+  <button onclick="calcDilution()">Calculate</button>
+  <div class="calc-result" id="dil-result"></div>
+</div>
+
+<!-- ══ Antibody Dilution ══ -->
+<div class="calc-box">
+  <h3>Antibody Dilution</h3>
+  <label>Dilution ratio (e.g. 1000 for 1:1000)</label>
+  <input type="number" id="ab-ratio" value="1000">
+  <div class="row2">
+    <div>
+      <label>Total volume needed (µL)</label>
+      <input type="number" id="ab-vol" value="500">
+    </div>
+    <div>
+      <label>Diluent</label>
+      <select id="ab-diluent">
+        <option>5% BSA in TBST</option>
+        <option>5% milk in TBST</option>
+        <option>2% BSA in PBS</option>
+        <option>Blocking buffer</option>
+      </select>
+    </div>
+  </div>
+  <button onclick="calcAntibody()">Calculate</button>
+  <div class="calc-result" id="ab-result"></div>
+</div>
+
+<!-- ══ Molar Concentration ══ -->
+<div class="calc-box">
+  <h3>Molar Concentration Converter</h3>
+  <div class="row2">
+    <div>
+      <label>Molecular weight (g/mol)</label>
+      <input type="number" id="mol-mw" value="500">
+    </div>
+    <div>
+      <label>Concentration (mg/mL)</label>
+      <input type="number" id="mol-mgml" value="1">
+    </div>
+  </div>
+  <label>Or: enter molar concentration (µM) to get mg/mL</label>
+  <input type="number" id="mol-um" placeholder="optional">
+  <button onclick="calcMolar()">Calculate</button>
+  <div class="calc-result" id="mol-result"></div>
+</div>
+
+<!-- ══ BigWig Normalization ══ -->
+<div class="calc-box">
+  <h3>BigWig Normalization Factor</h3>
+  <p style="font-size:0.82rem;color:#666;margin:0 0 0.5rem">Scales coverage to reads-per-10M mapped reads. Used in the HyperTRIBE pipeline BigWig generation script.</p>
+  <label>Total mapped reads (from samtools view -c)</label>
+  <input type="number" id="bw-reads" value="50000000">
+  <label>Scale denominator</label>
+  <select id="bw-denom">
+    <option value="10000000">10,000,000 (default in pipeline)</option>
+    <option value="1000000">1,000,000 (RPM)</option>
+    <option value="1000000000">1,000,000,000 (RPBM)</option>
+  </select>
+  <button onclick="calcBigwig()">Calculate</button>
+  <div class="calc-result" id="bw-result"></div>
+</div>
+
+<!-- ══ DNA / RNA Quantification ══ -->
+<div class="calc-box">
+  <h3>Nanodrop Concentration &amp; Yield</h3>
+  <div class="row2">
+    <div>
+      <label>Absorbance A260</label>
+      <input type="number" id="nd-a260" value="0.5" step="0.001">
+    </div>
+    <div>
+      <label>Sample type</label>
+      <select id="nd-type">
+        <option value="50">dsDNA (factor 50)</option>
+        <option value="40">RNA (factor 40)</option>
+        <option value="33">ssDNA (factor 33)</option>
+      </select>
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>A280 (for purity)</label>
+      <input type="number" id="nd-a280" value="0.25" step="0.001">
+    </div>
+    <div>
+      <label>Elution volume (µL)</label>
+      <input type="number" id="nd-vol" value="50">
+    </div>
+  </div>
+  <button onclick="calcNanodrop()">Calculate</button>
+  <div class="calc-result" id="nd-result"></div>
+</div>
+
+<!-- ══ Cell Counting / Seeding ══ -->
+<div class="calc-box">
+  <h3>Cell Seeding Density Calculator</h3>
+  <div class="row2">
+    <div>
+      <label>Counted cells/mL</label>
+      <input type="number" id="cell-count" value="1000000">
+    </div>
+    <div>
+      <label>Current volume (mL)</label>
+      <input type="number" id="cell-curvol" value="10">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Target cells per well/dish</label>
+      <input type="number" id="cell-target" value="500000">
+    </div>
+    <div>
+      <label>Final volume per well (mL)</label>
+      <input type="number" id="cell-finalvol" value="2">
+    </div>
+  </div>
+  <label>Number of wells/dishes</label>
+  <input type="number" id="cell-wells" value="6">
+  <button onclick="calcCellSeeding()">Calculate</button>
+  <div class="calc-result" id="cell-result"></div>
+</div>
+
+<!-- ══ Mouse Drug Dosing ══ -->
+<div class="calc-box">
+  <h3>Mouse Drug Dosing Calculator</h3>
+  <div class="row2">
+    <div>
+      <label>Stock concentration (mg/mL)</label>
+      <input type="number" id="dose-stock" value="10" step="any" oninput="calcDose()">
+    </div>
+    <div>
+      <label>Target dose (mg/kg)</label>
+      <input type="number" id="dose-target" value="10" step="any" oninput="calcDose()">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Avg mouse weight (g)</label>
+      <input type="number" id="dose-weight" value="25" step="any" oninput="calcDose()">
+    </div>
+    <div>
+      <label>Injection volume per mouse (µL)</label>
+      <input type="number" id="dose-injvol" value="200" step="any" oninput="calcDose()">
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Number of mice</label>
+      <input type="number" id="dose-mice" value="5" min="1" oninput="calcDose()">
+    </div>
+    <div>
+      <label>Days dosed per week</label>
+      <input type="number" id="dose-days" value="5" min="1" max="7" oninput="calcDose()">
+    </div>
+  </div>
+  <label>Number of weeks</label>
+  <input type="number" id="dose-weeks" value="2" min="1" oninput="calcDose()">
+  <button onclick="calcDose()">Calculate</button>
+  <div class="calc-result" id="dose-result"></div>
+</div>
+
+</div><!-- end calc-grid -->
+</div><!-- end container -->
+<footer>Jeet Biswas – Research Site &bull; MSKCC Internal &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────
+function show(id, html) {
+  const el = document.getElementById(id);
+  el.innerHTML = html;
+  el.classList.add('show');
+}
+function r(n, d=2) { return Math.round(n * Math.pow(10,d)) / Math.pow(10,d); }
+
+// ── PCR ──────────────────────────────────────────────────────────────────
+function calcPCR() {
+  const n = parseFloat(document.getElementById('pcr-n').value);
+  const poly = document.getElementById('pcr-poly').value;
+  const rxns = r(n * 1.1, 1); // 10% overage
+
+  const recipes = {
+    q5:      { '5x Q5 Buffer (µL)':5, 'dNTP 10 mM each (µL)':0.5, 'F primer 10 µM (µL)':1.25, 'R primer 10 µM (µL)':1.25, 'Q5 Polymerase (µL)':0.25, 'Template (µL)':1, 'H₂O (µL)':15.75, 'Total (µL)':25 },
+    phusion:  { '5x Phusion HF Buffer (µL)':5, 'dNTP 10 mM each (µL)':0.5, 'F primer 10 µM (µL)':1.25, 'R primer 10 µM (µL)':1.25, 'Phusion Polymerase (µL)':0.25, 'Template (µL)':1, 'H₂O (µL)':15.75, 'Total (µL)':25 },
+    taq:      { '10x Taq Buffer (µL)':2.5, 'dNTP 10 mM each (µL)':0.5, 'F primer 10 µM (µL)':0.5, 'R primer 10 µM (µL)':0.5, 'MgCl₂ 25 mM (µL)':1.5, 'Taq Polymerase (µL)':0.125, 'Template (µL)':1, 'H₂O (µL)':18.375, 'Total (µL)':25 },
+    kapa:     { '5x KAPA HiFi Buffer (µL)':5, 'dNTP 10 mM each (µL)':0.75, 'F primer 10 µM (µL)':0.75, 'R primer 10 µM (µL)':0.75, 'KAPA HiFi Polymerase (µL)':0.5, 'Template (µL)':1, 'H₂O (µL)':16.25, 'Total (µL)':25 },
+    custom:   { '5x Buffer (µL)':5, 'dNTP 10 mM each (µL)':0.5, 'F primer 10 µM (µL)':1.25, 'R primer 10 µM (µL)':1.25, 'Polymerase (µL)':0.25, 'Template (µL)':1, 'H₂O (µL)':15.75, 'Total (µL)':25 }
+  };
+  const rec = recipes[poly];
+  let rows = '';
+  for (const [comp, vol] of Object.entries(rec)) {
+    const scaled = comp === 'Template (µL)' ? vol + ' / rxn' : r(vol * rxns) + ' µL';
+    rows += `<tr><td>${comp}</td><td>${comp === 'Template (µL)' ? scaled : r(vol * rxns) + ' µL'}</td><td>${vol} µL/rxn</td></tr>`;
+  }
+  show('pcr-result', `<strong>${rxns} reactions prepared (${n} + 10% overage)</strong>
+    <table><tr><th>Component</th><th>Total</th><th>Per rxn</th></tr>${rows}</table>`);
+}
+
+// ── Ligation ─────────────────────────────────────────────────────────────
+function calcLigation() {
+  const bbMass = parseFloat(document.getElementById('lig-bb-mass').value);
+  const bbSize = parseFloat(document.getElementById('lig-bb-size').value);
+  const insSize = parseFloat(document.getElementById('lig-ins-size').value);
+  const ratio = parseFloat(document.getElementById('lig-ratio').value);
+  const vol = parseFloat(document.getElementById('lig-vol').value);
+
+  // pmol = mass(ng) / (size(bp) * 0.66 pg/bp) * 1e-3 to get pmol
+  const bbPmol = bbMass / (bbSize * 0.66);
+  const insPmol = bbPmol * ratio;
+  const insMass = r(insPmol * insSize * 0.66);
+
+  show('lig-result', `
+    <table>
+      <tr><td>Backbone</td><td>${bbMass} ng (${r(bbPmol,4)} pmol)</td></tr>
+      <tr><td>Insert needed</td><td>${insMass} ng (${r(insPmol,4)} pmol, ${ratio}:1 molar ratio)</td></tr>
+      <tr><td>10x T4 Ligase Buffer</td><td>${r(vol*0.1)} µL</td></tr>
+      <tr><td>T4 DNA Ligase</td><td>1 µL</td></tr>
+      <tr><td>Backbone + Insert + H₂O</td><td>to ${vol} µL total</td></tr>
+      <tr><td>Incubation</td><td>16°C overnight or RT 10 min (quick ligation)</td></tr>
+    </table>`);
+}
+
+// ── Gibson ────────────────────────────────────────────────────────────────
+function calcGibson() {
+  const bbMass = parseFloat(document.getElementById('gib-bb-mass').value);
+  const bbSize = parseFloat(document.getElementById('gib-bb-size').value);
+  const ratio = parseFloat(document.getElementById('gib-ratio').value);
+  const insSizes = [...document.querySelectorAll('.gib-ins-size')].map(el => parseFloat(el.value)).filter(v => v > 0);
+
+  const bbPmol = bbMass / (bbSize * 0.66);
+  let rows = `<tr><td>Backbone</td><td>${bbMass} ng (${r(bbPmol,4)} pmol)</td></tr>`;
+  insSizes.forEach((insSize, i) => {
+    const insPmol = bbPmol * ratio;
+    const insMass = r(insPmol * insSize * 0.66);
+    rows += `<tr><td>Insert ${i+1}</td><td>${insMass} ng (${r(insPmol,4)} pmol, ${ratio}:1)</td></tr>`;
+  });
+  rows += `<tr><td>2x Gibson Assembly Mix</td><td>10 µL</td></tr>`;
+  rows += `<tr><td>Total volume (H₂O to)</td><td>20 µL</td></tr>`;
+  rows += `<tr><td>Incubation</td><td>50°C for 60 min (NEB HiFi); keep on ice</td></tr>`;
+  show('gib-result', `<table>${rows}</table>`);
+}
+
+// ── Transfection (unified) ─────────────────────────────────────────────────
+const txDishDNA   = { '10cm':10, '6cm':4, '6well':2, '12well':1, '24well':0.5, '96well':0.1 };
+const txDishLabel = { '10cm':'10 cm dish', '6cm':'6 cm dish', '6well':'6-well plate', '12well':'12-well plate', '24well':'24-well plate', '96well':'96-well plate' };
+// Buffer volumes (µL) for dilution tubes
+const txOptiMEM   = { '10cm':500, '6cm':250, '6well':125, '12well':75, '24well':50, '96well':10 };
+const txFugPBS    = { '10cm':470, '6cm':200, '6well':100, '12well':50, '24well':25, '96well':10 };
+// JetPRIME buffer volumes (µL) per dish format
+const txJetPrimeBuf = { '10cm':500, '6cm':200, '6well':200, '12well':100, '24well':50, '96well':10 };
+// JetOptimus buffer volumes (µL) per dish format
+const txJetOptimusBuf = { '10cm':250, '6cm':100, '6well':100, '12well':50, '24well':25, '96well':5 };
+
+function updateTxUI() {
+  const reagent = document.getElementById('tx-reagent').value;
+  const dish = document.getElementById('tx-dish').value;
+  // Set default DNA amount
+  document.getElementById('tx-dna').value = txDishDNA[dish];
+  // Show/hide ratio row (CaPO4 and JetPRIME/JetOptimus use fixed protocols)
+  const hideRatio = reagent === 'capo4' || reagent === 'jetprime' || reagent === 'jetoptimus';
+  document.getElementById('tx-ratio-row').style.display = hideRatio ? 'none' : '';
+  // Update ratio options per reagent
+  const ratioSel = document.getElementById('tx-ratio');
+  const opts = {
+    fugene:      [{v:'2',l:'2:1 (standard)'},{v:'3',l:'3:1 (hard-to-transfect)'},{v:'3.5',l:'3.5:1 (suspension cells)'}],
+    lipo2000:    [{v:'2',l:'2:1 (standard)'},{v:'3',l:'3:1 (hard-to-transfect)'},{v:'5',l:'5:1 (optimization)'}],
+    lipo3000:    [{v:'1.5',l:'1.5:1 (standard)'},{v:'2',l:'2:1'},{v:'3',l:'3:1'}],
+    jetprime:    [],
+    jetoptimus:  [],
+    capo4:       []
+  };
+  const cur = ratioSel.value;
+  ratioSel.innerHTML = (opts[reagent]||[]).map(o=>`<option value="${o.v}"${o.v===cur?' selected':''}>${o.l}</option>`).join('');
+  calcTx();
+}
+
+function calcTx() {
+  const reagent = document.getElementById('tx-reagent').value;
+  const dish    = document.getElementById('tx-dish').value;
+  const dna     = parseFloat(document.getElementById('tx-dna').value);
+  const ratio   = parseFloat(document.getElementById('tx-ratio').value) || 2;
+  const label   = txDishLabel[dish];
+
+  if (!dna || dna <= 0) { document.getElementById('tx-result').classList.remove('show'); return; }
+
+  if (reagent === 'fugene') {
+    const reagVol = r(dna * ratio);
+    const pbs = txFugPBS[dish];
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>Plasmid DNA</td><td>${dna} µg</td></tr>
+      <tr><td>FuGENE HD</td><td>${reagVol} µL</td></tr>
+      <tr><td>PBS (serum-free)</td><td>${pbs} µL</td></tr>
+      <tr><td>Total complex</td><td>${r(pbs + reagVol)} µL</td></tr>
+      <tr><td>Protocol</td><td>Add FuGENE to PBS → flick vigorously → rest 10–20 min → add dropwise</td></tr>
+    </table>`);
+
+  } else if (reagent === 'lipo2000') {
+    const lipoVol = r(dna * ratio);
+    const om = txOptiMEM[dish];
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>Tube A — DNA</td><td>${dna} µg DNA + ${om} µL Opti-MEM</td></tr>
+      <tr><td>Tube B — Lipo2000</td><td>${lipoVol} µL Lipofectamine 2000 + ${om} µL Opti-MEM</td></tr>
+      <tr><td>Total complex</td><td>${r(om*2 + lipoVol)} µL (after combining)</td></tr>
+      <tr><td>Protocol</td><td>Mix each tube → combine A+B → incubate 20 min RT → add to cells; change media after 4–6 h</td></tr>
+    </table>`);
+
+  } else if (reagent === 'lipo3000') {
+    const lipoVol = r(dna * ratio);
+    const p3000Vol = r(dna * 2);   // P3000 reagent: 2 µL per µg DNA
+    const om = txOptiMEM[dish];
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>Tube A — DNA</td><td>${dna} µg DNA + ${p3000Vol} µL P3000 reagent in ${om} µL Opti-MEM</td></tr>
+      <tr><td>Tube B — Lipo3000</td><td>${lipoVol} µL Lipofectamine 3000 in ${om} µL Opti-MEM</td></tr>
+      <tr><td>Total complex</td><td>${r(om*2 + lipoVol + p3000Vol)} µL (after combining)</td></tr>
+      <tr><td>Protocol</td><td>Mix each tube → combine A+B → incubate 15 min RT → add to cells; change media after 24 h</td></tr>
+    </table>`);
+
+  } else if (reagent === 'jetprime') {
+    // JetPRIME: fixed 2 µL reagent per µg DNA; buffer is dish-specific
+    const jpVol = r(dna * 2);
+    const buf = txJetPrimeBuf[dish];
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>DNA</td><td>${dna} µg</td></tr>
+      <tr><td>JetPRIME buffer</td><td>${buf} µL</td></tr>
+      <tr><td>JetPRIME reagent</td><td>${jpVol} µL (2 µL per µg DNA)</td></tr>
+      <tr><td>Total complex</td><td>${r(buf + jpVol)} µL</td></tr>
+      <tr><td>Protocol</td><td>Add DNA to JetPRIME buffer → add JetPRIME reagent → vortex 10 s → incubate 10–15 min RT → add dropwise to cells</td></tr>
+    </table>`);
+
+  } else if (reagent === 'jetoptimus') {
+    // JetOptimus: fixed 1 µL reagent per µg DNA; buffer is dish-specific
+    const joVol = r(dna * 1);
+    const buf = txJetOptimusBuf[dish];
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>DNA</td><td>${dna} µg</td></tr>
+      <tr><td>JetOptimus buffer</td><td>${buf} µL</td></tr>
+      <tr><td>JetOptimus reagent</td><td>${joVol} µL (1 µL per µg DNA)</td></tr>
+      <tr><td>Total complex</td><td>${r(buf + joVol)} µL</td></tr>
+      <tr><td>Protocol</td><td>Add DNA to JetOptimus buffer → add JetOptimus reagent → vortex 10 s → incubate 10–15 min RT → add dropwise to cells</td></tr>
+    </table>`);
+
+  } else if (reagent === 'capo4') {
+    // Scales from 6-well base (2 µg DNA, 100+100 µL system)
+    const scale = { '10cm':5, '6cm':2, '6well':1, '12well':0.5, '24well':0.25, '96well':0.05 };
+    const s = scale[dish];
+    const dnaActual = r(dna || txDishDNA[dish]);
+    const teVol  = r(90 * s);
+    const cacl2  = r(10 * s);
+    const hbs    = r(100 * s);
+    show('tx-result', `<table>
+      <tr><td>Format</td><td>${label}</td></tr>
+      <tr><td>DNA</td><td>${dnaActual} µg</td></tr>
+      <tr><td>Step 1</td><td>Add DNA to ${teVol} µL 0.1× TE → add ${cacl2} µL 2 M CaCl₂ → mix 5 min RT</td></tr>
+      <tr><td>Step 2</td><td>Add ${hbs} µL 2× HBS dropwise while vortexing → rest 20 min RT</td></tr>
+      <tr><td>Reagents needed</td><td>2× HBS (50 mM HEPES, 280 mM NaCl, 1.5 mM Na₂HPO₄, pH 7.0); 2 M CaCl₂; 0.1× TE</td></tr>
+      <tr><td>Protocol</td><td>Add complex dropwise to cells; incubate overnight; replace with complete media</td></tr>
+    </table>`);
+  }
+}
+
+// ── Dilution ──────────────────────────────────────────────────────────────
+const unitFactors = { mM:1, µM:1e-3, nM:1e-6, 'mg/mL':1 };
+function calcDilution() {
+  const stockVal = parseFloat(document.getElementById('dil-stock').value);
+  const stockUnit = document.getElementById('dil-stock-units').value;
+  const finalVal = parseFloat(document.getElementById('dil-final').value);
+  const finalUnit = document.getElementById('dil-final-units').value;
+  const vol = parseFloat(document.getElementById('dil-vol').value);
+
+  const stockNorm = stockVal * unitFactors[stockUnit];
+  const finalNorm = finalVal * unitFactors[finalUnit];
+
+  const stockAdd = r((finalNorm / stockNorm) * vol, 3);
+  const diluent = r(vol - stockAdd, 3);
+
+  if (stockAdd > vol) {
+    show('dil-result', '<span style="color:red">Error: stock concentration is lower than desired final concentration.</span>');
+    return;
+  }
+  show('dil-result', `<table>
+    <tr><td>Stock to add</td><td>${stockAdd} µL</td></tr>
+    <tr><td>Diluent to add</td><td>${diluent} µL</td></tr>
+    <tr><td>Final volume</td><td>${vol} µL</td></tr>
+    <tr><td>Dilution factor</td><td>1 : ${r(stockNorm/finalNorm, 0)}</td></tr>
+  </table>`);
+}
+
+// ── Antibody ──────────────────────────────────────────────────────────────
+function calcAntibody() {
+  const ratio = parseFloat(document.getElementById('ab-ratio').value);
+  const vol = parseFloat(document.getElementById('ab-vol').value);
+  const diluent = document.getElementById('ab-diluent').value;
+  const abVol = r(vol / ratio, 2);
+  show('ab-result', `<table>
+    <tr><td>Antibody to add</td><td>${abVol} µL</td></tr>
+    <tr><td>Diluent (${diluent})</td><td>${r(vol - abVol, 2)} µL</td></tr>
+    <tr><td>Total volume</td><td>${vol} µL</td></tr>
+    <tr><td>Final dilution</td><td>1 : ${ratio}</td></tr>
+  </table>`);
+}
+
+// ── Molar Conversion ──────────────────────────────────────────────────────
+function calcMolar() {
+  const mw = parseFloat(document.getElementById('mol-mw').value);
+  const mgml = parseFloat(document.getElementById('mol-mgml').value);
+  const umIn = document.getElementById('mol-um').value;
+
+  let rows = '';
+  if (mgml && mw) {
+    const uM = r((mgml / mw) * 1e6, 2);
+    const mM = r((mgml / mw) * 1e3, 4);
+    rows += `<tr><td>From mg/mL → molar</td><td>${mgml} mg/mL = ${uM} µM = ${mM} mM</td></tr>`;
+  }
+  if (umIn && mw) {
+    const mgmlOut = r((parseFloat(umIn) * mw) / 1e6, 4);
+    rows += `<tr><td>From µM → mg/mL</td><td>${umIn} µM = ${mgmlOut} mg/mL</td></tr>`;
+  }
+  show('mol-result', `<table>${rows}</table>`);
+}
+
+// ── BigWig ────────────────────────────────────────────────────────────────
+function calcBigwig() {
+  const reads = parseFloat(document.getElementById('bw-reads').value);
+  const denom = parseFloat(document.getElementById('bw-denom').value);
+  const factor = r(reads / denom, 6);
+  show('bw-result', `<table>
+    <tr><td>Mapped reads</td><td>${reads.toLocaleString()}</td></tr>
+    <tr><td>Scale denominator</td><td>${denom.toLocaleString()}</td></tr>
+    <tr><td>Normalization factor</td><td>${factor}</td></tr>
+    <tr><td>Shell command</td><td><code>norm_value=$(awk -v n=${reads} -v d=${denom} 'BEGIN { printf "%.6f", (n/d) }')</code></td></tr>
+  </table>`);
+}
+
+// ── Nanodrop ──────────────────────────────────────────────────────────────
+function calcNanodrop() {
+  const a260 = parseFloat(document.getElementById('nd-a260').value);
+  const a280 = parseFloat(document.getElementById('nd-a280').value);
+  const factor = parseFloat(document.getElementById('nd-type').value);
+  const vol = parseFloat(document.getElementById('nd-vol').value);
+  const conc = r(a260 * factor, 1);  // ng/µL (1cm path, extinction coefficient)
+  const totalYield = r(conc * vol / 1000, 2);  // µg
+  const ratio = r(a260 / a280, 2);
+
+  let purityNote = ratio >= 1.8 && ratio <= 2.0 ? 'Good (1.8–2.0)' : ratio < 1.8 ? 'Low — possible protein/phenol contamination' : 'High — possible RNA contamination (for DNA)';
+  show('nd-result', `<table>
+    <tr><td>Concentration</td><td>${conc} ng/µL</td></tr>
+    <tr><td>Total yield</td><td>${totalYield} µg (in ${vol} µL)</td></tr>
+    <tr><td>A260/A280 ratio</td><td>${ratio} — ${purityNote}</td></tr>
+  </table>`);
+}
+
+// ── Mouse Drug Dosing ─────────────────────────────────────────────────────
+function calcDose() {
+  const stock   = parseFloat(document.getElementById('dose-stock').value);
+  const target  = parseFloat(document.getElementById('dose-target').value);
+  const weight  = parseFloat(document.getElementById('dose-weight').value);
+  const injVol  = parseFloat(document.getElementById('dose-injvol').value);
+  const mice    = parseFloat(document.getElementById('dose-mice').value);
+  const days    = parseFloat(document.getElementById('dose-days').value);
+  const weeks   = parseFloat(document.getElementById('dose-weeks').value);
+
+  if (!stock || !target || !weight || !injVol || !mice || !days || !weeks ||
+      stock <= 0 || target <= 0 || weight <= 0 || injVol <= 0 || mice <= 0 || days <= 0 || weeks <= 0) {
+    document.getElementById('dose-result').classList.remove('show');
+    return;
+  }
+
+  // Working concentration needed (mg/mL)
+  // = (target mg/kg × weight g / 1000 g·per·kg) / (injVol µL / 1000 µL·per·mL / 1000 mL·per·L)
+  // simplified: (target × weight / 1000) / (injVol / 1e6)  → mg per dose / vol in mL
+  const drugPerMouse = target * weight / 1000;          // mg per dose
+  const injVolML = injVol / 1000;                       // µL → mL
+  const workingConc = drugPerMouse / injVolML;          // mg/mL
+
+  if (workingConc > stock) {
+    show('dose-result', `<span style="color:red">Stock concentration (${stock} mg/mL) is too low for this dose. Working concentration needed is ${r(workingConc,4)} mg/mL — use a higher stock or increase injection volume.</span>`);
+    return;
+  }
+
+  const dilFactor = stock / workingConc;
+  const totalDoses = mice * days * weeks;
+  const totalVolUL = totalDoses * injVol * 1.10;        // µL with 10% overage
+  const totalVolML = totalVolUL / 1000;                 // mL
+  const drugVolML  = totalVolML * workingConc / stock;  // mL of stock needed
+  const vehicleVolML = totalVolML - drugVolML;          // mL of vehicle
+
+  show('dose-result', `<table>
+    <tr><td>Drug per mouse per dose</td><td>${r(drugPerMouse * 1000, 2)} µg &nbsp;(${r(drugPerMouse, 4)} mg)</td></tr>
+    <tr><td>Working concentration needed</td><td>${r(workingConc, 4)} mg/mL</td></tr>
+    <tr><td>Dilution factor</td><td>1 : ${r(dilFactor, 2)} (from ${stock} mg/mL stock)</td></tr>
+    <tr><td>Total doses</td><td>${totalDoses} &nbsp;(${mice} mice × ${days} days/wk × ${weeks} wk)</td></tr>
+    <tr><td>Total volume needed (+ 10% overage)</td><td>${r(totalVolML, 3)} mL &nbsp;(${r(totalVolUL, 1)} µL)</td></tr>
+    <tr><td>Stock drug to add</td><td>${r(drugVolML, 4)} mL &nbsp;(${r(drugVolML * 1000, 2)} µL)</td></tr>
+    <tr><td>Vehicle to add</td><td>${r(vehicleVolML, 3)} mL &nbsp;(${r(vehicleVolML * 1000, 1)} µL)</td></tr>
+    <tr><td>Injection volume per mouse</td><td>${injVol} µL</td></tr>
+  </table>`);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', updateTxUI);
+
+// ── Cell Seeding ──────────────────────────────────────────────────────────
+function calcCellSeeding() {
+  const conc = parseFloat(document.getElementById('cell-count').value);  // cells/mL
+  const curVol = parseFloat(document.getElementById('cell-curvol').value);
+  const target = parseFloat(document.getElementById('cell-target').value);
+  const finalVol = parseFloat(document.getElementById('cell-finalvol').value);
+  const wells = parseFloat(document.getElementById('cell-wells').value);
+
+  const totalCells = conc * curVol;
+  const cellsNeeded = target * wells;
+  const volFromStock = r((target / conc) * wells, 3);  // mL
+  const mediaToadd = r(finalVol * wells - volFromStock, 3);
+
+  show('cell-result', `<table>
+    <tr><td>Total cells available</td><td>${totalCells.toLocaleString()}</td></tr>
+    <tr><td>Cells needed (${wells} wells)</td><td>${cellsNeeded.toLocaleString()}</td></tr>
+    <tr><td>Volume from stock suspension</td><td>${volFromStock} mL</td></tr>
+    <tr><td>Media to add</td><td>${mediaToadd} mL</td></tr>
+    <tr><td>Total volume</td><td>${r(finalVol * wells, 2)} mL</td></tr>
+    ${cellsNeeded > totalCells ? '<tr><td colspan="2" style="color:red">⚠ Not enough cells — expand culture first</td></tr>' : ''}
+  </table>`);
+}
+</script>
+<script src="/js/site.js"></script>
+</body>
+</html>

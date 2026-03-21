@@ -1,0 +1,3457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Protocol Book – Jeet Biswas</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Cancer Genomics &bull; Proteomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link active" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/publications.html">Publications</a></div>
+  <div class="nav-item"><a class="nav-link" href="/people.html">People</a></div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title">
+  <h2>&#128209; Full Protocol Book</h2>
+  <p>Personal lab notebook — in silico &rarr; in vitro &rarr; in vivo &rarr; high tech</p>
+</div>
+<div class="container">
+  <div class="breadcrumb"><a href="/protocols/">Protocols</a> / Full Protocol Book</div>
+  <div class="proto-layout">
+    <aside class="proto-sidebar">
+      <div class="sidebar-heading">Contents</div>
+<a href="#sec-information-technology"><strong>Information Technology</strong></a>
+<a href="#sub-einstein-data-servers" class="sub">Einstein Data Servers</a>
+<a href="#sub-shared-abdel-wahab-lab-server" class="sub">Shared Abdel-Wahab Lab Server</a>
+<a href="#sub-rockefeller-hpc" class="sub">Rockefeller HPC</a>
+<a href="#sub-mskcc-vpn-" class="sub">MSKCC VPN:</a>
+<a href="#sub-mskcc-new-patient-visits" class="sub">MSKCC New Patient Visits</a>
+<a href="#sub-sail-data-download" class="sub">SAIL Data Download</a>
+<a href="#sub-transfer-node-of-iris" class="sub">Transfer Node of IRIS</a>
+<a href="#sub-igo-sequencing-data-access" class="sub">IGO Sequencing Data Access</a>
+<a href="#sub-gsea---gene-set-enrichment-ana" class="sub">GSEA - Gene Set Enrichment Analysis</a>
+<a href="#sec-guide-for-reusing-materials"><strong>Guide for Reusing Materials</strong></a>
+<a href="#sec-bacterial-methods"><strong>Bacterial Methods</strong></a>
+<a href="#sub-antibiotic-stocks-" class="sub">Antibiotic Stocks:</a>
+<a href="#sub-lb-agar-plates" class="sub">LB Agar Plates</a>
+<a href="#sub-autoclaving-trashed-plates--ev" class="sub">Autoclaving Trashed Plates (Every June)</a>
+<a href="#sub-heat-shock-transformation-" class="sub">Heat Shock Transformation:</a>
+<a href="#sub-creation-of-chemically-compete" class="sub">Creation of Chemically Competent Cells:</a>
+<a href="#sec-expression-and-purification-of"><strong>Expression and Purification of Proteins</strong></a>
+<a href="#sub-transformation-of-rosetta-cell" class="sub">Transformation of Rosetta cells</a>
+<a href="#sub-growth-and-induction-of-rosett" class="sub">Growth and Induction of Rosetta cells</a>
+<a href="#sub-bacterial-cell-lysis-from-xtra" class="sub">Bacterial Cell Lysis from xTractor buffer - prior to Talon spin columns</a>
+<a href="#sub-general-considerations-for-tal" class="sub">General Considerations for TALON Spin Column Purification</a>
+<a href="#sub-protocol--talon-spin-column-pu" class="sub">Protocol: TALON Spin Column Purification</a>
+<a href="#sub-protocols-for-purifying--mbp-h" class="sub">Protocols for Purifying  MBP/H6 Tagged+TEV Protease- Proteins</a>
+<a href="#sub-amylose-column-buffers-" class="sub">Amylose Column Buffers:</a>
+<a href="#sub-talon-column-buffers-" class="sub">TALON Column Buffers:</a>
+<a href="#sub-dialysis-buffers--4liters-all" class="sub">DIALYSIS BUFFERS: 4Liters All</a>
+<a href="#sub-procedures-" class="sub">PROCEDURES:</a>
+<a href="#sub-amylose-or-talon-lysis-" class="sub">AMYLOSE or TALON LYSIS:</a>
+<a href="#sub-amylose-load-wash-elution-" class="sub">AMYLOSE LOAD+WASH+ELUTION:</a>
+<a href="#sec-protein-quantification"><strong>Protein Quantification</strong></a>
+<a href="#sub-bca-assay-" class="sub">BCA Assay:</a>
+<a href="#sub-bradford-assay-" class="sub">Bradford Assay:</a>
+<a href="#sec-activity-based-protein-profili"><strong>Activity Based Protein Profiling</strong></a>
+<a href="#sub-compounds-used-for-abpp" class="sub">Compounds used for ABPP</a>
+<a href="#sub-chemicals" class="sub">Chemicals</a>
+<a href="#sub-short-protocol---activity-base" class="sub">Short Protocol - Activity Based Protein Profiling (ABPP) followed by FLAG-IP and gel readout V1 - with sonication based lysis</a>
+<a href="#sub-activity-based-protein-profili" class="sub">Activity Based Protein Profiling (ABPP) followed by FLAG-IP and gel readout V2 - with sonication based lysis</a>
+<a href="#sub-ip-flag-followed-by-activity-b" class="sub">IP-FLAG followed by Activity Based Protein Profiling (ABPP) V1 - with IP buffer lysis</a>
+<a href="#sec-western-blot-from-10cm-dish"><strong>Western Blot from 10cm Dish</strong></a>
+<a href="#sec-cloning-buffer-recipes"><strong>Cloning Buffer Recipes</strong></a>
+<a href="#sub-2x-tes-recipe--50ml-total-volu" class="sub">2X TES Recipe (50mL total volume)</a>
+<a href="#sub-2x-tes-recipe--10ml-total-volu" class="sub">2X TES Recipe (10mL total volume)</a>
+<a href="#sub-if-1ml-of-2x-tes-buffer" class="sub">if 1mL of 2x TES buffer</a>
+<a href="#sub-if-500ul-of-2x-tes-buffer" class="sub">if 500uL of 2x TES buffer</a>
+<a href="#sub-1x-tes-buffer--50ml-total-volu" class="sub">1x TES buffer (50mL total volume)</a>
+<a href="#sub-1x-tes-buffer--10ml-total-volu" class="sub">1x TES buffer (10mL total volume)</a>
+<a href="#sub-1ml-of-1x-tes-buffer" class="sub">1mL of 1x TES buffer</a>
+<a href="#sub-if-500ul-of-1x-tes-buffer" class="sub">if 500uL of 1x TES buffer</a>
+<a href="#sec-cloning-tips-and-tricks"><strong>Cloning Tips and Tricks</strong></a>
+<a href="#sub-making-primer-stocks--100um-" class="sub">Making primer stocks (100uM)</a>
+<a href="#sub-making-synthetic-duplexes" class="sub">Making synthetic duplexes</a>
+<a href="#sub-gene-block-resuspension-and-pc" class="sub">Gene block resuspension and PCR</a>
+<a href="#sub-to-anneal-oligos-for-ligation" class="sub">To anneal oligos for ligation</a>
+<a href="#sub-cloning---designing-a-premap" class="sub">Cloning / Designing a Premap</a>
+<a href="#sub-colony-pcr" class="sub">Colony PCR</a>
+<a href="#sub-colony-pcr-with-a-premade-mast" class="sub">Colony PCR with a PreMade Master Mix</a>
+<a href="#sub-agarose-gel-electrophoresis" class="sub">Agarose gel electrophoresis</a>
+<a href="#sub-reconstitute-plasmid-from-filt" class="sub">Reconstitute plasmid from filter paper</a>
+<a href="#sub-platinum--taq-dna-polymerase" class="sub">Platinum® Taq DNA Polymerase</a>
+<a href="#sub-platinum--taq-dna-polymerase-h" class="sub">Platinum® Taq DNA Polymerase High Fidelity</a>
+<a href="#sub-restriction-digests" class="sub">Restriction Digests</a>
+<a href="#sub-in-vitro-transcription" class="sub">In vitro Transcription</a>
+<a href="#sec-rna-biochemistry"><strong>RNA Biochemistry</strong></a>
+<a href="#sub-reverse-transcription" class="sub">Reverse transcription</a>
+<a href="#sub-rnase-protection-assay" class="sub">RNAse Protection Assay</a>
+<a href="#sub-phenol-chloroform-extraction" class="sub">Phenol chloroform extraction</a>
+<a href="#sub-rna-precipitation" class="sub">RNA Precipitation</a>
+<a href="#sec-cell-culture"><strong>Cell Culture</strong></a>
+<a href="#sub-mcf7-notes" class="sub">MCF7 Notes</a>
+<a href="#sub-thawing-frozen-mefs" class="sub">Thawing Frozen MEFs</a>
+<a href="#sub-splitting-mefs-from-10cm-plate" class="sub">Splitting MEFs from 10cm plate</a>
+<a href="#sub-harvesting-and-lysing-cells" class="sub">Harvesting and Lysing Cells</a>
+<a href="#sub-rna-isolation-from-matek-dish-" class="sub">RNA Isolation from Matek dish with TRIZOL</a>
+<a href="#sub-plasma-cleaning-of-coverslips" class="sub">Plasma Cleaning of Coverslips</a>
+<a href="#sub-rna-isolation-from-p0-mouse-he" class="sub">RNA isolation from p0 mouse hemisphere</a>
+<a href="#sub-freezing-down-cell-lines-with-" class="sub">Freezing down cell lines with FBS and 10% DMSO with dry ice</a>
+<a href="#sub-freezing-down-cell-lines-with-" class="sub">Freezing down cell lines with Bambanker Freezing media</a>
+<a href="#sub-seeding-cells-on-matek-dish" class="sub">Seeding cells on Matek Dish</a>
+<a href="#sub-preparing-fibronectin-coated-c" class="sub">Preparing Fibronectin Coated Coverslips</a>
+<a href="#sub-tecan-drug-printer-d300" class="sub">Tecan drug printer D300</a>
+<a href="#sec-cell-culture---viability-assay"><strong>Cell Culture - Viability Assays</strong></a>
+<a href="#sub-vicell-blue" class="sub">Vicell Blue</a>
+<a href="#sub-cell-titer-glo" class="sub">Cell titer Glo</a>
+<a href="#sub-caspase-3-7-assay-by-imaging--" class="sub">Caspase 3/7 assay by imaging
+
+Caspase 3/7 assay by flow cytometry</a>
+<a href="#sec-cell-culture---transfection"><strong>Cell Culture - Transfection</strong></a>
+<a href="#sub-nucleoporation-of-mefs--from-m" class="sub">Nucleoporation of MEFs (from Maria)</a>
+<a href="#sub-check-optimal-pei-transfection" class="sub">Check Optimal PEI transfection Ratio</a>
+<a href="#sub-pei-transfection-of-10cm-dish" class="sub">PEI transfection of 10cm dish</a>
+<a href="#sub-calcium-phosphate-transfection" class="sub">Calcium Phosphate Transfection of HEK cells in 6 well dish (1/5th the 10cm dish protocol)</a>
+<a href="#sub-calcium-phosphate-transfection" class="sub">Calcium Phosphate Transfection of HEK cells in 10cm dish</a>
+<a href="#sub-transient-transfection-with-li" class="sub">Transient Transfection with Lipofectamine 2000</a>
+<a href="#sub-lipofectamine-of-matek-dishes-" class="sub">Lipofectamine of matek dishes (2 dishes per plasmid, 3 plasmids)</a>
+<a href="#sub-fugene-hd-protocol-" class="sub">FuGENE HD protocol:</a>
+<a href="#sub-magnetofection-protocol" class="sub">Magnetofection protocol</a>
+<a href="#sec-cell-culture---viral-transduct"><strong>Cell Culture - Viral Transduction</strong></a>
+<a href="#sub-viral-packaging-of-lentivirus" class="sub">Viral packaging of lentivirus</a>
+<a href="#sub-lenti-x-precipitation" class="sub">Lenti-X precipitation</a>
+<a href="#sub-lentiviral-spinfection-of-k562" class="sub">Lentiviral Spinfection of K562 Cells using fresh virus</a>
+<a href="#sec-mouse-work"><strong>Mouse Work</strong></a>
+<a href="#sub-patient-derived-xenograft-inje" class="sub">Patient Derived Xenograft injections</a>
+<a href="#sub-c1498-injections-into-bl6-mice" class="sub">C1498 injections into BL6 mice</a>
+<a href="#sub-c1498-cells-will-be-injected-i" class="sub">C1498 cells will be injected into n=30 CD45.1+ mice (which will arrive tomorrow) with Jeet’s help next Tue (10/28).</a>
+<a href="#sub-hecd-mcd47-expressing-c1498-in" class="sub">hECD mCD47 expressing C1498 injections into triple humanized (hCD47/hSIRPa/hFcR) mice - for Carlo</a>
+<a href="#sub-hecd-mcd47-expressing-c1498-ce" class="sub">hECD mCD47 expressing C1498 cells will be injected into n=30 triple humanized mice (hCD47/hSIRPa/hFcR) by Carlo and Cynthia on Fri AM (1/09). Carlo will prepare the cells in Abdel-Wahab Lab.</a>
+<a href="#sec-cell-isolation-from-mouse-tiss"><strong>Cell isolation from mouse tissues</strong></a>
+<a href="#sub-patient-derived-xenograft-harv" class="sub">Patient Derived Xenograft harvesting bone marrow cells for Transplant
+
+​​Bone Marrow Cells for Transplant</a>
+<a href="#sub-patient-derived-xenograft-harv" class="sub">Patient Derived Xenograft harvesting spleens</a>
+<a href="#sec-cell-isolation-using-cd-marker"><strong>Cell isolation using CD Markers</strong></a>
+<a href="#sub-ficoll-enrichment-from-allobag" class="sub">Ficoll enrichment from allobag</a>
+<a href="#sub-miltenyi-biotech-kits" class="sub">Miltenyi Biotech Kits</a>
+<a href="#sub-cd34--isolation-from-mobilized" class="sub">CD34+ isolation from mobilized PBMC (for 4x109 cells)</a>
+<a href="#sub-cd45--isolation-from-pdx-mouse" class="sub">CD45+ isolation from PDX mouse models (for 4x109 cells)</a>
+<a href="#sub-stem-cell-technologies-kit-for" class="sub">Stem cell technologies kit for CD34 isolation</a>
+<a href="#sec-flow-cytometry"><strong>Flow cytometry</strong></a>
+<a href="#sec-facs"><strong>FACS</strong></a>
+<a href="#sub-facs-buffers-and-sorting" class="sub">FACS Buffers and sorting</a>
+<a href="#sec-microscopy"><strong>Microscopy</strong></a>
+<a href="#sub-calculating-pixel-size" class="sub">Calculating pixel size</a>
+<a href="#sub-labeling-halo-bin" class="sub">Labeling Halo BIN</a>
+<a href="#sub-sparse-halo-labeling-halo" class="sub">Sparse Halo Labeling Halo</a>
+<a href="#sub-snap-labeling-charles" class="sub">SNAP Labeling Charles</a>
+<a href="#sub-fixation" class="sub">Fixation</a>
+<a href="#sub-halo-gel" class="sub">Halo-Gel</a>
+<a href="#sub-staining-nascent-transcripts-w" class="sub">Staining nascent transcripts with azide dyes (EU click chemistry)</a>
+<a href="#sub-staining-cells-with-mitotracke" class="sub">Staining cells with MitoTracker Red CMXRos</a>
+<a href="#sec-mass-spec-sample-prep"><strong>Mass Spec Sample Prep</strong></a>
+<a href="#sub-kappor-lab-lc-ms" class="sub">Kappor Lab LC/MS</a>
+<a href="#sub-whole-proteome---sample-prep" class="sub">Whole Proteome - Sample Prep</a>
+<a href="#sub-cys-sol-protocol---sample-prep" class="sub">Cys-SoL Protocol - Sample Prep</a>
+<a href="#sub-hplc-fractionation" class="sub">HPLC Fractionation</a>
+<a href="#sub-ip2-based-peptide-search" class="sub">IP2 based peptide search</a>
+
+    </aside>
+    <main>
+      <div class="proto-section" id="sec-information-technology">
+<h2>💻 Information Technology</h2>
+<div class="proto-sub" id="sub-einstein-data-servers">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Einstein Data Servers</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Data server: //data.einstein.yu.edu
+Reststop: \\reststop\public</div>
+</div>
+<div class="proto-sub" id="sub-shared-abdel-wahab-lab-server">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Shared Abdel-Wahab Lab Server</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">smb://vpskihop1/abdelwahablab/
+Chemdraw
+Need to login to Revvity signals website with mskcc email
+There is an activation code that we can use to re-active our license
+
+Rockefeller VPN
+Onboarding at Rockefeller - jbiswas@rockefeller.edu
+username is jbiswas
+Need to get VPN access: https://itservices.rockefeller.edu/vpn#desktop
+Downloaded the ivanti software
+username: jbiswas
+server: vpn.rockefeller.edu/client
+
+Rockefeller Ordering
+For ordering:
+We need the following three parts of information regarding the funding
+
+
+Room 541b
+TSH is the building</div>
+</div>
+<div class="proto-sub collapsed" id="sub-rockefeller-hpc">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Rockefeller HPC</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">To get started, email it_hpc@rockefeller.edu
+Guide: https://hpcguide.rockefeller.edu/overview/
+GitLab: https://rcode.rockefeller.edu/
+
+Your account on the HPC cluster is ready,
+The HPC cluster has two login nodes: login04-hpc.rockefeller.edu and login03-hpc.rockefeller.edu. You can log in to these nodes using the ssh command. Be sure to specify your RUNet user ID when you login using a command like: `ssh -l jbiswas login04-hpc.rockefeller.edu`. Your provided ssh key has been added to your account, so you should be able to log in without entering your password. Please note that you have to be on campus or on the VPN to access this cluster.
+The login nodes should only be used for light work such as editing files and job scripts, submitting jobs to the batch scheduler, and reviewing output. Any processes that are CPU, memory, or IO intensive must be run on compute nodes.
+The HPC cluster uses slurm as the scheduler for batch jobs. I’ve left a small sample script in your home directory. In brief…
+Use `sinfo` to get an overview of the availability of nodes.
+Use `squeue` for a more detailed view of running jobs.
+Use `sbatch foo.sh` to submit a job.
+Use `scancel &lt;jobid&gt;` to unscheduled or kill a queued or running job, respectively.
+Individual nodes within the cluster are addressed like node001.hpc.rockefeller.internal. You can ssh to them directly if you need to monitor or debug running jobs, but of course should not run any intensive computations outside of slurm job contexts. This is true on the login node as well, of course.
+Your home directory is /ru-auth/local/home/jbiswas, which is a symlink to /rugpfs/fs0/home/jbiswas, where your home directory files are actually stored. This space has a very small quota (40G), and is intended for your ssh keys, some scripts and software you may have, and other small items, but not for large datasets.
+For large data (i.e., ???), you’ll want to use /rugpfs/fs0/vino_lab/store/jbiswas and /rugpfs/fs0/vino_lab/scratch/jbiswas.These areas have much higher quotas. Additionally, the “store” area is backed up (usually daily, although that is technically on a best effort basis, so we may occasionally miss a day or two – we’ll make an announcement if it ever gets any worse than that). Because the “store” area gets backed up, there is a tighter limit on the number of files that can be created, so if you have workflows that create many (hundreds of thousands or millions) of small files, you may need to the keep the individual files in the “scratch” area and keep a single tar archive of them in the “store” area.
+Be aware that to facilitate collaboration, we use standard Linux permissions on our cluster. This means that anyone with access to the cluster can read your files, but only you can modify or delete files that you own. If you want a different behavior, you can use the `chmod` and/or `umask` commands accordingly.
+/lustre/fs4/vino_lab/scratch/jbiswas/ONT_Compound3</div>
+</div>
+<div class="proto-sub collapsed" id="sub-mskcc-vpn-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>MSKCC VPN:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">mskvpn.mskcc.org - from this website you can download the global protect program that will allow you to access the other mskcc sites that are internal only:
+genomics.mskcc.org</div>
+</div>
+<div class="proto-sub collapsed" id="sub-mskcc-new-patient-visits">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>MSKCC New Patient Visits</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">\\pens21\New_Visit_Records
+MSKCC New Patient Visits
+github.mskcc.org has a link to create a ticket where you can login with your MSK account</div>
+</div>
+<div class="proto-sub collapsed" id="sub-sail-data-download">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>SAIL Data Download</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">AWS credentials needed
+Cyberduck needed</div>
+</div>
+<div class="proto-sub collapsed" id="sub-transfer-node-of-iris">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Transfer Node of IRIS</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Ssh biswasj@isxfer01.mskcc.org
+Login Node of IRIS
+Ssh biswasj@islogin01.mskcc.org
+
+OpenOnDemand IRIS
+https://isvood001.mskcc.org/pun/sys/dashboard</div>
+</div>
+<div class="proto-sub collapsed" id="sub-igo-sequencing-data-access">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>IGO Sequencing Data Access</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Instructions on accessing your FASTQ files
+You must have an HPC ID before you will be able to mount the share drive. For investigators who do not need to use the cluster or other HPC resources, this ID is still required, but is limited to allowing you to map a network drive. If you aren&#x27;t sure if you have this ID, please contact us. The instructions below will not work without this step.
+
+From a PC:
+Open File Explorer from the taskbar or the Start menu, or press the Windows logo key + E.
+Select This PC from the left pane. Then, on the Computer tab, select Map network drive.
+In the Drive list, select a drive letter. Any available letter will do.
+In the Folder box, type \\igo-share03.mskcc.org\igo_delivery\share\[LABNAME]
+When prompted enter your MSKCC username &amp; password
+Select Finish
+
+From a Mac:
+Click the Finder icon in the Dock to open a Finder window
+From the menu bar at the top select “Go” and then “Connect to Server”
+Enter the server address smb://igo-share04.mskcc.org/igo_delivery/share/[LABNAME]
+From the popup select the share for your lab
+When prompted enter your MSKCC username &amp; password
+On Juno:
+Navigate to /igo/delivery/share/[LABNAME]
+On Lilac:
+On lilac-xfer01.mskcc.org, navigate to /igo/delivery/share/[LABNAME]
+Rsync the data to its final destination -- your command should look like: rsync --copy-links -avz [SOURCE] [DEST]
+
+On Iris:
+On isxfer01, navigate to /ifs/datadelivery/igo_core/share/[LABNAME]/
+Rsync the data to its final destination -- your command should look like: rsync --copy-links -avz [SOURCE] [DEST]
+If you need to grant access to a collaborator or data analyst (internal or external) or an MSKCC core, please see the section below on data sharing.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-gsea---gene-set-enrichment-ana">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>GSEA - Gene Set Enrichment Analysis</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Need to supply 4 data files (all tab separated):
+an expression dataset file, phenotype labels file, gene sets file, and chip annotations file
+Expression dataset - normalized RNA seq expression values (txt format, Name, description, each column then one sample) - this can be the output from the counts file and normalized with degust
+Phenotype labels - total number of samples, the classes (with and without cytokine stimulation or different knockouts), then always 1
+Gene sets file - MiSigDB, we can select this from GSEA tool
+Chip platform - use this based on the gene IDs present in your sample</div>
+</div>
+</div>
+<div class="proto-section" id="sec-guide-for-reusing-materials">
+<h2>♻️ Guide for Reusing Materials</h2>
+<div class="proto-top-box">Can re run gels with the same MOPS buffer - just add 10 minutes to every run that you use it for as ions are depleted each time you use it
+Can re run TAE gels multiple times, just as long as the buffers dont dry up
+Comassie safe blue stain can be reused 3x, just decant into 50mL falcon and keep covered from the light at RT
+Make sure to follow the directions exactly for great results every time
+Can transform DH5as with 50uL of cells (split each tube into 2 while working near a sterile flame)
+Can transform Rosettas with 25uL of cells (split each tube into 2 while working near a sterile flame)
+Maxi - Invitrogen - $27 per maxi
+Midi - Invitrogen - $11 per midi
+Midi - Machery Nagel - $11 per midi
+Column swapping between kits:
+Quiagen columns work for the 5 prime kit
+Quiagen also sells columns separately for extra buffers that we have laying around $1.50 per column
+The Denville scientific columns work well for both PCR purifications as well as gel extractions and are about $1 a column
+You can precipitate lentivirus with PEG 6000 instead of lenti-X or Peg-it, Sulagna used to do this in her old lab but the final stocks may not be as concentrated
+Final solution after addition of PEG mix to supernatant is 8.5% PEG 6000 and 0.3M NaCl
+Take 250g bottle of PEG 6000 and add 8.766g of NaCl (final volume needs to be 500mL) - bring up to 500mL and autoclave
+Should be possible to use a home made gibson assembly mix instead of the NEB HiFi builder
+Wine fridges can be used instead of yeast incubators
+Can make your own DNA gel box imaging system with a DSLR, UV lens and computer</div>
+</div>
+<div class="proto-section" id="sec-bacterial-methods">
+<h2>🧫 Bacterial Methods</h2>
+<div class="proto-sub" id="sub-antibiotic-stocks-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Antibiotic Stocks:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Materials
+- Chloramphenicol; stock 1000x 34 mg/ml (323.132 g/mol) in 99,9% pure EtOH
+- Kanamycin; stock 1000x 50 mg/ml (484.499 g/mol) in dH2O
+- Ampicillin; stock 1000x 100 mg/ml (349.41 g/mol) in dH2O
+- IPTG; stock 1000x 1M (238.31g/mol), dissolve 5g in 20.98mL or 10g in 41.96mL (undershoot the measurement a little bit because the final volume will be about 10-20% more due to powder dissolving) in dH2O
+Method
+1. According to desired amount of antibiotics, calculate the amount in grams that has to be
+weighed
+2. For example:
+To make 11.5mL of Chloramphenicol: 34 mg/ml * 11.5mL= 391mg /1000= 0.391 gram
+To make 20mL of Ampicillin: 100mg/mL * 20mL = 2000mg /1000 = 2g
+3. Chloramphenicol has to be diluted in EtOH
+4. Dilute Ampicillin, Kanamycin, IPTG in dH2O
+5. Filter through 0.22um filter
+6. Divide in aliquots of 1000μL
+6. Save in freezer -20°C
+TE Buffer 10mM Tris 1mM EDTA
+1M (1000mM) Tris stock pH 7 diluted 100x
+0.5M EDTA stock (500mM) pH 8 diluted 500x
+For 50mL we need 500uL of 1M Tris and 100uL of EDTA
+For 10mL we need 100uL of 1M Tris and 20uL of EDTA</div>
+</div>
+<div class="proto-sub" id="sub-lb-agar-plates">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>LB Agar Plates</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">400mL is more than enough
+1.5g of Bacto-agar per 100mL
+2LB broth tablets per 100mL
+Add a stir bar - this will allow stirring while cooling
+Use agar program on the autoclave and then add antibiotics when cool
+Use liquid cycle NOT the agar cycle
+Liquid cycle peaks at 121 degrees and will sterilize, agar will get to 100 degrees max
+There is a cycle option that keeps the agar warm, use this one
+Sterilize bench and pour 10mL onto each plate
+Swirl after</div>
+</div>
+<div class="proto-sub collapsed" id="sub-autoclaving-trashed-plates--ev">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Autoclaving Trashed Plates (Every June)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Tape up the bag, place it inside the autoclave tray
+Poke holes to allow water to leak into the tray
+Melissa has a key in her bench
+Bring to Liver center Ullman 6th Floor
+Liquid cycle
+Program P13
+Make sure there is a probe inside water bottle before running
+The program takes about an hour and a half</div>
+</div>
+<div class="proto-sub collapsed" id="sub-heat-shock-transformation-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Heat Shock Transformation:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">20 min on ice with plasmid
+45 seconds at 42 degrees (water bath near Melissa&#x27;s desk)
+2 min on ice to recover
+500uL SOC followed by 45min to 1hr at 37oC with 300rpm shaking
+Plated 100uL onto amp/chl plate and placed at 37oC overnight</div>
+</div>
+<div class="proto-sub collapsed" id="sub-creation-of-chemically-compete">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Creation of Chemically Competent Cells:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Chemical comp cell prep – Always work near a flame!
+1. grow bacteria ON
+2. inoculate 1:100 into 200mL of LB
+3. grow until 00600 reaches 0.4-0.6
+Prepare a large tray and fill it with ice
+Pre-cooled 50mL falcon tubes on ice as well as the solutions 1 bottle of CaCl and 1 bottle of CaCl + glycerol
+Put eppendorf tubes in a 96 well box, label the outside of the box and put in the -20 freezer to pre chill everything
+4. Put the bacterial culture in the falcon tubes and place on ice for 15 min
+5. centrifuge at 4000rpm (max speed for tabletop) for 5 min at 4C
+6. resuspend the pellet in 1/4 original volume ice cold 0.1M CaCl2 (45ml for a 200ml starting culture)
+7. chill on ice for 15 min
+8. centrifuge at 5000rpm for 5 min at 4C
+While spinning, grab a container of dry ice + EtOH or liquid N2 (preferred)
+9. Pour off the supernatant
+10. Resuspend the pellet in 1/4 volume (10mL) ice cold 0.1MCaCl2
+11. Pour off the supernatant
+12. Resuspend the pellet in 1/2 volume (5 mL) ice cold 0.1MCaCl2+ 15% glycerol
+13. Make aliquots of 110ul (enough for 2 transformations)
+14. Once all aliquots are made, flash freeze the cells in liquid N2 (or dry ice+ 100% EtOH) and place in the pre cooled box
+15. Then quickly move the entire box to –80C</div>
+</div>
+</div>
+<div class="proto-section" id="sec-expression-and-purification-of">
+<h2>🔬 Expression and Purification of Proteins</h2>
+<div class="proto-sub" id="sub-transformation-of-rosetta-cell">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Transformation of Rosetta cells</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">These cells express pRare which has some of the human codons
+This plasmid pRare has chloramphenicol resistance
+Typically we aim to grow 1L of cells and get a 3g cell pellet from it
+
+Transform the cells, each tube of 50uL can be split into two transformations
+While recovering from heat shock - you may need to make ampicillin + chloramphenicol plates
+
+For 4 plates - we can add chloramphenicol resistance to the plates by:
+Diluted 25 chl stock 100x into 1mL of LB media
+Then plated 200uL onto each plate and spread, allowed it to dry before spreading the transformed bacteria
+
+Since you should use freshly transformed bacteria - start prepping LB in fenenbach flasks to grow your plasmids in</div>
+</div>
+<div class="proto-sub" id="sub-growth-and-induction-of-rosett">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Growth and Induction of Rosetta cells</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Use a pipette tip to pick a colony and grow a 50mL starter culture overnight
+The next morning use 10mL of that culture to innoculate 1L of LB in fenenbach flask
+Check the OD 600 2-3 hours after inoculation
+Once it gets &gt; 0.2 thaw out your IPTG as the bacteria will get to 0.6 around one hour after
+Save a sample of 1mL of cells pre induction
+Once 0.6 - add IPTG to 1mM final concentration and let the bacteria induce for 4 hours
+
+Get an OD measurement when transferring the cells to 1L bottles
+Then spin the cells for 15 minutes at 6000g
+Use the OD measurement to dilute in both the preinduction and post induction samples in H2O so that you get an equal concentration at the end
+Use the H2O lysed cell pellets to run a gel
+10uL 4x loading buffer + 30uL of cell lysate - then boil and load on a gel</div>
+</div>
+<div class="proto-sub collapsed" id="sub-bacterial-cell-lysis-from-xtra">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Bacterial Cell Lysis from xTractor buffer - prior to Talon spin columns</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">To get ready
+15mL falcon x3
+Pipettor
+rocking
+Bucket of ice
+DNaseI on ice
+Lysozyme on ice
+Edta complete mini protease inhibitor tablet - one mini tablet for 10mL of lysis buffer
+The His Talon buffer set has:
+• 2 x 250 ml HisTALON Equilibration Buffer
+• 200 ml HisTALON Elution Buffer
+• 100 ml HisTALON xTractor™ Buffer
+Note: We are only using 1mL of buffer at the end of the day - so we should aim to use 0.20g of pellet at a time
+
+1. Add 20 ml of xTractor Buffer to 1 g of bacterial cell pellet. Gently pipet up and down to fully
+resuspend the pellet.
+NOTE: A log-phase culture of E. coli (O.D.=0.6–0.8) when induced for 2–4 hours, would be
+expected to provide ~20–40 mg bacterial pellet from 2 ml of the culture.
+2. [Optional]: Add 40 µl of 1 unit/µl DNase I solution and 200 µl of 100X lysozyme solution.
+NOTE: DNase I reduces lysate viscosity, allowing more efficient cellular debris removal. DNase can be used without lysozyme—but cells with treated with lysozyme must also be treated with DNase I.
+Lysozyme helps to fully disrupt bacterial walls, and thus to extract high molecular weight
+proteins (&gt;40 KDa). However, lysozyme should be omitted for mammalian extraction procedures
+as well as when lysozyme interferes with your protein&#x27;s functionality.
+If the lysozyme solution forms a precipitate, resuspend the contents of the bottle and apply 200μl of suspension directly to the mix—or (optionally) centrifuge 200 μl of lysozyme solution for 5min at 14,000 rpm, and use the supernatant for the lysis.
+Added 5uL of DNAse stock from Katya’s lab
+3. Mix gently, pipetting up and down several times.
+4. Incubate with gentle shaking for 10 min at room temperature or at 4°C.
+NOTE: At the end of this incubation period, there should be no visible particles. If cell pellet fragments are present, resuspend them by pipetting solution up and down and incubating for an
+additional 1–2 min.
+5. Centrifuge the resulting cell lysate at 10,000–12,000 x g for 20 min at 4°C and carefully transfer the supernatant to a clean tube to yield the clarified sample.
+Used tabletop and placed lysate in several 2ml and 1.5mL tubes - we will only use one tube per column anyways
+While this is spinning down, prepare the talon spin tubes
+6. Set aside a small portion of the clarified sample for SDS/PAGE analysis before starting TALON Spin purification.
+The centrifugation rotor and speed may affect your results. Ideally, you should centrifuge TALON Spin Columns in a swinging bucket rotor to allow the sample to pass through the resin uniformly. However, a fixed angle rotor or a microcentrifuge is also acceptable. Centrifugation speeds higher than 700 x g may cause irregularities in the flow of solution through the resin bed, and thus, decrease the performance of the column.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-general-considerations-for-tal">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>General Considerations for TALON Spin Column Purification</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">IMPORTANT: Follow these guidelines to achieve optimal results:
+Before proceeding with purification, estimate the concentration of his-tagged protein in your sample by running a sample of the clarified lysate directly on SDS/PAGE, and observing band intensity.  Avoid excessively concentrated or viscous lysates.  If the his-tagged protein concentration in the lysate is very dilute, use one column to enrich the protein from several 0.6–1 ml lysate aliquots as follows: Repeat Steps 9–15 (Section IV.B) until the desired amount of lysate has been processed—or concentrate your protein by reducing the sample volume.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-protocol--talon-spin-column-pu">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Protocol: TALON Spin Column Purification</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Things you will need beforehand
+2mL eppendorf tubes for collection
+Swinging bucket rotor for tubes
+Setup - get ice bucket
+Prepare wash buffer - add 660uL of elution buffer to 9.33mL of equilibration buffer
+Overal outline:
+Remove storage buffer
+Equilibrate x3
+Load 1mL of sample for a protein where the band was induced on gel
+Load 3mL of sample for a protein where we didnt see a strong band induced on the gel
+Wash x3
+Elute x3
+1. Hold the TALON Spin Column upright and flick it until all resin falls to the bottom of the column. Then, snap off the breakaway seal.
+NOTE: Save end-cap for later use.
+2. Place column in the 2 ml collection tube.
+3. Remove the clear top-cap and centrifuge column at 700 x g for 2 min to remove the storage buffer from the resin bed.
+NOTE: The resin bed will appear semi-dry after centrifugation.
+4. Remove column from centrifuge, and place the end-cap on the bottom of the column.
+5. Add 1 ml of HisTALON Equilibration/ Buffer, close the column with the clear top-cap, and mix briefly to pre-equilibrate the resin.
+6. Remove both caps from column and place column inside the 2 ml collection tube.
+7. Recentrifuge at 700 x g for 2 min to pellet the resin. Discard the supernatant.
+8. Repeat Steps 5–7, twice.
+9. Place the end-cap on the bottom of the column and add 0.6–1 ml of the clarified sample from Section III.A or B to the resin. Close the column with the clear top-cap.
+10. Allow sample to passively wet the resin bed for 30 sec.
+11. Mix or vortex contents briskly for 1–2 sec, completely resuspending the resin in the lysate.
+12. Gently agitate the suspension for 5 min to allow his-tagged protein to bind. Do not vortex.
+13. Remove both caps from column and place column inside the 2 ml collection tube.
+14. Centrifuge at 700 x g for 2 min.
+15. Remove the column and collection tube from the centrifuge rotor, making sure that the entire sample has passed through the resin bed.
+NOTE: Viscous samples may require additional centrifugation.
+16. Remove the flowthrough and save the 2 ml collection tube.
+17. Place the 2 ml collection tube in the rotor.
+18. Place the end-cap on the column, and add 1 ml of HisTALON Equilibration Buffer. Close the column with the clear top-cap.
+19. Allow the buffer to passively wet the resin bed for 30 sec.
+20. Agitate or vortex briskly for a few sec until the resin is completely resuspended.
+21. Gently agitate for 5 min.
+22. Remove both caps and place the column inside the 2 ml collection tube; then centrifuge at 700 x g for 2 min.
+23. Repeat Steps 18–22. Repeat twice for particularly concentrated lysates, or if necessary, to improve purity.
+24. Examine the resin bed to ensure that it appears semi-dry, and to ensure that all buffer has drained from the resin bed and the column end.
+25. Discard the used 2 ml collection tube.
+26. If necessary, repeat the spin to remove all traces of buffer.
+27. Replace the end-cap on the spin column. 28. Add 400–600 µl of Elution Buffer. Close the column with the clear top-cap. NOTE: Alternatively, use 100 mM EDTA (pH 8.0) if it does not interfere with downstream applications of the protein. Samples eluted with EDTA will also contain cobalt.
+29. Allow 1 min for Elution Buffer to passively wet the resin bed.
+30. Briefly agitate or vortex to resuspend the resin.
+31. Place a fresh 2 ml collection tube into the centrifuge rotor.
+32. Remove both caps and place column into the 2 ml collection tube.
+33. Centrifuge sample at 700 x g for 2 min.
+34. Repeat Steps 27–33. NOTE: The his-tagged protein sample can generally be recovered in 800–1,200 µl of Elution Buffer, but it may be necessary to use a larger Elution Buffer volume or repeat Steps 27–33.
+35. Determine his-tagged protein yield using gel or spectrophotometric analysis.
+NOTE: If the purity of the his-tagged protein preparation is unsatisfactory, refer to the procedure in the Troubleshooting Guide (Section V).
+We can use the nanodrop to get an A280 measurement from each sample
+Will run a gell with the following lanes
+Crude lysate
+Flowthrough from loading
+Wash 1
+Wash 2
+Wash 3
+Elution 1
+Elution 2
+Elution 3</div>
+</div>
+<div class="proto-sub collapsed" id="sub-protocols-for-purifying--mbp-h">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Protocols for Purifying  MBP/H6 Tagged+TEV Protease- Proteins</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">MBP-TEV ~60+ kD</div>
+</div>
+<div class="proto-sub collapsed" id="sub-amylose-column-buffers-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Amylose Column Buffers:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">STOCK BUFFERS:
+3M NaCl: 175.3g  /1L (Sterile Filtered)
+Tris pH 7.2: 140.4g Tris HCL + 13.4g Tris Base  /1L (Sterile Filtered)
+0.5M pH 8 EDTA
+1M DTT
+2% Sodium Azide 100x (1g/50ml Sterile Filtered)
+1) Lysis Buffer: 100ml
+25mM Tris pH 7.2  (2.5ml/1M stock)
+1.5M NaCl  (50ml/3M stock)
+1mM EDTA pH8  (200ul/0.5M stock)
+1mM DTT [If Cys in Protein] (100ul/1M stock)
++1 Complete EDTA Free Protease Inhibitor Tablet [ADD DURING LYSIS]
++1ul Recombinant Lysozyme [ADD DURING LYSIS]
+2) Wash Buffer: 1L
+25mM Tris pH 7.2  (25ml/1M stock)
+300mM NaCl  (100ml/3M stock)
+1mM EDTA pH8  (2ml/0.5M stock)
+1mM DTT [If Cys] (1ml/1M stock)
+3) Elution Buffer: 200ml
+25mM Tris pH 7.2  (5ml/1M stock)
+300mM NaCl  (20ml/3M stock)
+1mM EDTA pH8  (400ul/0.5M stock)
+1mM DTT [If Cys] (200ul/1M stock)
+10mM Maltose  (.72g powder/200ml solution)
+4) Storage Buffer: WASH BUFFER + 1ml 2% 100x Sodium Azide/100ml Wash Buffer
+Left.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-talon-column-buffers-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>TALON Column Buffers:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">STOCK BUFFERS:
+10X PBS
+1M Imidazole pH 8
+1) Lysis Buffer: 100ml [FOR USE WITH H6 TAG-PROTEINS: LYSE W/TALON]
+1X PBS  (10ml/10X stock)
+1.5M NaCl  (50ml/3M stock)
+1mM Imidazole pH 8  (100ul/1M stock)
+70 uL BME [If Cys] (70ul BME/100ml Buffer)
+2) Wash Buffer: 1L
+1X PBS  (100ml/10X stock)
+10mM Imidazole pH 8  (10ml/1M stock)
+700ul BME [If Cys]  (700ul BME/1L Buffer)
+3) Elution Buffer: 100ml
+1X PBS  (10ml/10X stock)
+150mM Imidazole pH 8  (15ml/1M stock)
+70ul BME [If Cys]</div>
+</div>
+<div class="proto-sub collapsed" id="sub-dialysis-buffers--4liters-all">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>DIALYSIS BUFFERS: 4Liters All</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">1) TEV PROTEASE BUFFER:
+150mM NaCl  (200ml/3M stock)
+25mM Tris pH 7.2  (100ml/1M stock)
+1mM DTT [NEED FOR TEV] (0.6g Powder/4L Buffer)
+1mM EDTA pH 8  (8ml/0.5M stock)
++2x Tubes of MBP-TEV
+2) STORAGE BUFFER:
+150mM NaCl  (200ml/3M stock)
+25mM Tris pH 7.2  (100ml/1M stock)
+1mM DTT (0.6g Powder/4L Buffer)
+1mM EDTA pH 8  (8ml/0.5M stock)
+3) AMYLOSE COLUMN -&gt; TALON COLUMN BUFFER
+1X PBS  (400ml/10X stock)
+2.8ml BME [If Cys]  (700ul BME/1L Buffer)
+4) CRYSTALLIZATION BUFFERS:
+150mM NaCl  (200ml/3M stock)
+25mM Tris pH 7.2  (100ml/1M stock)
++1mM DTT [IF CYS IN PROTEIN] (0.6g Powder/4L Buffer)
++5mM MgCl2 [IF PRECIPITATING] (20ml/1M stock)
++5% Glycerol [IF PRECIPITATING] (200ml/100% Glycerol)
+5) GE ANION EXCHANGE DIALYSIS BUFFER FOR MBPTEV PURIFICATION
+50mM Tris pH 8.8  (200ml/1M stock)
+15mM NaCl  (20ml/3M stock)
+1mM DTT  (0.6g Powder/4L Buffer)
+6) MBP-TEV STORAGE DIALYSIS BUFFER
+100mM Tris pH 8.8 (400ml/1M stock)
+500mM NaCl  (667ml/3M stock)
+50% Glycerol  (2L/100% stock)
+5mM DTT  (3.08g/powder)
+0.5mM EDTA pH8 (4ml/0.5M stock)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-procedures-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>PROCEDURES:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body"></div>
+</div>
+<div class="proto-sub collapsed" id="sub-amylose-or-talon-lysis-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>AMYLOSE or TALON LYSIS:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">-MAKE LYSIS/WASH BUFFERS ON THE DAY BEFORE
+1) Take Cell Pellet from Induction (-80 C), Put On Ice.
+2) Put 40ml of COLD Lysis buffer, made yesterday, into Falcon Tube.
+3) Crush 1 Protease Inhibitor Tablet in a small weigh tray, then add to Falcon Tube.
+4) Add 1ul Recombinant Lysozyme into Falcon Tube.
+5) Pour the 40ml Lysis buffer with Tablet and Lysozyme into tube with Cell Pellet.
+6) Let Cell Pellet rock in cold room for 20 MINUTES.
+7) Set up Amylose Column.
+8) Purge all Ethanol from the Pump, then fill the pump with WASH buffer.
+9) Open Amylose Column at bottom. Connect Amylose Column with the Pump while pump is running at 2ml/min.
+10) Allow column to equilibrate (~150-200ml) until ready to load protein.
+11) Change out Sonicator tip to flat large surface area tip, clean with Ethanol and Water.
+12) Start Sonicator, set power to 3.5. Tune sonicator to minimum at 3.5.
+13) Set Sonicator program to 10 minutes total sonication, 30 seconds on with 2:30 off. (PROGRAM WILL LAST 1 HOUR)
+14) Fill Styrofoam Box with Ice, put in 1x 80ml PLASTIC beaker into center of ice,
+pack surrounding tightly with ice.
+15) After 20 MINUTES of rocking, take tube with cell pellet back to ice bucket.
+16) Start resuspending the pellet via 10ml Pipetting, use 10ml Pipet as Mortar/Pestle.
+17) Start transferring resuspended pellet into the 80ml PLASTIC beaker. Add in more Lysis Buffer until ~70 ml total for Sonication.
+18) Place all resuspended pellet into PLASTIC beaker in Styrofoam box, bring to sonicator. Place Styrofoam box onto additional boxes+metal platform. Bring the raise-able platform up to the tip, until the BOTTOM of the PLASTIC BEAKER is 1-2cm away from the Sonicator Tip.
+19) Start Sonication Program, listen for noise, should sound like old fax machines/dial up internet connection.
+20) Check back every 3 minutes for first few cycles to make sure it’s sonicating.
+21) Put 2 NALGENE CENTRIFUGE TUBES with Rubber O-Rings on Ice.
+22) After Sonication, put about 35ml into each NALGENE tube, weigh to make sure it’s balanced.
+23) Spin down at 15000g on Centrifuge in Common Equipment Room ~11,200 RPM. 20 Minutes, at 4C.
+24) Pour Supernatant into 2x 50ml Falcon Tubes.
+25) LOAD onto Amylose Column at 0.5 ml/min.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-amylose-load-wash-elution-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>AMYLOSE LOAD+WASH+ELUTION:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">AMYLOSE COLUMN ~50ML TOTAL
+1) LOAD onto Amylose Column at 0.5 ml/min.
+2) Collect into a new beaker, marked LOAD for Gel later.
+3) After all 70-80ml has been loaded, put Pump into WASH buffer, and allow another 20-25 minutes of 0.5ml/min to LOAD the protein inside pump.
+4) WASH for 4-4.5 Hours at 2ml/min. Collect into separate beaker marked
+WASH.
+5) During WASH, prepare Elution Buffer and place in cold room to chill.
+6) Set up 10x 15ml Falcon Tubes + 1x 50ml Falcon Tube for Elution. Label accordingly.
+7) ELUTE 10x 12 ml elutions, then 1x 40ml elution at 2ml/min.
+8) Add Sodium Azide to Wash Buffer (1ml/100ml left).
+9) Run 80-100ml Storage Buffer through at 2ml/min.
+10) Run 15 well Gel, Ladder-Load-Wash-Elution1-11-Final Elution
+AMYLOSE – TALON DIALYSIS:
+1) Place elutions with most protein into Dialysis buffer for TALON column.
+2) Allow Overnight dialysis.
+3) Take out next day and load for TALON.
+TALON WASH+ELUTION:
+TALON COLUMN ~20-25ML TOTAL
+1) LOAD onto TALON column at 0.5ml/min.
+2) Collect into a new beaker marked LOAD for Gel.
+3) After completely loaded, run 20-25 minutes of WASH buffer through at 0.5 ml/min to load protein inside pump.
+4) Wash for 350-450 ml at 2ml/min ~3.5-4 hours.
+5) Collect Wash in separate beaker too for Gel.
+6) Prepare Elution Buffer and place in cold room.
+7) Set up 6x 15ml Falcon Tubes + 1x 50ml Falcon Tube.
+8) Elute 6x 10ml elutions + 1x 35ml  final elution at 2ml/min.
+9) CHECK FREQUENTLY TO MAKE SURE COLUMN DOES NOT RUN DRY DURING FINAL ELUTION.
+10) After elutions, run 100-120ml WASH buffer through at 2ml/min.
+11) Run 30-60ml 20% Ethanol for TALON column storage. 1-1.5ml/min.
+12) Run 10 well Gel with Ladder-Load-Wash-Elution1-6-Final Elution.
+DIALYSIS FOR TEV PROTEASE CUT:
+1) Place elutions with protein into TEV Dialysis buffer + 2 Tubes of MBPTEV.
+2) Save a PRE TEV sample for Gel.
+3) Allow Overnight Cleavage.
+4) Run Gel with PRE TEV and POST TEV.
+5) If ~100% cleaved, prepare AMYLOSE GRAVITY column.
+AMYLOSE GRAVITY COLUMN:
+1) Pour 5-10ml Amylose Resin into clean column.
+2) Close Column and allow resin to settle. 10-20 minutes.
+3) After settling, open column and allow Ethanol to completely drip out.
+4) Sterile Filter 50ml Dialysis Buffer.
+5) Equilibrate resin with 2x washes of 20ml Sterile Filtered TEV Dialysis Buffer.
+6) Load wash buffer onto column with 5/10ml Pipet, load slowly to not disturb resin.
+7) Allow Wash buffer to fully drip through.
+8) Prepare 3x 50ml Falcon Tube to catch elutions.
+9) Load Protein onto column slowly and catch FLOWTHROUGH with 50ml Elution tube #1.
+10) Set column to drip as slow as possible, at about 0.5ml/min. (Turn Drip nozzle/lever).
+11) After filling Elution tube #1, reload protein and catch in Elution tube #2.
+12) Repeat with #2 and catch with final Elution tube #3. After E3, run additional 5 ml of wash buffer to get all protein.
+13) Run a gel to make sure Elution #3 has no MBP-TEV left.
+14) Set up Dialysis for Elution #3 into Crystallization Buffers for next step.
+PURIFYING MBP-TEV
+1) USE AMYLOSE COLUMN LYSIS+LOAD. ADD DTT FOR ALL BUFFERS.
+2) DIALYZE AFTER AMYLOSE COLUMN + GEL INTO: G.E. Anion Exchange Buffer.
+3) GE QFF Hi-Trap Anion Exchange Columns.
+4) FIND ADAPTER FOR GE COLUMNS -&gt; PUMP
+5) Screw 3x small columns together.
+6) Equilibrate 3 columns with Sterile Filtered Dialysis Buffer (1L) ~100mls@ 2ml/min.
+7) Load MBP-TEV at 0.5ml/min.
+8) Save Load with new beaker for Gel.
+9) WASH with 300ml Sterile Filtered Dialysis Buffer.  2ml/min. (150 mins)
+10)Take 300ml of S/F Dialysis buffer, aliquot into 3x 100ml fractions.
+11)Make 3 Elution Buffers (100ml each).
+12)Elution Buffer 1: 100ml Dialysis Buffer + 300mM NaCl Powder: (1.75g)
+13)Elution Buffer 2: 100ml Dialysis Buffer + 600mM NaCl Powder: (3.5g)
+14)Elution Buffer 3: 100ml Dialysis Buffer + 2M NaCl Powder: (11.688g)
+15)Dissolve NaCl in 3 Buffers, then sterile filter.
+16)ELUTE 7x10ml from Elution Buffer 1
+17)ELUTE 1x50ml from Elution Buffer 2
+18)ELUTE 1x50ml from Elution Buffer 3
+19)WASH with 150ml S/F Dialysis Buffer at 2ml/min. (75 mins)
+20)RUN 20% Ethanol through for storage. ~35 mls at 1.5ml/min.
+21)Run Gel: Ladder-Load-Wash-Elution7x10ml-Elution1x50
+22)Set up Dialysis into MBP TEV Storage Dialysis Buffer.
+23)Aliquot 100-150ul fractions from Dialysis. Freeze at -80C.</div>
+</div>
+</div>
+<div class="proto-section" id="sec-protein-quantification">
+<h2>⚗️ Protein Quantification</h2>
+<div class="proto-sub" id="sub-bca-assay-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>BCA Assay:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepare protein standards in the same buffer as your lysate
+Stock albumin can either come with BCA kit or one can purchase pre-diluted standards as well
+
+We have premade standards in PBS and in RIPA
+
+
+There are both normal and micro assays (the micro assay uses less material but is only valid for a lower concentration range)
+(Number of samples + 2) * 400 = total volume of working reagent (we need 2x200uL per reaction)
+
+Create 10mL of working reagent by adding 200uL of reagent B to 9.8mL of reagent A</div>
+</div>
+<div class="proto-sub" id="sub-bradford-assay-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Bradford Assay:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Protocol – NOTE: USE THE CLEAR 96 WELL PLATE.
+FIRST ADD BRADFORD THEN ADD PROTEIN SAMPLES (EITHER STDS OR UNKNOWNS) TO THE BRADFORD IN THE SAMPLES. Calculate out your additions in your lab book in table format.
+1- Prepare 0.5 ml of each known BSA protein standards. Freeze unused std for your next assay! • The stock BSA concentration is 2 mg/ml. Use water to dilute. Adjust if the concentration is different
+• Protein standards = 0.0, 0.1, 0.2, 0.4, 0.8, 1.0, 2.0 mg/ml.
+Prepare 50uL of dilutions in water in first row
+50uL water
+2.5uL BSA 47.5uL of water
+5uL of BSA 45uL of water
+10uL of BSA 40uL of water
+20uL of BSA, 30uL of water
+25uL of BSA 25uL of water
+Nothing because that will be pure BSA
+2- Determine how many wells you will need for your assay.
+• Run EACH standard in triplicate If reading column fractions, n=1 will be fine. 3- Add 250 µl of 1X Bradford reagent in each well.
+4 – Add 10 µl of EITHER BSA standard OR your unknown sample (fraction) to the Bradford Reagent.
+5- Determine the absorbance at 595 nm. • Turn on the plate reader FIRST then the computer. There is no password, leave blank
+• Click on the plate reader KC4 icon on the desktop • Use methods or protocols to find the Bradford assay file and measure your protein.
+• Export your data to an excel file and transfer to a USB file for your notebook. 6 – Wash your plate and if needed a rinse with methanol followed by water to remove residual blue dye.</div>
+</div>
+</div>
+<div class="proto-section" id="sec-activity-based-protein-profili">
+<h2>🧪 Activity Based Protein Profiling</h2>
+<div class="proto-sub" id="sub-compounds-used-for-abpp">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Compounds used for ABPP</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Probes
+Iodoacetamine				Iodoacetamide Azide
+KB-05						KB05-yne
+KB-02						KB-02-yne
+Copper catalyzed click reaction
+TBTA (copper catalyst)		TCEP (reducing agent)</div>
+</div>
+<div class="proto-sub" id="sub-chemicals">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Chemicals</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">TCEP Tris(2-carboxyethyl)phosphine hydrochloride - TCI Chemicals #T1656, Jeet purchased Sigma #C4706-2G
+TBTA (Tris[(1-benzyl-1H-1,2,3-triazol-4-yl)methyl]amine) - TCI Chemicals #T2993, Jeet purchased Sigma #678937-50MG
+CuSO4 - Jeet purchased Sigma #12852-250G-R
+
+Rhodamine-N3 - Jeet purchased MedChem Express #HY-D1269
+IA - stock - Jeet purchased MedChem Express #HY-136205
+KB02 stock
+KB05 stock - Ambeed #A1282645, Jeet purchased from Sigma #911798-100MG
+KB02-yne stock - Jeet purchased Sigma #925225-10MG
+KB05-yne stock - Jeet purchased Sigma #925144-10MG
+
+1M TRIS pH 7.5 - Thermo Fisher #15567027
+Complete protease inhibitor cocktail - from Pierce Thermo Fisher #A32955 - one mini tablet per 10mL of PBS
+Anti-FLAG agarose - Sigma #A2220-1ML, Jeet purchased 2mL from Fisher 
+Or Anti-Flag magnetic resin - Jeet from Thermo #A36797
+NP-40 or IGEPAL CA-630 from Kharas lab
+Stocks and buffers:
+
+Room temp (CuSo4, TBTA, NP-40, IGEPAL CA-630):
+CuSo4, 50mM stock (put 12.5mg / mL of H2O, pre-made)
+TBTA, 1.7mM stock (put 0.9 mg TBTA / mL 4:1 tBuOH:DMSO, pre-made)
+Rhodamine-N3 - 1.25mM stock in DMSO
+TCEP, 50mM stock (put 13 mg / mL H2O, made fresh)
+-80 (compounds and RB catalyst):
+- KB02 / KB05 / KB02-yne / KB05-yne - 10-50mM stock in DMSO
+IP Lysis buffer (Pierce vs home made below) (25 mM Tris-HCl pH 7.4, 150 mM NaCl, 10% glycerol, 1% NP-40)
+To make 50mL of lysis buffer
+1.25mL of 1M TRIS-HCL
+1.5mL of 5M NaCl
+10mL of 50% glycerol
+50uL of NP-40 or IGPAL-630
+37.2mL of UP H2O
+IP Wash buffer (25 mM Tris-HCl pH 7.4, 150 mM NaCl, 0.2% NP-40)
+To make 50mL of wash buffer
+1.25mL of 1M TRIS-HCL
+1.5mL of 5M NaCl
+10mL of 50% glycerol
+5uL of NP-40 or IGPAL-630
+37.25mL of UP H2O</div>
+</div>
+<div class="proto-sub collapsed" id="sub-short-protocol---activity-base">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Short Protocol - Activity Based Protein Profiling (ABPP) followed by FLAG-IP and gel readout V1 - with sonication based lysis</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Protocol based on https://pubs.acs.org/doi/10.1021/acscentsci.0c01336
+Lyse cells in PBS by sonication
+Centrifuge (3 min, 1400g)
+Normalize to 1 mg/ml with PBS (DC assay for protein concentration)
+Use 200 uL of lysates (200 ug of protein)
+Treatment with electrophiles/scouts: add 2uL of compounds (100X), incubate 1h in RT
+Treatment alkyne probes, add 2uL of alkyne probe (100X), incubate 1h in RT
+Prepare FLAG M2 affinity gel: 30 uL of beads per sample, wash beads two times with PBS
+Dilute beads with 300 ul per sample of 0.1% Triton-100/PBS, (30 ul of anti-FLAG M2 affinity gel – per sample), incubate 2h in 4C
+Wash 2x with IP wash buffer (0.2% NP-40, 25 mM Tris-HCl pH 7.4, 150 mM NaCl) and 3x with PBS
+Resuspend in 50 ul of PBS
+Add 6 uL click chemistry, incubate for 1h in RT
+60 uL TBTA [1.7 mM] (0.9 mg TBTA / mL 4:1 tBuOH:DMSO, pre-made)
+20 uL CuSO4 [50 mM] (12.5 mg / mL H2O, pre-made)
+20 µL Rh-N3 [1.25 mM]
+20 uL TCEP [50 mM] (13 mg / mL H2O, made fresh)
+Quench by adding 30 ul of loading buffer, incubate 7 min in 95C
+Run gel
+Image Rho-N3 , 555
+Run WB
+Cells: ctrl, SF1 isoform 1, SF1 isoform 6
+Compounds: KB05 50 mM (final 500 uM), KB05-yne 10 mM (final 100 uM), pools/compounds 2 mM (final 20 uL)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-activity-based-protein-profili">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Activity Based Protein Profiling (ABPP) followed by FLAG-IP and gel readout V2 - with sonication based lysis</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Protocol based on https://pubs.acs.org/doi/10.1021/acscentsci.0c01336
+Day 0 - Plating
+Materials: pre-warmed cell culture media
+
+HEK293T cells were seeded at 7.5x105 cells/well in a 6-well plate and incubated overnight.
+If using multiple compounds for the same protein of interest - consider using a 10cm dish.
+Day 1 - Transfection
+Materials: transfection reagent (PEI or JetOptimus), cell culture media
+
+The following day plasmid DNA (1 μg/well) and PEI (1 mg/mL, 3 μg/well) were incubated in serumfree media (100 μL) for 15 min before addition to cells.
+Day 2 or 3 - Freezing
+Cells were returned to the incubator for 48h, then harvested, frozen, and stored at -80 °C until use.
+Materials: cold PBS, cell scrapers
+Put PBS on ice prior to grabbing cells
+Example pellets:
+Untransfected cells
+Cells expressing flag tagged protein of interest
+Detach cells, pellet and store at -80
+1. Detach cells from the bottom of the cell culture dish by pipetting or scraping and transfer cell suspension to 15 mL falcon tube.
+2. Wash the plate with 1 mL cold-PBS and transfer to the same 15 mL tube
+3. Centrifuge (520g, 5 min, 4ºC)
+4. Aspirate cell culture medium
+5. Add 1 mL cold-PBS and transfer cell suspension to 1.5 mL tubes
+6. Centrifuge (600g, 5 min, 4ºC)
+7. Aspirate PBS, frozen samples in liquid nitrogen, and keep them at -78ºC
+Day 4 - Gel-based labeling with Fragment Alkyne Probes
+
+Part 1-2 hours - Materials:
+PBS containing protease inhibitors - before starting dissolve one Pierce mini tablet in 10mL of PBS
+Water bath sonicator
+DC protein assay kit or BCA protein assay kit
+Microplate reader
+50mM DMSO stock of KB05 - stored at -80
+10mM DMSO stock of KB05-yne - stored at -80
+4mM DMSO stock of test compounds - stored at -80
+TCEP
+TBTA
+Example layout:
+Ladder
+Untransfected cells with KB05-yne (100uM)
+CMV SF1-6 with KB05-yne (100uM)
+CMV SF1-6 with KB05 (500uM) / KB05-yne (100uM) - tells the max competition decrease
+CMV SF1-6 with IP74 (40uM) / KB05-yne (100uM)
+Ladder
+Untransfected cells with KB05-yne (100uM)
+UBC SF1-6 with KB05-yne (100uM)
+UBC SF1-6 with KB05 (500uM) / KB05-yne (100uM) - tells the max competition decrease
+UBC SF1-6 with IP74 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 #1 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 #2 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 #3 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 #4 (40uM) / KB05-yne (100uM)
+SF1-6 with IP74 #5 (40uM) / KB05-yne (100uM)
+HEK293T cell pellets expressing FLAG-tagged protein of interest were thawed on ice and
+resuspended in 400uL of PBS with protease inhibitors.
+Cells were lysed by  sonication (2 x 7 pulses) and centrifuged (3 min, 1400g). Then supernatant was moved to a new tube.
+
+Brought cells to water bath sonicator in KV lab, started to cool down table top centrifuge before walking
+Assembled the plastic pieces to hold tubes under water and close to bath
+Used 3x8 pulse protocol that is standard
+
+60% amplitude
+Process time 00:00:08
+Pulse-ON time 00:00:01
+Pulse-OFF time 00:00:01
+DC assay for protein concentration (96 well plate)
+- Calculate number of wells that we will need (we will have 6 standards in duplicate in addition to samples)
+- Add 20 μl of reagent S to each ml of reagent A that will be needed for the run.
+(This working reagent A&#x27; is stable for 1 week even though a precipitate will form after 1 day. If precipitate forms, warm the solution and vortex. Do not pipet the undissolved precipitate, as this will likely plug the tip of the pipet, thereby altering the volume of reagent that is added to the sample.) If samples do not contain detergent, you may omit step #1 and simply use
+reagent A as supplied.
+2. Prepare 3 - 5 dilutions of a protein standard containing from 0.2 mg/ml to about 1.5 mg/ml protein. A standard curve should be prepared each time the assay is performed. For best results, the standard should be prepared in the same buffer as the sample.
+3. Pipet 5 μl of standards and samples into a clean, dry microtiter plate. 
+4. Add 25 μl of reagent A&#x27; or reagent A (see note from step 1) into each well.
+5. Add 200 μl reagent B into each well. If microplate reader has a mixing function available, place plate in reader and let the plate mix for 5 seconds. If not, gently agitate the plate to mix the reagents. If bubbles form, pop them with a clean, dry pipet tip. Be careful to avoid cross-contamination of sample wells.
+6. After 15 minutes, absorbances can be read at 750 nm. The absorbances will be stable for about 1 hour. (See Troubleshooting Guide for recommendation on using a wavelength other than 750 nm.)
+
+BCA assay for protein concentration
+Create a 96 well plates
+Calculate number of wells we will need:
+9 wells for standards 20-2000ug/mL concentration can do this in replicates so 18
+Then do each sample in duplicate 6
+
+Make 25 reactions worth of working reagent (200uL * 25 = 5mL)
+So we need 5mL of reagent A with 100uL of reagent B (50x dilution)
+
+Use 10uL of each sample and standard onto the plate
+Add 200uL of working solution to each well
+Then put at 37 degrees for 30 minutes - while incubating - thaw out the stocks of the reagents to use (KB05, IP74)
+
+Measure on microplate reader downstairs
+Lysates were diluted to 1mg/mL with PBS containing protease inhibitors
+So from two wells of a 6 well dish we got around 1.3 to 1.6mg/mL of lysate in 400uL - this was enough to run 3 or 4 samples each
+Treatment with first probe (scout fragment or test fragment):
+For proteins with high expression (AKR1B10, IDH1, NAGK, and HPCAL1), 50 μg of protein was treated with 1 μM KB02yne or KB05yne (0.5 μL of 0.1 mM DMSO stock) for 1 h at room temperature.
+For proteins with lower expression (IRF4, CDK2, WDR43, ERLIN1, MOB4, and CDKN2AIP), 200 μg of protein were treated with 1 μM KB02yne or KB05yne (2 μL of 0.1 mM DMSO stock) for 1 h at room temperature.
+2uL of 50mM KB05 per 200uL sample to get 500uM
+2uL of 10mM KB05-yne per 200uL sample to get 100uM
+4uL of 5mM KB05-yne per 200uL sample to get 100uM
+4uL of 2mM IP74 stock per 200uL sample to get 40uM
+Can put everything except for the alkyne probe back at -80
+
+
+Treatment with second probe (alkyne):
+
+	For proteins with high expression (AKR1B10, IDH1, NAGK, and HPCAL1), 50 μg of protein was treated with 1 μM KB02yne or KB05yne (0.5 μL of 0.1 mM DMSO stock) for 1 h at room temperature.
+For proteins with lower expression (IRF4, CDK2, WDR43, ERLIN1, MOB4, and CDKN2AIP), 200 μg of protein were treated with 1 μM KB02yne or KB05yne (2 μL of 0.1 mM DMSO stock) for 1 h at room temperature. 
+
+2uL of 10mM KB05-yne per 200uL sample to get 100uM OR
+4uL of 5mM KB05-yne per 200uL sample to get 100uM OR
+
+
+Part 2 - 4 hours
+
+Materials:
+Anti-Flag agarose or magnetic beads
+PBS with Triton-x100 0.1%
+10% triton x stock
+IP wash buffer
+PBS
+Click reagent mixture (CuSO4, TBTA, TCEP, Rhodamine-azide)
+Protein gel
+Western blot transfer supplies
+Blocking (5% BSA in TBST)
+IP with anti-FLAG:
+Then diluted with 300 μL of 0.1% Triton-100/PBS was added followed by 30 μL of ANTI-FLAG M2 Affinity Gel from Sigma (1:1 slurry in PBS) and incubated with rotation at 4 °C for 2h. Beads were washed with IP wash buffer (2 x 1mL, 0.2% NP-40, 25 mM Tris-HCl pH 7.4, 150 mM NaCl) and PBS (3 x 1mL) then resuspended in 50 μL of PBS.
+While the IP is occurring - make a fresh stock of TCEP
+Click reaction for rhodamine azide:
+To each sample, 6 μL of freshly prepared “click” reagent mixture was added to conjugate rhodamine azide to alkyne probe-labeled protein and incubated for 1h at room temperature. CuAAC reaction mixture contained:
+1 μL CuSO4 (50 mM in water, final concentration = 1 mM)
+3 μL TBTA (1.7 mM in 4:1 tBuOH:DMSO, final concentration = 100 μM)
+1 μL TCEP (50 mM in water, final concentration = 1 mM)
+1 μL rhodamine azide (12.5 mM stock in DMSO, final concentration = 250 μM).
+Master mix for 15 reactions
+15uL of CuSO4
+45uL of TBTA
+15uL of fresh TCEP
+15uL of rhodamine azide
+
+Master mix for 40 reactions
+40uL of CuSO4
+120uL of TBTA
+40uL of fresh TCEP
+40uL of rhodamine azide
+Gel based visualization and membrane transfer:
+Reactions were quenched with the addition of 30μL of LDS loading buffer with reducing agent. Samples were boiled and proteins were resolved by SDS-PAGE (10% acrylamide) and visualized by in-gel fluorescence on a Bio-Rad ChemiDOC MP flatbed fluorescence scanner. Proteins were then transferred to PVDF membrane.
+
+
+We will use 4x loading buffer so we have 56uL of sample which requires 19uL of loading buffer to each sample
+The total amount of sample is more than what we can load in the gel - we will want to use just 45uL per well to load
+Unable to detect the gel in the azure chemiluminescent imager so we had to bring it to KV lab for imaging.
+
+On biorad imaging system use the fluorescent plate. Then put gel ontop of the plate and select DyLight 550 for Rhodamine, DyLight 650 or 680 or 800 for ladder (the last two if using LiCor ladders).
+
+The Chemiluminescence filters are for if using HRP tag.
+
+
+Blocking and western blot visualization with anti-FLAG antibody:
+Membranes were blocked with 5% BSA in TBST (0.1% Tween 20, 20 mM Tris-HCl 7.6, 150 mM NaCl) and immunoblotted with anti-FLAG HRP antibody (1:40,000 dilution in 5% BSA in TBST) overnight.
+Day 5: Processing of western blot
+
+Incubate the blot with secondary antibody for 1 hour
+Then image on odyssey
+The chemiluminescence signal was recorded after developing in ECL western blotting detection reagent using CL-Xpsoure film or ChemiDOC MP flatbed scanner. Images were processed using Image Lab (v 5.2.1) software. Fluorescent band quantification was performed using ImageJ (v1.8.0_112).</div>
+</div>
+<div class="proto-sub collapsed" id="sub-ip-flag-followed-by-activity-b">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>IP-FLAG followed by Activity Based Protein Profiling (ABPP) V1 - with IP buffer lysis</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">PART 1 - Expression of FLAG tagged protein and generation of cell pellets
+Day 0
+Plate cells onto 10cm dish
+Day 1
+Transfect HEK Cells with JetPrime Optimus and plasmid of interest
+10ug of DNA per 10cm dish
+Day 2
+Materials: cold PBS, cell scrapers
+Put PBS on ice prior to grabbing cells
+Detach cells, pellet and store at -80
+1. Detach cells from the bottom of the cell culture dish by pipetting and transfer cell suspension to 15 mL tube.
+2. Wash the plate with 1 mL cold-PBS and transfer to the same 15 mL tube
+3. Centrifuge (520g, 5 min, 4ºC)
+4. Aspirate cell culture medium
+5. Add 1 mL cold-PBS and transfer cell suspension to 1.5 mL tubes
+6. Centrifuge (600g, 5 min, 4ºC)
+7. Aspirate PBS, frozen samples in liquid nitrogen, and keep them at -78ºC
+Part 2 - IP and ABPP
+Decide on the samples to test, remember all of these will then get labeled with rhodamine:
+Control - untransfected cells
+Iodoacetaminde - alkyne control (should hit everything)
+Day 3 (IP and ABPP)
+FLAG-IP
+Although it depends on the expression levels of a protein of interest, you can get enough immunopurified target protein for 3 conditions from 1 well of 6-well plate.
+Overall goal is to pull down the FLAG tagged protein so that we have plenty of material to use for downstream ABPP.
+1. Make IP Lysis buffer (25 mM Tris-HCl pH 7.4, 150 mM NaCl, 10% glycerol, 1% NP-40, cOmplete protease inhibitor cocktail)
+Alternatively can purchase IP lysis buffer (Thermo #87788 - this has 5% glycerol instead of 10%), just add protease inhibitor cocktail to this
+2. Resuspend cell pellet in 400 uL cold lysis buffer and incubated for 10 min on ice
+3. Centrifuged at 16,000 x g for 10 min at 4℃ and transferred supernatant (370 uL) to a new 1.5 mL tube for IP
+4. Added 100 uL FLAG affinity gel in IP lysis buffer (40 uL slurry per sample, washed three times with cold PBS and resuspended in IP lysis buffer) to each tube containing supernatant
+5. Rotated tubes for 2 h at 4℃
+6. Washed FLAG affinity gel four times with IP wash buffer (25 mM Tris-HCl pH 7.4, 150 mM NaCl, 0.2% NP-40) (500 uL x 4 times, centrifuge at 4,000 x g for 1 min)
+7. Added 25 x (sample number + 1) uL cold PBS for ABPP
+ABPP
+Overall goal is to react the cystines in the flag pulled down protein with scout fragments or DMSO. Then react with alykne version of the scout. Then we will use copper catalyzed click chemistry of the alkyne to ligate
+1. Add 23 uL sample to 1.5 mL tube
+2. Scout treatment
+Add 1 uL DMSO, or KB02/KB05 500uM per sample,
+incubate 1 hr at RT
+3. Alkyne treatment
+Add 1 uL KB02-yne /KB05-yne 100 uM per sample
+incubate 1 hr at RT
+3. Click reaction
+Add 3 uL click mix per sample (28 uL), incubate 1 hr at RT
+a. 30 uL TBTA [1.7 mM] (0.9 mg TBTA / mL 4:1 tBuOH:DMSO, pre-made)
+b. 10 uL CuSO4 [50 mM] (12.5 mg / mL H2O, pre-,made)
+c. 10 uL DTB-N3 [5 mM] - this should be rhodamine azide
+d. 10 uL TCEP [50 mM] (13 mg / mL H2O, made fresh)
+4. Quench with sample buffer, 9.3 uL each tube
+5. Boil at 95℃ for 7 min
+Day 4 (Run gels)
+Load 10 uL sample
+Dilute ladder (1 uL in 200 uL loading buffer), load 2 uL on gel
+Visualize on bio-rad (Daylight 550 &amp; Daylight 650 for ladder)</div>
+</div>
+</div>
+<div class="proto-section" id="sec-western-blot-from-10cm-dish">
+<h2>📊 Western Blot from 10cm Dish</h2>
+<div class="proto-top-box">Items to have before you start:
+Protease inhibitor stock solution, RIPA buffer and DPBS all on Ice
+1M PMSF in isopropanol (can be at -20, careful because this is toxic)
+1x20G needle and 1mL syringe for each dish
+Cell scraper (1 per dish)
+Cooled table top centrifuge
+Protease Inhibitor
+Option 1 - Prepare protease inhibitor from pellet
+Prepared 10x stock of mini complete protease inhibitor tablet (Roche) - 1 tablet dissolved in 1mL of water
+Make 250uL aliquots and store at -20
+Option 2 - purchase HALT protease inhibitor cocktail
+
+Option 3 - prepare PMSF solution
+
+Lysis Buffer
+Option 1 - Prepared RIPA buffer and stored at 4 degrees (100mL will last a long time)
+RIPA buffer (05-01)
+10 mM Tris-Cl (pH 8.0)
+1 mM EDTA
+0.5 mM EGTA
+1% Triton X-100
+0.1% sodium deoxycholate
+0.1% SDS
+140 mM NaCl
+The above solution is stable at room temperature.
+Before use, add:
+1 mM PMSF
+
+Option 2 - purchase 10x RIPA buffer from Invitrogen
+Alternative lysis buffers (still with protease inhibitors) - PBS and sonication or IP lysis buffer
+Prepared an eppendorf with 300uL RIPA buffer and added 30uL of protease inhibitor tablet stock and 3uL of 1M PMSF stock (optional)
+Washed with 10mL of ice cold PBS then resuspended cells in 300uL of RIPA buffer, lysed by passing through 20G needle a few times
+
+If lysing suspension cells - can let the cells sit on ice for 15 minutes, while that is happening prepare BCA reagents
+Spun down for 15 mins at 14000g to remove any debris
+Move the supernatant to a new eppendorf and either go to the next step or store at -20 if you want
+Ran the following on a 10 well protein gel 25uL total volume so 6uL of LDS, 1uL of DTT and the rest water (made a stock with 30uL of LDS and 5uL of DTT - use 7uL of each for a sample)
+Ladder on left
+Protein standard - use 1uL of MBP-ZBP1-his
+10, 15, 20, 25ul sample
+Loaded all of the sample onto the gel with one lane spacer between each
+Added 4uL of protein standard (see blue plus 2)
+Ran gel in MOPS buffer (200V for 50 mins) then transfered with the IBLOT system
+Made a 10x stock of TBS
+For 1 L:
+24 g Tris-HCl (formula weight: 157.6 g)
+5.6 g Tris base (formula weight: 121.1 g)
+88 g NaCl (formula weight: 58.4 g)
+Dissolve in 900 mL distilled water
+Used that to make a 1X stock of TBST (by adding 1mL of Tween 20 to 1L of 1X TBS)
+After the transfer used 4% milk in TBST to block in the cold room overnight
+Put the lysate back at -20 in case the blot didnt look as expected
+For a 6 well dish:
+Prepare 900uL of RIPA buffer and add 100uL of 10x protease inhibitor
+Same as above but after the PBS washes use 150uL of RIPA with protease inhibitors per well
+Then put on ice and then rotate for 5 mins to dislodge the cells
+Pipet up and down aggressively to lyse the cells</div>
+</div>
+<div class="proto-section" id="sec-cloning-buffer-recipes">
+<h2>🧮 Cloning Buffer Recipes</h2>
+<div class="proto-sub" id="sub-2x-tes-recipe--50ml-total-volu">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>2X TES Recipe (50mL total volume)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">20mM Tris-HCl pH 8.0 (1mL of 1M RNA stock)
+2mM EDTA pH 8.0 (200uL of 0.5M RNA stock)
+200mM NaCl (2mL of 5M RNA stock)</div>
+</div>
+<div class="proto-sub" id="sub-2x-tes-recipe--10ml-total-volu">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>2X TES Recipe (10mL total volume)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">20mM Tris-HCl pH 8.0 (200uL of 1M RNA stock)
+2mM EDTA pH 8.0 (40uL of 0.5M RNA stock)
+200mM NaCl (400uL of 5M RNA stock)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-if-1ml-of-2x-tes-buffer">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>if 1mL of 2x TES buffer</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">20uL of Tris-HCl pH 8.0
+4uL of EDTA pH 8.0
+40uL of 5M NaCl
+936uL of DEPC water</div>
+</div>
+<div class="proto-sub collapsed" id="sub-if-500ul-of-2x-tes-buffer">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>if 500uL of 2x TES buffer</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">10uL of Tris-HCl pH 8.0
+2uL of EDTA pH 8.0
+20uL of 5M NaCl
+468uL of DEPC water</div>
+</div>
+<div class="proto-sub collapsed" id="sub-1x-tes-buffer--50ml-total-volu">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>1x TES buffer (50mL total volume)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">10mM Tris-HCl pH 8.0 (500uL 1M RNA stock)
+1mM EDTA pH 8.0 (100uL of 0.5M RNA stock)
+100mM NaCl (1mL of 5M RNA stock)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-1x-tes-buffer--10ml-total-volu">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>1x TES buffer (10mL total volume)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">10mM Tris-HCl pH 8.0 (100uL 1M RNA stock)
+1mM EDTA pH 8.0 (20uL of 0.5M RNA stock)
+100mM NaCl (200uL of 5M RNA stock)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-1ml-of-1x-tes-buffer">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>1mL of 1x TES buffer</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">10uL of Tris-HCl pH 8.0
+2uL of EDTA pH 8.0
+20uL of 5M NaCl
+968uL of DEPC water</div>
+</div>
+<div class="proto-sub collapsed" id="sub-if-500ul-of-1x-tes-buffer">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>if 500uL of 1x TES buffer</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">5uL of Tris-HCl pH 8.0
+1uL of EDTA pH 8.0
+10uL of 5M NaCl
+484uL of DEPC water</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cloning-tips-and-tricks">
+<h2>🔧 Cloning Tips and Tricks</h2>
+<div class="proto-sub" id="sub-making-primer-stocks--100um-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Making primer stocks (100uM)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Dilute the nmol of primer x 10
+For 15nmol dilute with 150uL of ultra pure water</div>
+</div>
+<div class="proto-sub" id="sub-making-synthetic-duplexes">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Making synthetic duplexes</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">This is approximately 450ug of each primer and we do a transcription rxn with 100ng/uL (20uL volume so that is 2ug of total DNA per reaction)
+Need around 1ug of each primer in the reaction (base it off the longer primer and then use equal amount of shorter primer)
+For the annealing reaction we need 10-50uM concentration of each oligo, need to anneal before transcription
+Dilute the oligos to 100uM with water as per usual
+That way we can use them for other things and dont risk stock buffer contamination
+Make 2x TES buffer (will dilute to 1x when we add both oligos)
+20mM Tris-HCl pH 8.0
+2mM EDTA
+200mM NaCl
+Add equal volume of each oligo (2uL) into a PCR tube and then double the volume with 4uL of 2xTES buffer (1x final concentration of TES, 25uM for each oligo)
+Will need to dilute this again 5 fold in 1x TES buffer (add 32uL of 1x buffer) before using in the reaction, final concentration should be about 5uM
+10mM Tris-HCl pH 8.0
+1mM EDTA
+100mM NaCl
+Head them up to 95 degrees then allow them to cool down to room temp
+Check on a gel - compare individual fragments and the duplex</div>
+</div>
+<div class="proto-sub collapsed" id="sub-gene-block-resuspension-and-pc">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Gene block resuspension and PCR</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Resuspend in TE buffer to get 25ng/uL
+Then use 1uL of resuspended DNA per 50uL PCR reaction</div>
+</div>
+<div class="proto-sub collapsed" id="sub-to-anneal-oligos-for-ligation">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>To anneal oligos for ligation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Took 2ug of each strand (currently 100uM concentration)
+Put total volume of 4ug into a eppendorf
+The longer oligos are around 29kD use 0.7uL of each to get 2ug
+The shorter ones are around 24kD use 0.84uL of each to get 2ug
+Added 3uL of 3M NaCl to 95uL of water - then added the oligos in their respective tubes to get a 100uL stock 4ug/100uL of duplex 40ng/uL of duplex
+This was placed in a 95 degree block for 1 minute then cooled extremely slowly by moving the hot block to the benchtop and allowing the whole thing to cool (better annealing)
+Diluted this 10x into 100mM NaCl then used 1.25uL for the following reaction
+Protocol
+Set up the following reaction in a microcentrifuge tube on ice. (T4 DNA Ligase should be added last. Note that the table shows a ligation using a molar ratio of 1:3 vector to insert.)
+COMPONENT 20 µl REACTION 10X T4 DNA Ligase Buffer* 2 µl Vector DNA (5.5 kb) 110 ng (0.025 pmol) - 6.5uL of BB Insert DNA (0.1 kb) 5 ng (0.076 pmol) - 1.25uL of BB T4 DNA Ligase 1 µl Nuclease-free water to 20 µl
+* The T4 DNA Ligase Buffer should be thawed and resuspended at room temperature.
+Gently mix the reaction by pipetting up and down, and microfuge briefly.
+For cohesive (sticky) ends, incubate at 16°C overnight or room temperature for 10 minutes.
+For blunt ends or single base overhangs, incubate at 16°C overnight or room temperature for 2 hours (alternatively, high concentration T4 DNA Ligase can be used in a 10 minute ligation).
+Chill on ice and transform 1-5 µl of the reaction into 50 µl competent cells.
+Will ligate at 16 degrees until tomorrow</div>
+</div>
+<div class="proto-sub collapsed" id="sub-cloning---designing-a-premap">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Cloning / Designing a Premap</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Know thy polymerase - some polymerases will leave A overhangs when you PCR amplify - this is ok if you want sticky ends - not OK if you want blunt ends
+
+Know thy restriction enzyme - check the NEB website because some enzymes will need buffers other than cutsmart and temperatures other than 37 degrees
+Know thy plasmid - some plasmids dont have ampicillin resistance
+Select from the sequencing data what we want to clone (exclude the poly His and thrombin cleavage sites)
+Format the sequence to include all reading frames and then pick the frame that has our product to work with
+Use this to just select the sequence that we want to clone out, copy and paste into a new sequence (make sure to adjust the frame for the sequence when its cut and pasted)
+Minimize windows when you are done working with them
+Check to see if there are restriction enzyme overlaps between insert and vector
+Add in sequences for the restriction enzymes onto the ends of the insert (make sure not to disturb the frame)
+Perform restriction digest of the backbone and only keep the area of interest (remove the insert)
+Perform restriction digest of the insert and then ligate the two together
+Make sure everything is in frame with the upstream elements!
+Delete the start codon of the second protein
+
+Plasmidsaurus - for $20 you can send a colony and they will sequence the plasmid inside - works for high copy number plasmids that are endA- (eg DH5a works but STBL3 do not work)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-colony-pcr">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Colony PCR</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Marked and screened 10 colonies with internal (red tubes, bottom PCR row, bottom of gel) and flanking (blue tubes, top PCR row, top of gel) primers using control plasmid and XIV ladder (same time, made 2x12 sample MMs)
+Platinum® Taq DNA Polymerase
+Regular fidelity (invitrogen)               Volume/rxn          Volume/MM
+10x PCR buffer -Mg                              2uL                    24uL
+10mM dNTPs                                       0.4uL                  4.8uL
+50mM MgCl2                                       0.65uL                7.8uL
+Fwd primer 10uM                                0.8uL                  9.6uL
+Rev primer 10uM                                 0.8uL                  9.6uL
+Platinum tag (invitrogen) 0.2uL              0.08uL               0.96uL
+Water up to 15uL (+5uL template)        10.27uL             123.24uL
+Used 5uL from each colony in H2O / reaction (had previously heated on heating block for 10 minutes)
+Ran on a 1.5% Agarose gel
+Samples 1-10, then control and ladder (4uL)
+Checked gel after 15 min
+Either added LB to cultures that worked or removed cultures that didnt work
+Let all cultures grow overnight
+Ran gel for another 30 minutes, Remember that in the top row only one primer matches up (the halo FWD, the other primer is inside our insert), on the bottom row we have primers that are on either side of our plasmid, the smaller MW bands may be the same as what we had previously - some sort of plasmid ligation</div>
+</div>
+<div class="proto-sub collapsed" id="sub-colony-pcr-with-a-premade-mast">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Colony PCR with a PreMade Master Mix</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Using the platinum green master mix (2x) hot start, used 20uL reactions
+10uL of master mix
+0.5uL of 10uM forward primer
+0.5uL of 10uM reverse primer
+5uL of template
+4uL of H2O
+Making master mix for 5.5 reactions (make 2 of these for each of the plasmids tested)
+55uL of master mix
+2.75uL forward primer
+2.75uL of reverse
+22uL of H2O
+Add 15uL to each tube with 5uL template already inside
+After PCR is done, loaded 5uL of each reaction directly onto a gel</div>
+</div>
+<div class="proto-sub collapsed" id="sub-agarose-gel-electrophoresis">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Agarose gel electrophoresis</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Percentage is number of grams per 100mL
+1% is 1g /100mL, 2% is 2g/100mL
+Each gel is 50mL but can do 75 or up to 100mL to try and load 50uL volume PCRs
+Use either TAE or TBE buffer (Caro prefers TBE, runs more quickly) however everyone in Omars lab uses TAE and that is what is in the common room
+Microwave and add 5uL of EtBr or 5uL of SybrSafe into 50mL once cool to touch
+Once the gel has polymerized can run at 100V</div>
+</div>
+<div class="proto-sub collapsed" id="sub-reconstitute-plasmid-from-filt">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Reconstitute plasmid from filter paper</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Cut out with fresh razor blade
+Place in clean eppendorf with 50uL dH2O
+Let sit for 5 minutes
+Use 10uL of that mix to transform E Coli and save the rest</div>
+</div>
+<div class="proto-sub collapsed" id="sub-platinum--taq-dna-polymerase">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Platinum® Taq DNA Polymerase</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Regular fidelity (invitrogen)               Volume
+10x PCR buffer -Mg                              5uL
+10mM dNTPs                                        1uL
+50mM MgCl2                                       1.5uL
+Fwd primer 10uM                                  2uL
+Rev primer 10uM                                   2uL
+Template DNA (10ng)                           1uL
+Platinum tag (invitrogen) 0.2uL            0.2uL
+Water up to 50uL                                 37.3uL
+Jeet Program
+Temp     Time (min)
+1. 94          2
+2. 94          0.5
+3. 55          0.5 &lt;- we are using high GC so 55 instead of 50
+4. 72          2 (1min per kb)
+5. 72          7
+6. 4            infin
+End
+Loop steps 2-4 35x</div>
+</div>
+<div class="proto-sub collapsed" id="sub-platinum--taq-dna-polymerase-h">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Platinum® Taq DNA Polymerase High Fidelity</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Hi-Fi PCR (invitrogen)                         Volume
+10x HiFi PCR buffer                              5uL
+10mM dNTPs                                        1uL
+50mM MgSO4                                       2uL
+Fwd primer 10uM                                  2uL
+Rev primer 10uM                                   2uL
+Template DNA (10ng)                            1uL
+Platinum tag HiFi (invitrogen) 0.2uL      0.2uL
+Water up to 50uL                              36.8uL
+Jeet HiFi Program
+Temp     Time (min)
+1. 94          2
+2. 94          0.5
+3. 55          0.5 &lt;- we are using high GC so 55 instead of 50
+4. 68          0.5 (1min per kb)
+5. 68          7
+6. 4            infin
+End
+Loop steps 2-4 35x
+Remember that the stocks for the primers are 100uM, do a 10x dilution to make these stocks NOT THE 100x for sequencing dilution</div>
+</div>
+<div class="proto-sub collapsed" id="sub-restriction-digests">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Restriction Digests</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Use 3ug of DNA so that you have enough for the downstream processes
+For dephosphorylation of blunt ended backbones use CIP
+Be sure to use a total volume of cutsmart reaction of 100uL for 1uL of CIP
+Maximum of 1 hour at 37 degrees then heat inactivate for 20mins at 65 degrees and EDTA (2uL of 0.5M EDTA pH 8.0) to inactivate it completely before gel extraction</div>
+</div>
+<div class="proto-sub collapsed" id="sub-in-vitro-transcription">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>In vitro Transcription</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Ambion T7 megashortscript kit
+T7 PCR product                   20ul
+NTPS (A,G,U,C)                   5ul each
+10x Txn buffer                      5ul
+T7 enzyme                            5ul
+Water                                      ----
+TOTAL                                    50 uL
+37C 4hour
+add 5ul of DNaseI; 37C 20min
+Transfer 50 uL reaction to a 1.5 mL microcentrifuge tube
+Rinse the PCR tube with 50 uL water and transfer to the 1.5 mL tube. (final volume 100ul)</div>
+</div>
+</div>
+<div class="proto-section" id="sec-rna-biochemistry">
+<h2>🧬 RNA Biochemistry</h2>
+<div class="proto-sub" id="sub-reverse-transcription">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Reverse transcription</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Make a master mix for 15 reactions
+15uL of 50uM primer (OligodT or random Hexamer) - if using primer 75 (anchored oligoDT use half as much and use water to make up remaining)
+15uL of 10mM dNTP mix
+
+Add 2uL of MM to each tube containing
+11uL of RNA
+Anneal at 65 degrees for 5 minutes then put on ice for a minute
+
+In another tube prepare:
+60uL of SSIV buffer
+15uL of 100mM DTT
+15uL of RNAseOUT inhibitor
+Then add 15uL of super script IV
+
+Add 7uL of RT mixture to each tube
+
+Then incubate at 55 degrees for 10 minutes followed by 80 degrees for 10 minutes
+Then move onto PCR amplification
+LunaScript RT Master Mix
+Add 4uL of master mix to 16uL of RNA</div>
+</div>
+<div class="proto-sub" id="sub-rnase-protection-assay">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>RNAse Protection Assay</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Made RNAse Stocks (~10uL each, toss out after use)
+10u/uL (original vial) - used 1ul to put into 9ul of dilution buffer
+Tested the following RNase dilutions
+1u/uL
+0.1u/uL
+0.001u/uL
+0.0001u/uL
+We will pipet directly from this into the assay with multipipettor
+Set up 8 pcr tubes
+Prepared 2 different MM of RNA
+16.5uL of RNA and 8.25uL of tRNA (10mg/mL)
+8.25uL of RNA and 8.25uL of tRNA and 8.25uL of UP H2O
+Put 6uL of MM1 into the first 4 tubes
+Put 6uL of MM2 into the last 4 tubes
+Added 1uL of Rnase to each tube (did this 2x for the two tube sets)
+Incubated at RT for 5 minutes for the first 4 tubes and 15 minutes for the last 4 tubes and then added 7uL of denaturing gel loading buffer
+Heat up the sample and load 10uL onto a gel
+Ran gel for 50 minutes, in the dark and with TBE buffer and then imaged on odyssey
+Change the focal point - these gels are much thinner than what we normally use
+The thickness is 1mm, when we do the EMSA gels they are much thicker!
+Use the flat setting (0mm focal point deviation) - normally we compensate about 3mm above the plane of the scanner</div>
+</div>
+<div class="proto-sub collapsed" id="sub-phenol-chloroform-extraction">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Phenol chloroform extraction</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Set up 4 rows of tubes (two rows for phenol, one row for cholorform, one row for precipitation)
+Equal volume of organic solvent compared to aqueous phase added
+For example
+100uL of aq + 100uL phenol
+Vortex and spin down, max speed 2 min
+Transfer aq layer (top layer) to fresh tube
+100uL of aq + 100uL phenol
+Vortex and spin down, max speed 2 min
+Transfer aq layer (top layer) to fresh tube
+100uL of aq + 100uL chloroform
+Vortex and spin down, max speed 2 min
+Transfer aq layer (top layer) to fresh tube</div>
+</div>
+<div class="proto-sub collapsed" id="sub-rna-precipitation">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>RNA Precipitation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Add the following to the tube to precipitate RNA:
+1/20th volume of 5M NaCl (5 ul)
+8 uL Glycogen 5ug/uL stock (Ambion)
+2.5 volumes 200 Proof EtOH (250 ul)
+Vortex
+Freeze -20 O/N
+Spin 1 hr at max speed in refrigerated 4 degrees Celsius centrifuge
+Remove supernatant and dry 5-7 mins in speedvac (if in rush)
+Resuspend well in 50 uL DEPC water + 50 uL Ambion gel loading buffer II
+Gel purify 8% Acrylamide 7M Urea 1xTBE
+1L:
+8% Acrylamide         267 ml of 30% Stock solution
+7M Urea                     420.42 g  (FW 60.06 g/mol)
+1X TBE                       100 mL of 10X Stock
+Mix all in a 1L bottle (add urea first)
+Place a stir bar in bottle
+Cover bottle with aluminum foil
+Stir with low/med heat on stir plate
+Once completely dissolved bring volume to 1L in a graduated cylinder
+Sterile filter
+– 25ml gel, 100uL 30%APS (4.5g in 15mL), 30ul TEMED
+Loaded 2 wells
+Run at 35W for ~ 30-45 mins
+short wavelength UV shadow       - band should appear just below xylene cyanol marker in the Ambion gel loading buffer II
+cut out and slice up bands; transfer to 1.5 mL microfuge tube
+soak in approx. 400-600uL Gel Purification Elution Buffer  (per band)
+Gel Purification Elution Buffer - 10 mL
+500 mM NaCl            - 1 mL of 5M stock
+10 mM Tris pH 7.0    - 100 uL of 1M stock
+1 mM EDTA               -  20 uL of 0.5M stock
+overnight on 360 degree rocker at 4 degrees
+Remove the fluid to 2 tubes.
+Vortex gel with 200uL additional soaking buffer, spin down 3min max speed, extract supernatant (do not transfer gel debris)
+Then, Precipitate as above
+add 12ul glycogen (5 mg/mL Ambion) and 2.5vols of 100%ethanol
+Freeze at -80 C at least 1 hour.
+Spin down at max speed 20-25 min at 4ºC
+Dry pellet at RT for 20 min
+Resuspend in 50 uL of TE buffer (10mM Tris pH 7.0, 1 mM EDTA)
+Take concentration with nanodrop: uM (use A = c. ε. L formula)
+ε =</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-culture">
+<h2>🏺 Cell Culture</h2>
+<div class="proto-top-box">Media for different cell lines
+Common:
+HEK293T - DMEM high glucose, 10% FBS, P/S, Glutamax
+U2OS - DMEM high glucose, 10% FBS, P/S, Glutamax
+MEF - DMEM high glucose, 10% FBS, P/S, Glutamax
+HeLa - DMEM high glucose, 10% FBS, P/S, Glutamax
+Breast:
+MCF7 - DMEM/F12, 10% tetracycline free FBS (​​Takara #631106), P/S, 1xITS (Gibco #41400-045)
+T47D - RPMI1640 with 10% FBS (Gibco) supplemented with 1% Insulin-Transferrin-Selenium (ITS-G, Gibco)
+MCF10a - DMEM/F12 supplemented with 5% horse serum (Gibco), 20 ng/mL EGF (MilliporeSigma), 10 μg/mL insulin (MilliporeSigma), 0.5 μg/mL hydrocortisone (MilliporeSigma), 0.1 μg/mL cholera toxin (MilliporeSigma)
+Leukemia:
+MV411 - RPMI 1640 with 10% FBS, P/S
+MOLM13 - RPMI 1640 with 10% FBS, P/S
+K562 - IMDM with 10% FBS, P/S
+Blasticidin 10mg/mL stock - dilute 1mL into 500mL of media for selection with 20ug/mL
+Puromycin selection does not work
+K052 - RPMI 1640 with 10% FBS, P/S
+NALM6 - RPMI 1640 with 10% FBS, P/S
+TF-1 - RPMI 1640 with 10% FBS, P/S
+Melanoma:
+Mel202 -  RPMI 1640 with 10% FBS, P/S and Glutamax
+Mel285 -  RPMI 1640 with 10% FBS, P/S
+MCF10a media:
+DMEM/F12 supplemented with
+5% horse serum (Gibco)
+20 ng ml−1 EGF (MilliporeSigma) - we need 10,000ng per 500mL bottle or 10ug per 500mL bottle (we are ordering 100ug)
+10 μg ml−1 insulin (MilliporeSigma) - stock solution (Sigma I9278) is 10mg/mL so we will dilute 1000x or use 0.5mL per bottle and are ordering 5mL
+0.5 μg ml−1 hydrocortisone (MilliporeSigma) - this is 250ug per 500mL bottle (we have a 1mg / mL stock in ethanol so we will use
+0.1 μg ml−1 cholera toxin (MilliporeSigma) - this is 100ng/mL so we need 50,000ng or 50ug per 500mL bottle (we are ordering 1mg)
+1% Penn Strep (implied)
+Hydrocortisone: (Sigma #H-0888, 1 g bottles) Resuspend at 1 mg/ml in 200 proof ethanol and store aliquots at -20 oC
+Cholera Toxin: (Sigma #C-8052, 2 mg vials) Resuspend at 1 mg/ml in sterile dH2O and allow to reconstitute for about 10 minutes. Store aliquots at 4oC.
+From former OAW lab paper:
+MCF-10A and MCF-10A MYC-ER cells were a gift from Senthil K. Muthuswamy (Beth Israel Deaconess Medical Center) and were maintained in DMEM/F12 (Gibco) supplemented with 5% horse serum (GIBCO), 1% penicillin streptomycin (Sigma), 20 ng/mL EGF (Peprotech), 2 ug/mL hydrocortisone 0.5 ug/mL (Sigma), 100 ng/mL cholera toxin (Sigma), and 10 ug/mL insulin (Sigma).
+Medium Components from Sigma sheet:
+Cholera Toxin from V. cholerae, Catalog Number C8052
+DMEM/F12, Catalog Number 51448C
+Insulin Solution, Catalog Number I9278
+Epidermal Growth Factor, Catalog Number E9644
+50 mM Hydrocortisone Solution, Catalog Number H6909 - this is approximately 0.0181mg/mL or 18.1ug/mL
+Horse Serum, Catalog Number H1270
+Here is what Salima ordered in 2022
+Peprotech	each	Animal-Free Recombinant Human EGF 100ug	AF-100-15	1	$72.00
+Sigma 	each	Insulin solution from bovine pancreas	I0516-5ML	1	$121.00
+Sigma C8052-2MG	each	Cholera Toxin from Vibrio cholerae	C8052-1MG	1	$271.00</div>
+<div class="proto-sub" id="sub-mcf7-notes">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>MCF7 Notes</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">General recommendations:
+Cells are frozen in BamBanker (Bulldog Bio) and stored at -80
+Shipped on dry ice
+Please store in -80 or in liquid nitrogen until ready to use
+Freeze down early passage aliquots
+Keep in tetracycline free FBS, otherwise leaky expression will cause loss of SF3B1 transgene constructs (in particular loss of K700E mutation)
+Items to have:
+Pre-warmed MCF7 growth media - DMEM/F12 with glutamax (Thermo 10-565-018), 10% tetracycline free FBS (​​Takara #631106), P/S, 1xITS (Gibco #41400-045)
+10cm dishes
+
+Cell thaw:
+Thaw out cells in water bath, as soon as thawed bring cells into TC hood, add 10mL of pre warmed media and plate on 10cm dish
+Leave cells in incubator for 1-2 days
+
+Serial passages:
+Aspirate complete media and add 10mL of PBS without calcium or magnesium
+Aspirate PBS and add 1x trypsin solution
+Incubate in incubator for 1-5 minutes
+Once cells are detached, agitate and resuspend the cells in 10mL of media
+Split 1:2 or 1:4 max - these cells cannot be diluted sparsely because the growth rate is quite slow
+
+Cell freezing:
+After dissociation add 10mL of complete media and spin for 5 min at 500g
+Resuspend with 1mL of BamBanker (Bulldog Bio) per 1 million cells
+Transfer 1mL of cells to labeled cryovial
+Place in -80 immediately
+Doxycycline induction:
+Pre warm media and dilite stock Doxycycline (Millipore Sigma D3072-1ML) 100x to final concentration of 1mg/mL
+Remove media and replace with Doxycycline containing media
+Allow at least 24 hours for induction, maximum induction obtained after 48 hours
+If needed, can replace doxycycline containing media after 72 hours but generally would limit inductions to less than 1 week
+Do not freeze down cells that were induced, over time you can cause loss of the SF3B1 mutation
+MOLM13 Notes
+General recommendations:
+Cells are frozen in BamBanker (Bulldog Bio) and stored at -80
+Shipped on dry ice
+Please store in -80 or in liquid nitrogen until ready to use
+Freeze down early passage aliquots
+
+Items to have:
+Pre warmed MOLM13 media - RPMI 1640 with 10% FBS, P/S
+T25, T75 flasks for suspension cells
+
+Cell thaw:
+Thaw out cells in water bath, as soon as thawed bring cells into TC hood, add 10mL of pre warmed media and plate on T25 flask
+Leave cells in incubator for 1-2 days
+Serial passages:
+Split 1:10 max - these cells can tolerate sparse dilution and grow quite easily
+Cell freezing:
+Spin cell suspension for 5 min at 500g
+Resuspend with 1mL of BamBanker (Bulldog Bio) per 1 million cells
+Transfer 1mL of cells to labeled cryovial
+Place in -80 immediately
+Doxycycline induction:
+Dilite stock Doxycycline (Millipore Sigma D3072-1ML) 100x to final concentration of 1mg/mL in media
+Allow at least 24 hours for induction, maximum induction obtained after 48 hours
+If needed, can replace doxycycline containing media after 72 hours but generally would limit inductions to less than 1 week
+Do not freeze down cells that were induced, over time you can cause loss of the SF3B1 mutation</div>
+</div>
+<div class="proto-sub" id="sub-thawing-frozen-mefs">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Thawing Frozen MEFs</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepare media (usually DMEM with 10% FBS and 1x penn strep)
+Warm media in 37 degree water bath for at least half an hour before using
+Prepare 1x10mL falcon of media per vial that you want to thaw, label
+Thaw cells in water bath until a little bit of ice remains
+Clean with EtOH before entering hood
+Mix the thawed cells with 1.5mL of media and then add to the respective 10mL falcon of media
+Spin the cells for 5 minutes in the falcon tube
+Remove the supernatant and add fresh media, re-suspend well and then  add all media to a small 10cm petri dish
+Check after 1-2 hours to see if the cells have started to adhere</div>
+</div>
+<div class="proto-sub collapsed" id="sub-splitting-mefs-from-10cm-plate">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Splitting MEFs from 10cm plate</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Things to have in the hood:
+Plates with cells
+trypsin
+DMEM
+PBS
+Fresh plates to split cells into (large plates)
+Aspirate media
+Gently add 7.5mL of PBS to corner of plate
+Remove PBS
+Repeat with another 7.5mL of PBS
+Add 1mL of trypsin
+Let incubate for 1min at 37
+Label the two large 15cm plates by labeling them
+Add 15mL of media to each plate
+Remove trypsinized culture from incubator, tap the sides to remove cells from the bottom
+Check under the microscope
+Add 10mL of fresh media to the plate and wash multiple times to remove all cells from bottom
+Add appropriate amount to the large dishes</div>
+</div>
+<div class="proto-sub collapsed" id="sub-harvesting-and-lysing-cells">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Harvesting and Lysing Cells</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepared 10x stock of mini complete tablet - 1 tablet dissolved in 1mL of water, can keep these stocks in -20
+Use this to prepare the RIPA buffer 1mL RIPA with 100uL of inhibitor and 1uL of PMSF
+Removed media
+Washed 2x10mL of cold PBS
+Added 1mL of PBS and scraped cells, collected into 2 eppendorfs
+Spun down at 1000g for 3 minutes to collect the cells
+Resuspended cells in 300uL of RIPA buffer, lysed by passing through 20G needle a few times
+Then spun down for 10min at 10000g to remove the membranes, froze down the supernatant</div>
+</div>
+<div class="proto-sub collapsed" id="sub-rna-isolation-from-matek-dish-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>RNA Isolation from Matek dish with TRIZOL</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepared the following:
+Bucket of ice
+Cooled PBS-MC
+Thawed glycogen stock
+Bleach in a beaker
+Took the neuron dish after 1 week of infection out of the incubator
+Washed each dish with 2mL of cold PBS-MC
+Then added 200uL of TRIZOL (Tri-Reagent from Ambion) and pipetted up and down to dissociate cells
+Added 40uL of chloroform into eppendorf tube then shake for 15 seconds
+Incubate at RT for 2-3 minutes then 12000g for 15 minutes at 4 degrees
+Remove the aueous phase to a fresh tube (this has the RNA) - be careful not to touch the white gunk in between layers as that is genomic DNA
+Add 1uL of glycogen
+Add 100uL of isopropanol
+Incubate at room temp for 10 minutes or longer if you want to precipitate more RNA
+Spin for 10 minutes at 12000g to pellet (4 degrees)
+Wont be able to see much of the pellet - it will just look like a clear blob at the bottom of the tube when you remove the supernatant
+Wash with 200uL of 75% ethanol
+Spin down for 5 minutes at 7500g then remove the ethanol and let dry at room temperature for 10 minutes at least
+Re-suspend in TE buffer (can do as little as 40uL - you only will use 35uL for DNAse digest) and quantified on the nanodrop
+If using multiple samples you can combine the pellets at the TE step
+U20S ZBP1 high cells (10cm dish) gave 260ng/uL of RNA
+MBS neurons from 1 matek dish gave 20ng/uL of RNA, the second time i did it i could get 30ng/uL if I resuspended in 40uL TE buffer
+Will run 200ng on a gel tomorrow and do the cDNA synthesis
+Put 1-2ug of RNA into a PCR tube for DNAse digestion at 37 degrees for half an hour (4uL of 10X buffer, 1uL of turbo DNAse in 40uL total volume)
+After it has run for 20-30 minutes (till 4:30pm) added 4uL of DNA inactivation resin then incubate at room temperature for a few minutes
+Spin down the resin and transfer RNA to a fresh tube
+Then combine 11uL of this RNA with 1uL of anchored oligo dT (355 in our stock)
+1uL of 10mM dNTP mix
+Also make a no RT control sample that will be used to make sure that the DNAse digestion was efficient
+Heat at 65 for 5 minute then on ice for one minute
+made an RT program that I will use from now on - make sure the RT reaction runs for half an hour rather than just 10 minutes (really want to capture all the mRNA, not just the 3&#x27; UTRs)
+Dilute the final reaction 5x by adding 80uL of nuclease free water then stored at -20
+Use the 2%  gel from today to test the PCR amplification of beta actin</div>
+</div>
+<div class="proto-sub collapsed" id="sub-plasma-cleaning-of-coverslips">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Plasma Cleaning of Coverslips</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Plasma cleaned the coverslips (instrument from Harrick Plasma)
+Make sure the plasma dial is set to off
+Turn on the power (right switch) and insert the samples
+Close the door tightly and lock
+Then turn on the vaccum pump (left switch)
+Wait until vaccum gets down to 700umHg before turning on the plasma (otherwise it will burn the inside of the machine because too many air particles will ionize)
+Let run for 90s then turn off plasma and vaccum
+Release the air slowly with the handle in the front (otherwise coverslips will fly around inside)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-rna-isolation-from-p0-mouse-he">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>RNA isolation from p0 mouse hemisphere</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepared the following:
+Bucket of ice
+Cooled PBS-MC
+Thawed glycogen stock
+Bleach in a beaker
+Took mouse hemisphere out of the -80
+Then added 500uL of TRIZOL (Tri-Reagent from Ambion) and pipetted up and down to dissociate cells
+Then passed tissue 5x through a 22 1/2 gauge needle
+Incubated at RT for 5-15 mins to dissolve (can use gentle shaking)
+Spin for 5 minutes at 10,000g to pellet the undissolved tissue - transfer the supernatant to a new tube
+Added 100uL of chloroform into eppendorf tube then shake for 15 seconds
+Incubate at RT for 2-3 minutes then 12000g for 15 minutes at 4 degrees
+Remove the aueous phase to a fresh tube (this has the RNA) - be careful not to touch the white gunk in between layers as that is genomic DNA
+Add 5uL of glycogen
+Add 250uL of isopropanol
+Incubate at overnight at -20
+Spin for 10 minutes at 12000g to pellet (4 degrees)
+Wont be able to see much of the pellet - it will just look like a clear blob at the bottom of the tube when you remove the supernatant
+Wash with 500uL of 75% ethanol
+Spin down for 5 minutes at 7500g then remove the ethanol and let dry at room temperature for 10 minutes at least
+Re-suspend in TE buffer (can do as little as 40uL - you only will use 35uL for DNAse digest) and quantified on the nanodrop
+If using multiple samples you can combine the pellets at the TE step</div>
+</div>
+<div class="proto-sub collapsed" id="sub-freezing-down-cell-lines-with-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Freezing down cell lines with FBS and 10% DMSO with dry ice</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">What to have ready:
+Dry Ice
+Thawed FBS
+DMSO
+Cryo vials
+What to have warmed:
+DMEM
+PBS
+Trypsin
+Washed cells 2x with 10mL of PBS
+Trypsinized each plate with 3mL, 1 min at 37
+Added 10mL of DMEM + 10% FBS and pen/step to quench trypsin
+Aggresively removed clots and washed plate with the added DMEM
+Moved all 26mL to a 50mL falcon tube
+Used 2x10uL to determine cell count in hemocytometer
+97 cells in 8 grids counted (max)
+97/8 = 12.125 cells on average per grid
+12.125x10^4 = 121,250 cells per mL
+121250*26mL = 3,152,500 cells in total
+We want each cryo vial to have a million cells so we can get 3x1mL stocks to freeze down
+We used 1mL to start a new 10cm dish
+Diluted with 9mL of media
+Spun down the remaining cells in 2x15mL falcon tubes for 5 minutes
+While they were spinning, prepared 5mL of FBS, 10% DMSO in a 15mL falcon tube
+Quickly removed the media and re-suspended 1 of the 15mL tubes with 3mL of FBS 10% DMSO
+Then used that same 3mL to resuspend the other tube
+Removed all 3mL from the last tube and aliquoted 1mL into each of the cryo containers
+Freezing with regulated cooling:
+Put the cells in 2 Styrofoam containers (15mL falcon tubes) and seal with tape
+Place in -80
+Move to liquid nitrogen after a few days
+Freezing in dry ice chest:
+Placed in freezer box and left on dry ice for 1 hour
+Got a liquid N2 inventory sheet
+My box is 14L
+After an hour on dry ice i placed the box in -80 overnight
+Will eventually transfer to LN2 for long term storage</div>
+</div>
+<div class="proto-sub collapsed" id="sub-freezing-down-cell-lines-with-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Freezing down cell lines with Bambanker Freezing media</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Spin down cell pellet - resuspend 2-10 million cells per mL in Bambanker freezing media
+Place directly at -80</div>
+</div>
+<div class="proto-sub collapsed" id="sub-seeding-cells-on-matek-dish">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Seeding cells on Matek Dish</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">2mL total volume
+Preparing Poly-D-Lysine Coated Coverslips
+0.1mg/mL stock (can buy 100mL of this from Gibco at 0.1mg/mL)
+Wash the coverslips with 1x PBS in the hood
+
+Dilute the poly lysine stock 2x (50ug/mL final concentration)
+Place diluted stock on wells (1mL per well of 12 well dish)
+Incubate at 37 for at least one hour</div>
+</div>
+<div class="proto-sub collapsed" id="sub-preparing-fibronectin-coated-c">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Preparing Fibronectin Coated Coverslips</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepared fibronectin coverslips on a 12 well plate (from left to right, ZBP1KO, WTimp2, IMP2KO)
+Growth area of 12 well plate is 3.8cm^2
+1mL aliquot resuspended at 1mg/mL (Sigma Aldrich F1141 SIGMA Fibronectin from bovine plasma)
+Make and froze down 105uL aliquots
+Need to dilute to 10ug/mL (100x dilution) so put 100uL into 10mL of PBS
+Washed the coverslips 2x with 2mL of 1x PBS in the hood
+For a 12 well dish:
+Added 0.8mL of 10ug/mL fibronectin in PBS to each of the wells and incubated at 37 for at least half an hour
+Then PBS can be added ontop and the cells can be left coated for up to a week</div>
+</div>
+<div class="proto-sub collapsed" id="sub-tecan-drug-printer-d300">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Tecan drug printer D300</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Will dispense drugs from using a cartirdge into very small volumes of a 96 or 384 well plate
+Open D3003 software
+Two major things needed for every assay - need to define the plate and define the fluids.
+To define a plate: top left - edit plate pencil
+No shaking
+To define fluids: Dispense
+Add fluid one (drug one)
+Set concentration of stock drug and pick color
+The machine will backfill your DMSO so it is consistent across all columns
+Top left is fluid plus - will keep concentration
+Click and drag
+Press titration - specify highest and lowest concentration
+Then can copy and paste each replicate
+To highlight the DMSO wells, highlight all wells getting drug as well as one row above those cells (that row will be your DMSO only control)
+Then click normalize selected wells
+Also get dmso back fill - this will allocate the right amount of DMSO to make it all even across the wells
+Normalize to highest class volume
+Will be duplicating plate if you have multiple genotypes or mutants
+Right click and press replicate plate if this is what you want
+Save as to save your plate
+Next you can proceed - the run prompt will walk you through step by step
+Look at the total volume of drug
+Minimum is 2uL loading - will use less for 1uM max
+12uL os max for T8
+Then press run
+Fluids are drugs
+Then press start to start walking through
+D4 and T8 cassettes
+T8 is the smaller volume - more common one to use
+Place in holder
+Comb comes down
+Program will come down
+May need to load dmso in D4 cassette for larger volume (eg DMSO)
+Load straight up and down touching the bottom
+Stocks need to be 10mM
+Aim for 0.1% DMSO
+Draw an X to mark the dispense heads that are used
+At end there is a file that has the concentration in each well
+Can copy and paste into prism</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-culture---viability-assay">
+<h2>📉 Cell Culture - Viability Assays</h2>
+<div class="proto-sub" id="sub-vicell-blue">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Vicell Blue</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Vicell Blue is very easy - just place 200uL of cells into the tube, add protocol for your cells and specify where the cells are being loaded in the rack, the machine automatically pulls up the cells and returns a viability as well as a number of cells
+ALternatively you dont have to specify the location - the machine will circle until it finds the tubes
+The alternative machine is the countess 3 or the old fashioned way of using trypan blue and hemocytometer</div>
+</div>
+<div class="proto-sub" id="sub-cell-titer-glo">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Cell titer Glo</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Making stocks of cell titer glo regent
+Start by resuspending the reagent in the provided buffer, we have the largest size so 100mL of buffer for one bottle of reagent
+Need to thaw out the reagent and buffer - can keep in drawer all day and resuspend at end of day
+Take cap off of the reagent and slowly pour the buffer inside, recap and mix well
+Then freeze down 10.5mL aliquots of the mixed reagent with buffer and store at -20
+
+On day of assay
+Remove cells from the incubator and let equilibrate to room temperature uncovered for one hour
+At the same time bring the celltiter glo reagent to room temperature
+After an hour put the reagent in a reservoir and use the multichannel to administer 25uL of reagent into each well of the 384 well plate containing 50uL of cells
+Let this equilibrate for 15 minutes
+
+6th floor plate reader used for readout
+Right at the end of the hall
+Spectramax M5
+Usually open to the plates in program itself
+Press New Plate button
+On the plate screen press the gear icon
+Fill in the following settings - luminescence, 384 well plate, standard opaque, specify the read area - the whole plate will take around 6 minutes
+Then press OK
+Press a button to make drawer come out
+Plate in with lid off
+Hit read
+Will show you all the readouts as numbers on the plate
+If you click any box and press control copy - this will copy the entire plate
+Paste into an excel document and email it to yourself from that computer
+Kharas lab plate reader
+File —&gt; new task —&gt; experiments —&gt; create using an existing protocol
+Documents (just click on it, don’t expand) —&gt; protocols —&gt; “Cell Titer Glo384 well plate.prt”
+To export open excel and just click th excel button at the top of the plate window (right next to where it says “edit matrix), will automatically paste the results into your doc</div>
+</div>
+<div class="proto-sub collapsed" id="sub-caspase-3-7-assay-by-imaging--">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Caspase 3/7 assay by imaging
+
+Caspase 3/7 assay by flow cytometry</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Need to make single color controls and untreated samples on same plate as the samples
+Also the positive control wells need to have a lot of apoptosis - make these the same high drug treatment
+Need to have good multichannel pipette
+Day 0
+Plate 200uL of cells per well on 96 well U bottom plate
+Treat on Drug printer
+Day 1
+Make facs buffer - 100uL of 0.5M EDTA and 500uL of FBS into 50mL of PBS, then sterile filtered
+Day 2
+Spin down for 5min at 500g
+Prepare reagent A in FACS buffer
+They normally say 2 drops (100uL) per million cells in one mL
+Prepare PBS buffer with component A (100uL per mL of buffer) - prepare 10mL of buffer for the plate and place 20 drops or 1mL into the buffer
+Then put 100uL into each well of the dish and incubate for 30 mins at 37
+Spin the cells down
+Then add two drops of component B
+Aim to place 100k cells into each well
+Then we will pellet tomorrow morning resuspend in PBS and bring to the flow core</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-culture---transfection">
+<h2>💉 Cell Culture - Transfection</h2>
+<div class="proto-sub" id="sub-nucleoporation-of-mefs--from-m">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Nucleoporation of MEFs (from Maria)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">From a 10 cm dish 80% confluence I can make three transfections.
+- Trypsinize cells and divide them in 3 falcons (15 ml).
+- Centrifuge in TC room for 3 minutes
+- Remove well the media, dissociate the cells and add 100 ul of transfection reagent (solutions 1+2).
+- Add the cells to an eppendorf containing 10 ug of plasmid
+- Mix by pipetting~3 times and add the solution to the bottom of the cuvette.
+- Electroporate Program A024
+- Add media to collect the cells from the cuvette and add them to a falcom with 6 mls of media.
+- Plate and check for expression 24 hours later.
+Preparation of PEI
+
+PEI based transfection of HEK cells
+Prepare PEI
+Use HCl to pH the reagent
+Filter sterilize</div>
+</div>
+<div class="proto-sub" id="sub-check-optimal-pei-transfection">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Check Optimal PEI transfection Ratio</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Take out DMEM and bring to room temperature
+Titrate with 2ug of plasmid for each well of a 6 well dish to determine optimal PEI ratio
+Use the 6 well dish to test PEI transfection - use 200uL total volume for each well
+Use the MCP plasmid since this is high concentration - transfect with different concentrations of PEI to DNA
+0
+1:1
+1:2
+1:4
+1:6
+1:8
+
+We will transfect 2ug into each dish so prepare a falcon tube with 600uL of optimem and 12ug of DNA (4.5uL of DNA)
+Then prepare 5 tubes with 100uL of optimem and 2uL, 4uL, 8uL, 12uL, 16uL of PEI
+Add 100uL of DNA to each of the tubes and mix up and down (keep the extra tube for control)
+Let sit for 10 minutes to incubate
+Aspirate media from HEK cells then apply the DNA/PEI mixture ontop of HEK cells
+Return to incubator and let incubate for 2-4 hours
+Add complete media and let cells recover overnight
+Assess GFP fluorescence the next day</div>
+</div>
+<div class="proto-sub collapsed" id="sub-pei-transfection-of-10cm-dish">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>PEI transfection of 10cm dish</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Take out DMEM and bring to room temperature
+Take 10ug of plasmid DNA and place in 500uL of optimem
+Then prepare 1 tube per plasmid with 500uL of optimem and 40uL of PEI
+Add the DNA tube to the PEI tube, mix up and down a few times and let sit for 10 minutes
+Aspirate media from HEK cells then apply the DNA/PEI mixture ontop of HEK cells
+Return to incubator and let incubate for 2-4 hours
+Add complete media and let cells recover overnight
+Assess GFP fluorescence the next day</div>
+</div>
+<div class="proto-sub collapsed" id="sub-calcium-phosphate-transfection">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Calcium Phosphate Transfection of HEK cells in 6 well dish (1/5th the 10cm dish protocol)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepare 2x HBS (50mL then S/F and stored at 4)
+2x HBS buffer:
+50 mM HEPES
+280 mM NaCl
+1.5 mM Na2HPO4
+Adjust pH to 7.0 using HCl. Filter sterilize. The solution can be freezed/thawed once for future use.
+2M CaCl2 (S/F and stored at 4)
+111g/mol so 11.1g per 50mL in H2O
+0.1x TE buffer (S/F and stored at 4 degrees, can also use ultra pure water)
+Make sure cells have been plated for no more than 24 hours
+Move cells to antibiotic free medium for a few hours
+If making a small amount can use 1.5mL tubes, otherwise use FACS tubes
+Add 2-3ug of plasmid to 90uL of 0.1x TE buffer (can use ultra pure water instead of TE buffer)
+add 10uL of 2M CaCl2
+Mix at RT for 5 mins
+Add 100uL of 2x HBS (slowly) dropwise while vortexing
+Leave at RT for 20 mins (should be a little cloudy)
+Add the solution to cells and leave overnight, should be able to see precipitate on phase contrast
+Then replace media with fresh complete DMEM</div>
+</div>
+<div class="proto-sub collapsed" id="sub-calcium-phosphate-transfection">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Calcium Phosphate Transfection of HEK cells in 10cm dish</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepare 2x HBS (50mL then S/F and stored at 4)
+2x HBS buffer:
+50 mM HEPES
+280 mM NaCl
+1.5 mM Na2HPO4
+Adjust pH to 7.0 using HCl. Filter sterilize. The solution can be freezed/thawed once for future use.
+2M CaCl2 (S/F and stored at 4)
+111g/mol so 11.1g per 50mL in H2O
+0.1x TE buffer (S/F and stored at 4 degrees, can also use ultra pure water)
+Make sure cells have been plated for no more than 24 hours
+Move cells to antibiotic free medium for a few hours
+Use FACS tubes
+Add 10-20ug of plasmid to 450uL of 0.1x TE buffer (can use ultra pure water instead of TE buffer)
+add 50uL of 2M CaCl2
+Mix at RT for 5 mins
+Add 500uL of 2x HBS (slowly) dropwise while vortexing
+Leave at RT for 20 mins (should be a little cloudy)
+Add the solution to cells and leave overnight, should be able to see precipitate on phase contrast
+Then replace media with fresh complete DMEM</div>
+</div>
+<div class="proto-sub collapsed" id="sub-transient-transfection-with-li">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Transient Transfection with Lipofectamine 2000</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Prepared fibronectin coated coverslips on a 6 well plate (see protocol above)
+Plated onto a 6 well plate for transfection, want them to be 50-70% confluent by tomorrow - these wells should be normal (with antibiotic and serum)
+Testing 2 different lipofectamine conditions in triplicate (6uL and 12uL of lipofectamine 2000 in each well) - will use the triplicates to test 3 different halo ligand concentrations
+500uL of serum free medium in each of these 2 tubes
+Then add 18 and 36uL of lipofectamine to each of these tubes
+Flick to mix the tube
+Prepare another tube with 1050uL of serum free medium and add 21ug of plasmid DNA (4.66uL of 4.5ug/uL)
+Add 500uL diluted DNA to each of the lipofectamine tubes (1mL total volume in each tube)
+Incubate for 5 minutes at room temp
+Add 250uL of transfection mix to each well of the 6 wells dropwise
+Mix by rocking back and forth and up and down after each well
+Put back in incubator overnight, will add halo reagent, wash and then fix tomorrow
+for 12 well plate triplicates
+Testing 2 different lipofectamine conditions in triplicate (2uL and 4uL of lipofectamine 2000 in each well) - will use triplicates of each condition
+350uL of serum free medium in each of these 2 tubes
+Then add 7 and 14uL of lipofectamine to each of these tubes
+Flick to mix the tube
+Prepare another tube with 750uL of serum free medium and add 7.5ug of plasmid DNA (1.66uL of 4.5ug/uL)
+Add 350uL diluted DNA to each of the lipofectamine tubes (0.7mL total volume in each tube)
+Incubate for 5 minutes at room temp
+Add 100uL of the correct transfection mix to each well dropwise
+Mix by rocking back and forth and up and down after each well
+Put back in incubator overnight, will add halo reagent, wash and then fix tomorrow</div>
+</div>
+<div class="proto-sub collapsed" id="sub-lipofectamine-of-matek-dishes-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Lipofectamine of matek dishes (2 dishes per plasmid, 3 plasmids)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">3x(2x100uL) of optimem with 4 and 8uL of lipofectamine 2000
+3x2.5ug of each DNA diluted in 250uL of optimem (add 100uL of this mix to each of the respective lipofectamine tubes)
+Add 150uL to each dish
+So each dish will get either 4 or 8uL treatments
+4 plasmids
+Prepare 4x100uL of Optimem and add 6uL of lipofectamine to each
+Set up 4x100uL samples of Optimem (add 1.5ug of DNA to each)
+Mix the two samples together and incubate for 15 minutes room temperature, use 175uL for transfection</div>
+</div>
+<div class="proto-sub collapsed" id="sub-fugene-hd-protocol-">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>FuGENE HD protocol:</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">http://www.promega.com/techserv/tools/FugeneHdTool/
+1.5 to 1 ratio of reagent to DNA
+Total volume of 500uL
+For 100uL would use 2ug of DNA and 3uL of reagent, this would be the ammount for a 3.5cm dish
+So for 10cm dish we should use 500uL, 10ug of DNA and 15uL of reagent
+2 to 1 ratio of reagent to DNA
+Placed 10ug of plasmid DNA into 1.5mL eppendorf (around 5uL)
+Added 470uL of PBS
+Added 20uL of reagent (1:2 ratio of DNA to reagent)
+Flicked vigerously, then let rest for 10-20 minutes
+Added dropwise to the 10cm dish</div>
+</div>
+<div class="proto-sub collapsed" id="sub-magnetofection-protocol">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Magnetofection protocol</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Materials needed:
+Neodynium magnet - keep otop of styrofoam holder and be careful not to put this close to anything magnetic, it will crush your fingers and break whatever is nearby
+Neuro-Mag (need to remove from -20 and thaw completely)
+DIV 7 neurons
+Add 1.5ug of plasmid DNA into 100uL of neurobasal
+In a separate tube add 3uL of magnetofectamine
+Mix the tubes and let sit for 20 minutes
+After 20 minutes, add 100uL directly ontop of the matek dish glass slide
+Move the matek dish ontop of the neodynium magnet for 20 minutes
+Put back in incubator overnight, check transfection after 24 hours</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-culture---viral-transduct">
+<h2>🦠 Cell Culture - Viral Transduction</h2>
+<div class="proto-sub" id="sub-viral-packaging-of-lentivirus">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Viral packaging of lentivirus</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Used lipofectamine to transfect the following plasmids (third generation system)
+backbone (20ug)
+tat (1ug) - not required for third generation system!
+rev (1ug)
+gag/pol (1ug)
+vsv-g (2ug)
+Transfected 1mL of total volume lipofectamine 2000 and 25ug of DNA onto the 10cm dish</div>
+</div>
+<div class="proto-sub" id="sub-lenti-x-precipitation">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Lenti-X precipitation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Harvest 3x10mL (24, 48 and 72 hours)
+Add 10mL of lenti-X
+Resuspend the pellet in 800uL and then aliquot after (this will have 1mL final volume)</div>
+</div>
+<div class="proto-sub collapsed" id="sub-lentiviral-spinfection-of-k562">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Lentiviral Spinfection of K562 Cells using fresh virus</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Day 0
+Seed 293T cells (for virus packaging) at 30-40%
+Day 1
+Transfection of three lentivirus packaging vectors into 293T cells
+psPAX2 (10kb) - 1.3 pmol - 8ug of plasmid - 30uL of stock
+pMD2.G (5.8kb) - 0.72 pmol - 2.5ug of plasmid - 3uL of stock
+Transfer Plasmid (10kb) - 1.64 pmol - 10ug of plasmid (use the same number of ug of plasmid as kb of plasmid)
+For each guide - Put this in 1mL of jetprime optimus buffer
+Vortex and spin down
+Then add 20uL of JetOptimus reagent to each tube (1uL per ug of plasmid)
+Vortex, spin down and then incubate for 10 minutes before adding to our HEK cells
+Day 2
+When using a 12-well plate for virus infection:
+Collect and spin down (2300 rpm 5 min) 24 hr virus-containing media to remove debris.
+Alternatively use a 45um PES membrane and filter the virus into a falcon tube (we will add more virus tomorrow for concentration and saving stocks)
+Add 1 mL virus-containing media (DMEM) into 500k K562 cells resuspended in 0.1 mL media (IMDM or DMEM), add polybrene to 4 ug / mL. Spinoculation 2300 rpm 32 °C 90 min.
+Day 3
+When using a 24-well plate for virus infection:
+Collect and spin down (2300 rpm 5 min) 48 hr virus-containing media to remove debris.
+Alternatively use a 45um PES membrane and filter the virus into a falcon tube (we will add more virus tomorrow for concentration and saving stocks)
+Add 1 mL virus-containing media (DMEM) into 0.5 M K562 cells resuspended in 0.1 mL media (IMDM or DMEM), add polybrene to 4 ug / mL. Spinoculation 2300 rpm 32 °C 90 min.
+The final volume in each well is ~ 2 mL
+
+To the viral supernatant in eppendorf tube - calculate the volume of lenti-x needed to be added (divide total volume by 3 and add this much) - final volume of lentix should be 25% of total
+Add lentix to supernatant, invert tube to mix and keep at 4 degrees overnight
+Day 4
+Collect each sample, spin down K562 cells, remove supernatant (virus + DMEM), resuspend cells in IMDM with appropriate concentration of the antibiotics.
+For the lenti-x precipitated supernatant - spin for 45min at 1500g, then remove supernatant and resuspend in Optimem (1/10th to 1/100th the original volume) and place into aliquots for later
+Usually I resuspend in 1mL of optimem and save 5x200uL aliquots
+Day X (depends on the selection marker)
+Count cells / test viability / other phenotyping</div>
+</div>
+</div>
+<div class="proto-section" id="sec-mouse-work">
+<h2>🐭 Mouse Work</h2>
+<div class="proto-sub" id="sub-patient-derived-xenograft-inje">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Patient Derived Xenograft injections</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Strategies to confirm engraftment
+Use human antibodies vs mouse antibodies to look for human CD45+ cells in the mouse peripheral blood prior to sack - only works if the cells enter the blood
+Use human antibodies vs mouse antibodies to look for human CD45+ cells in the mouse tissues isolated after sack
+Use fluorescence / luminescence if you have a line with stable expression of a marker
+We have two PDX models that can be cultured in vitro and grow nicely ex vivo - we can also use these for PDX studies as they are the most robust
+
+AML60B - relapsed refractory leukemia
+KMT2A-MLLT3 fusion (11q23), PDGFRa loss, GSK3B, GATA2
+PDX2263 - 46XY, DNMT3A, HNRNPK, NPM1, KRAS, PTPN11 mutated
+CD13+, CD14+, CD15+, CD33+, CD34+, CD56+, HLA-DR+, TdT-, MPO+
+ENA cells - from Justin, ET to MF to AML - Type I CALR mutation, inv(3)
+These lines are grown in RPMI + 10% FBS + Penn Strep but grow really slowly, will need to dilute gently
+
+To thaw out frozen vials of PDX cells - make sure you resuspend into 10mL of pre-warmed media and then spin down for 5 minutes at 400g
+When preparing to do tail vein injections - we need to get 1 million cells per mouse and have a volume around 100uL
+
+Calculate total number of mice * 1.5million cells per mouse to start with - will lose some during straining
+If unsure if we have enough cells - take the whole culture
+If one line has less - normalize down
+If needed can do 500k cells per mouse
+Pipet up and down to resuspend cells and aliquot 35-40ml into four 50ml conical tubes.
+Spin down at 400g for 4 minutes and aspirate supernatant
+Resuspend each tube with 12ml sterile PBS and combine them into one 50ml conical tube (cells in ~50ml PBS)
+Spin down at 400g for 4 minutes and aspirate supernatant
+Resuspend in 50ml PBS and pipet up and down
+Spin down at 400g for 3 minutes and aspirate supernatant
+Resuspend in 5ml PBS and strain cells into two FACS tubes with blue cap (2.5ml each)
+Combine each 2.5ml cell suspension in 15ml conical tube (5ml total), pipet up and down, and count cells at 1:20 dilution (10ul cells + 190ul PBS)
+- If cell concentration &lt;10 million/ml: aliquot 600ul each into eight Eppendorf tubes.
+- If cell concentration &gt;10million/ml: in a new 15ml conical tubes, prepare x56-60 cell solution of 1 million cells per 100ul (e.g. 60 million cells in 6ml). Aliquot 600-650ul each into eight Eppendorf tubes
+- Give 8 Eppendorf tubes to Nina (leave them on ice).</div>
+</div>
+<div class="proto-sub" id="sub-c1498-injections-into-bl6-mice">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>C1498 injections into BL6 mice</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body"></div>
+</div>
+<div class="proto-sub collapsed" id="sub-c1498-cells-will-be-injected-i">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>C1498 cells will be injected into n=30 CD45.1+ mice (which will arrive tomorrow) with Jeet’s help next Tue (10/28).</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">When preparing to do tail vein injections - we need to get 1 million cells per mouse and have a volume around 100uL
+
+Calculate total number of mice * 1.5million cells per mouse to start with - will lose some during straining
+If unsure if we have enough cells - take the whole culture
+If one line has less - normalize down
+If needed can do 500k cells per mouse
+Pipet up and down to resuspend cells and aliquot 35-40ml per 50ml conical tubes.
+Spin down at 400g for 4 minutes and aspirate supernatant
+If dealing with multiple tubes - resuspend each tube with 12ml sterile PBS and combine them into one 50ml conical tube (cells in ~50ml PBS)
+Spin down at 400g for 4 minutes and aspirate supernatant
+Resuspend in 50ml PBS and pipet up and down
+Spin down at 400g for 3 minutes and aspirate supernatant
+Resuspend in 5ml PBS and strain cells into two FACS tubes with blue cap (2.5ml each)
+Combine each 2.5ml cell suspension in 15ml conical tube (5ml total), pipet up and down, and count cells at 1:20 dilution (10ul cells + 190ul PBS)
+- If cell concentration &lt;10 million/ml: aliquot 600ul each into eight Eppendorf tubes.
+- If cell concentration &gt;10million/ml: in a new 15ml conical tubes, prepare x56-60 cell solution of 1 million cells per 100ul (e.g. 60 million cells in 6ml). Aliquot 600-650ul each into eight Eppendorf tubes
+- Give 6 Eppendorf tubes to Cynthia (leave them on ice).</div>
+</div>
+<div class="proto-sub collapsed" id="sub-hecd-mcd47-expressing-c1498-in">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>hECD mCD47 expressing C1498 injections into triple humanized (hCD47/hSIRPa/hFcR) mice - for Carlo</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body"></div>
+</div>
+<div class="proto-sub collapsed" id="sub-hecd-mcd47-expressing-c1498-ce">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>hECD mCD47 expressing C1498 cells will be injected into n=30 triple humanized mice (hCD47/hSIRPa/hFcR) by Carlo and Cynthia on Fri AM (1/09). Carlo will prepare the cells in Abdel-Wahab Lab.</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">When preparing to do tail vein injections - we need to get 100k cells per mouse and have a volume around 100uL per mouse.
+
+Calculate total number of mice * 150k cells per mouse to start with - will lose some during straining
+For example if doing 30 mice, plan to start with &gt; 4.5 million cells
+If unsure, no harm in taking the whole culture and diluting cells at the last step
+Materials to have in the hood:
+50mL conicals
+Cell strainers
+ViCell Blue tubes for cell counting
+PBS without magnesium and calcium
+Complete Media
+Sterile 1.5mL eppendorf tubes
+Bucket with ice
+When ready to begin
+Pipet up and down to resuspend cells within their flask and aliquot 35-40ml of cell culture per 50ml conical tubes.
+Spin down at 400g for 4 minutes and aspirate supernatant, being careful not to disturb the pellet, ok to leave a small amount of media at bottom
+Resuspend each tube with 30ml sterile PBS (without magnesium and calcium), during PBS ejection try to use the ejected fluid to resuspend the cell pellet to limit the amount of pipetting up and down and limit the number of cells that stick on the pipette
+Spin down cells in PBS at 400g for 4 minutes and aspirate supernatant
+Resuspend in 30ml PBS and pipet up and down
+Spin down at 400g for 4 minutes and aspirate supernatant
+Resuspend in 5ml PBS and strain cells into 50mL conical
+After straining place 190uL of PBS into vicell blue tube, then add 10uL of the strained cells into the tube
+Bring tube into the OAW lab equipment room and measure cell concentration (make sure to update the dilution factor to 20 on the machine)
+If cell concentration is &gt; 1 million cells per mL (e.g. &gt; 100k cells per 100uL) then dilute the cells using PBS to achieve 1 million cells per mL
+Aliquot 650ul into each eppendorf tube (remember one tube for 5 mice) and move them to ice
+Give 6 Eppendorf tubes to Cynthia (place in a small container on ice for ease of transport).</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-isolation-from-mouse-tiss">
+<h2>🔍 Cell isolation from mouse tissues</h2>
+<div class="proto-top-box">Make sure that the mice are not too heavy in terms of disease burden, especially if you want to isolate HSPCs
+When ready - make sure to let omar know and the techs should be aware at least one week before
+10 mice per person is reasonable so if trying to do 30 mice - try to get two technicians
+Materials
+Make sure to have PBS with BSA or FBS (FACS buffer) on hand and cold
+Need large buckets of ice and cell strainers
+50mL falcon tubes
+15mL falcon tubes
+1.5mL eppendorfs
+500uL tubes for cell counting
+Need to have flow panels designed ahead of time
+Need narrow curved forceps and surgical scissors
+Sacking the mice
+Anesthesetise the mice and bring on ice upstairs
+Make sure to note the eartags and use that to label each of the tube
+Use a lateral incision, go through the fascial layer - then pull back to expose both the hindlimbs and up past the ribs
+Make a cut at the feet as well as next to the spine to remove the leg bones and hip bone (these will be used to isolate marrow cells) - put into cold FACS buffer
+Cut a lobe of the liver - put in cold FACS buffer
+Cut out the spleen - put in cold FACS buffer
+Discard the remaining carcas and repeat for all mice
+These individual organs are going to be placed into a 6 well plate and in cold FACS buffer
+For the bone marrows we need to further process
+We then need to clean the bones and remove any muscle and fat from them
+Start by putting an absorbant paper towel down
+For each sample - bring the hindlimbs onto the towel
+Grab the end of the limb and use a razor blade to scrape any tissue away from the bone
+Once you have gone past the first joint, use the blade to cut the bone away
+Then continue onto the other joints
+Put the cleaned bones back in the 6 well dish
+Then for the livers and spleens - the organs are placed ontop of a cell strainer and strained into a 50mL falcon tube - one person can do this while the bones are being processed
+Prepare PCR tubes for bone marrow harvesting - use a long injection needle and put holes into the PCR tube (Two sets of holes on the side and one hole on the bottom)
+Take the bones and use the razor blade to cut the end off of the bone (focus on the end that is more red) and try to conserve as much of the marrow as possible
+The bones are then placed into a nesting PCR tube setup (PCR tube inside of a 1.5mL eppendorf tube that contains 200uL of FACS buffer)
+The bones are then spun at 6000g for XXX min
+Look at bones - they should have become white and there should be a dark brown / red pellet at the bottom</div>
+<div class="proto-sub" id="sub-patient-derived-xenograft-harv">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Patient Derived Xenograft harvesting bone marrow cells for Transplant
+
+​​Bone Marrow Cells for Transplant</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Take 6 bones/mouse (if there is a concern that you won’t have enough cells, also take the forelimbs and spine).
+Sterilize a mortar and pestle in a BSC with EtOH.
+Mash bones in 3-5mL media (anything with protein is ok as far as I know, it will be washed soon). You should not mash too finely, just enough to release all the marrow from the bone.
+Add 5mL more media and transfer through a 40 micron strainer. Wash the bones with more media and repeat.
+Spin down, 1500RPM/5min.
+Resuspend the pellet in 1-5 mLs of STERILE PBS. Resuspend really well, and then count with ViCell.
+Usually, you get ~100M cells with two hindlimbs. Based on the cells/mL take out the volume that will give you n+5 portions for your transplant (if you have many mice, go with n+10, n+15 etc.). Remove volume needed to contain your goal # of cells and add to tube. Then, dilute until you have the concentration for your cells/mouse in 100uL.
+Patient Derived Xenograft harvesting bone marrow by centrifugation
+Bone Marrow Processing by Centrifugation
+(Steven)
+Cut legs, strip flesh, cut off the barest amount from one end
+Put bones in tiny Eppendorf tubes with 3 holes poked into the bottom; place those tubes into regular sized Eppendorf tubes with 100-250 microliters of media.
+Spin for 1:30 minutes at 6500 rpm (little centrifuge).
+Throw out the bones, dump supernatant, and add 1 ml of media.
+Resuspend and filter through blue filter into 50 ml tube
+Add 2-3 ml media to rinse filter (toss filter).
+Spin at 1500 rpm for 5 minutes.
+(Aspirate supernatant, then add 5 ml of Ack Lysis Buffer.) CHECK WITH POST DOC BEFORE LYSIS!
+Lyse 3-5 min on ice.
+Neutralize with 5+ mL FACS Buffer or PBS.
+Spin down again at 1500 rpm for 5 minutes. Remove supernatant
+Vortex and resuspend (volume and media vary, 1 mL IMDM 10% FCS usually OK), then put in ice bath for post doc.</div>
+</div>
+<div class="proto-sub" id="sub-patient-derived-xenograft-harv">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Patient Derived Xenograft harvesting spleens</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Spleen Processing
+(Steven)
+Cut out spleen.
+Cover a petri dish with 5 ml of PBS (make sure bottom is covered).
+Mash spleen completely through a small blue filter in the petri dish until it is completely
+Rinse filter in petri dish with roughly 5ml of PBS to make sure cells are flushed into the dish as much as possible.
+Aspirate petri dish and put bone marrow solution in 50 ml conical tube.
+Spin for 5 minutes at 1500 rpm.
+Aspirate supernatant then add 5ml of ACK Lysis Buffer.
+Put on ice for 3-5 minutes.
+Add equal or greater parts of PBS or FACS buffer then spin down for another 5 minutes at 1500 rpm.
+Resuspend in 5 ml of media (usually PBS, but ask Post Doc to confirm).</div>
+</div>
+</div>
+<div class="proto-section" id="sec-cell-isolation-using-cd-marker">
+<h2>🔵 Cell isolation using CD Markers</h2>
+<div class="proto-sub" id="sub-ficoll-enrichment-from-allobag">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Ficoll enrichment from allobag</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Before starting:
+Bring scissors, 50mL falcon tubes, a bottle of Cytiva Ficoll Plus to the hood
+There is around 60mL of volume per allobag
+Put 15mL of Cytiva Ficoll Plus into 4 50mL falcon tubes
+Cool down the centrifuge to 18 degrees and turn off brakes
+When ready to start:
+Thaw the allobag by taking it from -80 and putting it int the water bath
+Layer the 15mL of sample per falcon tube ontop of 15mL of ficoll
+Spin for 40 minutes at 400g and 18 degrees with no brake (will take about an hour)
+
+While that is spinning
+Bring the kits to the hood
+Make sure you have antibodies (CD38 APC, CD34 FITC) - we will stain the before and after purification samples and include DAPI for live dead - we can do this on Wallace
+Make sure we have UM171</div>
+</div>
+<div class="proto-sub" id="sub-miltenyi-biotech-kits">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Miltenyi Biotech Kits</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">GENERAL TIPS
+Need to have buffers degassed
+Need to single cell strain along the way
+DNAse to help break up clots</div>
+</div>
+<div class="proto-sub collapsed" id="sub-cd34--isolation-from-mobilized">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>CD34+ isolation from mobilized PBMC (for 4x109 cells)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Please refer to manufacturer website for general info:
+https://www.stemcell.com/technical-resources/culture-and-expansion-of-leukemic-cells.html
+Protocol on manufacturer website:
+Before starting do the following:
+Pre-warm RPMI with 10% FBS (no abx if going into culture long term) otherwise penn strep OK if just doing cell isolation
+Prepare 1x RBC lysis buffer (dilute 10x stock with ultra pure H2O)
+Make MACS buffer (take PBS without magnesium or calcium +0.5% BSA +2mM EDTA)
+Have the isolation kit of interest at 4 degrees
+Have enough LS columns (at least 8 per isolation kit) saved
+Have the magnetic stand, 50mL falcon tubes and 15mL falcon tubes in the hood
+Separation filters (for single cell straining)
+
+CD34+ hSPC cell expansion media
+StemSpan II media
+CD34 expansion supplement
+UM729
+1. 	Quickly thaw the apheresis product in a 37C water bath
+2. 	Cut the top of the bag and transfer the entire contents into a sterile bottle or large conical tubes (e.g., 50 mL tubes)
+3. 	Spin down the tubes at 400g for 5 minutes and remove the supernatant
+4. 	Add equal volume of RBC lysis buffer to the remaining cells in the 50mL falcon tube
+5. 	Incubate for 5-10minutes at room temperature
+6. 	Spin for 400g for 5 minutes
+7. 	Remove the supernatant and resuspend in 50mL total volume of RPMI
+8. 	Count the cells (Vi cell) using a 20x dilution (10uL of cells into 190uL of RPMI buffer)
+9. 	Take 2x105 cells for FACS (want to compare pre and post-isolation)
+10.  Split into aliquots of 1x10⁹ cells each (we ended up using
+11.  Gently dilute the thawed product with pre-warmed RPMI + 10% FBS (up to 50 mL or 1:1 dilution)
+12.  Centrifuge at 400g for 5 min at 4C
+13.  Resuspend 1x109 cells in 3 mL of MACS buffer (1x108 cells/ 300 uL)
+14.  Addition of CD34 MicroBeads
+15.  Add 1 mL of FcR Blocking Reagent (100 uL for 1x108 cells)
+16.  Add 1 mL of CD34 MicroBeads (100 uL for 1x108 cells)
+17.  Mix well and Incubate for 30 minutes at 4C
+18.  Add 50 mL of MACS buffer
+19.  Centrifuge at 400g for 5 min at 4C
+20.  Resuspend 1x109 cells in 5 mL of MACS buffer (1x108 cells/ 300 uL)
+21.  Pass the cell suspension through a 40 μm cell strainer to remove clumps and debris.
+22.  Place an LS column in the MACS separator and pre-wet the column with MACS buffer (3 mL)
+23.  Apply the cell suspension onto the column 2 LS column for 1x109 cells
+(option) Collect the flow-through
+24.  Wash the column 3 times with 3 mL MACS buffer
+25.  Flush out the CD34⁺ fraction using a plunger and 5 mL of MACS buffer.
+26.  Count the collected CD34⁺ cells
+27.  Check CD34 positivity by FACS</div>
+</div>
+<div class="proto-sub collapsed" id="sub-cd45--isolation-from-pdx-mouse">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>CD45+ isolation from PDX mouse models (for 4x109 cells)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Protocol on manufacturer website:
+https://static.miltenyibiotec.com/asset/150655405641/document_e8cr1f86r91pt0bd2708oi172j?content-disposition=inline
+Before starting do the following:
+Pre-warm RPMI with 10% FBS (no abx if going into culture long term) otherwise penn strep OK if just doing cell isolation and then going to make pellets
+Prepare 1x RBC lysis buffer (dilute 10x stock with ultra pure H2O)
+Make MACS buffer (take PBS without magnesium or calcium +0.5% BSA +2mM EDTA)
+Have the isolation kit of interest at 4 degrees
+Have enough LS columns (at least 8 per isolation kit) saved
+Have the magnetic stand, 50mL falcon tubes and 15mL falcon tubes in the hood
+Separation filters (for single cell straining)
+RPMI 10% FBS in the water bath
+1. 	The technicians will process the PDX mice (bone marrows and spleens) and then perform single cell straining of the samples, RBC lysis and then pelleting of the lysed samples
+2. 	Resuspend cells in 5mL of MACS buffer then measure the total number of cells per sample on vicell (use a 20x dilution in MACS buffer)
+3. 	Spin down the tubes at 400g for 5 minutes and remove the supernatant
+5.  Resuspend 2x109 cells in 8mL of MACS buffer (2x108 cells/800 uL) within 50mL falcon tube
+6.  Addition of CD45 MicroBeads
+Add 2mL of CD45 MicroBeads (200uL for 1x107 cells)
+7.  Mix well and Incubate for 30 minutes at 4C
+8.  Add 50 mL of MACS buffer
+9.  Centrifuge at 400g for 5 min at 4C
+10.  Resuspend 1x109 cells in 5mL of MACS buffer (1x108 cells/500 uL)
+11.  Pass the cell suspension through a 40 μm cell strainer to remove clumps and debris.
+12.  Place an LS column in the MACS separator and pre-wet the column with MACS buffer (3 mL)
+13.  Apply the cell suspension onto the column 2 LS column for 1x109 cells
+(option) Collect the flow-through
+14.  Wash the column 3 times with 3 mL MACS buffer
+15.  Flush out the CD45⁺ fraction using a plunger and 5 mL of MACS buffer.
+16.  Count the collected CD45⁺ cells
+17.  Check CD45 positivity by FACS</div>
+</div>
+<div class="proto-sub collapsed" id="sub-stem-cell-technologies-kit-for">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Stem cell technologies kit for CD34 isolation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body"></div>
+</div>
+</div>
+<div class="proto-section" id="sec-flow-cytometry">
+<h2>🌊 Flow cytometry</h2>
+<div class="proto-top-box">Cell surface protein staining (simple protocol)
+Spin down cells in U bottom or deep well plates (500g for 5 minutes)
+Flick to remove supernatant
+Resuspend cells in labeling buffer - FACS buffer (PBS without magnesium and without calcium + either BSA or FBS + 1mM EDTA) + DAPI + antibody of interest (green or red directly conjugated)
+Label cells in the dark for 30 minutes
+Spin down 500g for 5 minutes
+Flick off the supernatant
+Resuspend in FACS buffer + DAPI without antibody - bring to FACS</div>
+</div>
+<div class="proto-section" id="sec-facs">
+<h2>🔴 FACS</h2>
+<div class="proto-sub" id="sub-facs-buffers-and-sorting">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>FACS Buffers and sorting</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Basic Sorting Buffer
+1 x Phosphate Buffered Saline (PBS) or Hanks Balanced Salt Solution (HBSS) (Ca2+/ Mg2+ Free.)
+1mM EDTA 25 mM HEPES pH7.0
+1% Fetal Calf Serum (Heat inactivated) or 1% Albumin
+Filter sterilize using a 0.2 µM filter - Store at 4 degrees. 
+
+OAW Lab Pre-prepared sorting buffer (500mL bottles)
+PBS without calcium and magnesium and 0.5% BSA
+We can add 1mM EDTA to this (add 1mL of 0.5M stock to the bottle before use)
+MEF Sorting Buffer (10mL)
+(8.9mL) 1 x Phosphate Buffered Saline (PBS) or Hanks Balanced Salt Solution (HBSS) (Ca2+/ Mg2+ Free.)
+(100uL of 0.5M stock) 5mM EDTA 25 mM HEPES pH7.0
+(1mL of 10% stock) 1% Fetal Calf Serum (Heat inactivated) or 1% BSA (start with a 10% stock that has been sterile filtered)
+(5uL of 2% stock) 0.01% sodium azide
+(10uL) DAPI (diluted 1000x from stock)
+Filter sterilize using a 0.2 µM filter - Store at 4 degrees.
+Cell Type Specific Buffer Modifications:
+2) Sticky Cells: Raise the concentration of EDTA to 5mM and use 1% BSA instead of FBS. - EDTA helps prevent cation dependent cell-cell interactions
+3) Adherent Cells: Trypsin is usually used to detach cells from the plate surface and is neutralized with media containing FBS. The FBS re-introduces cations that aids in attachment to plastic and can cause cells to re-aggregate before sorting.
+a. Use 5 mM EDTA or higher NOTE: too much EDTA can kill your cells
+b. Accutase and Accumax are cell dissociation products sold by Innovative Technologies that can aid in maintaining single cell suspensions. 
+
+Add live dead stain to FACS buffer
+Resuspend cells in FACS buffer.
+Add (final concentration) 1 µg/ml PI, 500-1000 ng/ml DAPI, 2.5 µm 7-AAD, or 5.0 µM CyTRAK Orange</div>
+</div>
+</div>
+<div class="proto-section" id="sec-microscopy">
+<h2>🔭 Microscopy</h2>
+<div class="proto-sub" id="sub-calculating-pixel-size">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Calculating pixel size</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">1. Objective magnification
+2. Lens magnification (in some microscopes, it is possible to get extra mag of 1.25x, 1.6x or 2x.
+3. C mount (is usually 1x)
+4. Pixel size – is the actual pixel size of the camera that is attached to the microscope.
+5. Binning – i.e. combining a cluster of pixels to a single pixel. The common options are 1X1, 2X2 and 4X4. Binning is usually used to reduce noise, but at the expense of resolution.
+The formula: Image pixel size = camera pixel size x binning / (obj. mag x lens mag x C mount)
+Example: For Cascade 512 camera (16µm/pixel on CCD), at 60x mag and 1×1 binning:
+Pixel size = 16×1/(60x1x1) = 0.2667µm = 266.7nm.
+6.</div>
+</div>
+<div class="proto-sub" id="sub-labeling-halo-bin">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Labeling Halo BIN</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Bin has a stock that is 10uM
+Need to make a working stock that is 1uM (1000nM) and this will be diluted 1000x into 2mL of media
+Dilute 1uL of stock into 9uL of DMSO
+Use 2.1uL of this per dish (4 dishes total)
+Prewarmed the halo reagent at 37 degrees for a few minutes
+Incubate cells with Halo reagent for 1 hour at 37 degrees
+Perform three quick washes in HBS followed by 2x1hr washes in DMEM</div>
+</div>
+<div class="proto-sub collapsed" id="sub-sparse-halo-labeling-halo">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Sparse Halo Labeling Halo</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">JF549-HTL labeling of cells.
+Cells:
+- Plate Halo-tag expressing cells in MatTek Imaging dish with 1.5 mL Complete DMEM + selective agents.
+Materials:
+- 1x PBS
+- 0.5 uM JF549-HTL in Complete DMEM (high glucose DMEM + 10% FBS, 2 mM Glutamax (Fisher Scientific) (optional), 100 I.U./mL Penicillin, and 100 ug/mL Streptomycin (Corning)).
+- Complete DMEM.
+Procedure:
+1. Take cells out of incubator, and remove 1 mL media to an Eppendorf tube. To this media, add 1.2 uL 0.5 uM JF549 in complete DMEM and drip media back onto MatTek imaging dish evenly. Swirl and replace in incubator for 15 minutes.
+1. Can dilute Hoechst stock (10mg/mL) 2000x and add also to this step
+2. Wash cells 3x with 1x PBS and replace with Complete DMEM (do not put dye in this).
+Incubate cells for 30 minutes in incubator.
+Wash cells 2x with 1x PBS and replace media with L-15 imaging media.
+3. Remove plate to microscope for imaging.</div>
+</div>
+<div class="proto-sub collapsed" id="sub-snap-labeling-charles">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>SNAP Labeling Charles</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">30 minute incubation with 10nM dye
+3 quick washes with PBS
+30 minute recovery in regular media
+2 quick washes
+L15 and image</div>
+</div>
+<div class="proto-sub collapsed" id="sub-fixation">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Fixation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">With PFA:
+Prepared 4% PFA
+5mL of 10x PBS 35mL of ultra pure H2O and then 10mL of the PFA (the entire aliquot)
+Prepared 500mL of 1xPBS with 5mM Mg (2.5mL of 1M MgCl stock)
+Prepared 50mM glycine in PBS (187mg / 50mL)
+Removed media with mitotracker
+Washed 3x with 2mL of PBS
+Then performed fixation in 4% PFA for 10min at RT in dark
+Washed with PBS (3x 5min)
+Added glycine to quench for 5 minutes
+Added DAPI (50ug/mL) in PBS for 1min
+Washed with PBS for 5 minutes
+Then directly mounted onto the slides with one drop of prolong gold mounting media
+Used 3 slides (put each cell line on each slide)
+Left covered and on benchtop overnight for mounting
+For FISH - dont use DAPI and just leave the samples in PBS sealed and at 4 degrees until you are ready to proceed
+With EtOH or MeOH:
+Use ice cold (-20 EtOH or MeOH) to coat coverslips
+Move to freezer for 5-10 minutes
+Wash with PBS 3x 5 mins
+Then proceed or mount in DAPI</div>
+</div>
+<div class="proto-sub collapsed" id="sub-halo-gel">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Halo-Gel</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Removed media and washed 2x with ice cold PBS (1mL each wash)
+Add 100uL of RIPA buffer to each of the wells, scraped placed on eppendorf
+Incubated on ice for 10 minutes
+Then spun down to collect debris
+Moved the supernatant to a fresh tube
+Froze at -80 degrees until ready to run gel
+Thawed
+Added in 10uL of Halo Ligand (make sure this is the one compatible with oddysey imaging) and incubated  at RT for 15 minutes
+Prepared 32uL samples (8uL of LDS and 24ul of each sample)
+Boiled for 5 minutes then loaded as much as possible onto a gel with a protein ladder
+Imaged on the oddysey (has 685 and 785nm lasers), so we should use a cy5 type Halo dye</div>
+</div>
+<div class="proto-sub collapsed" id="sub-staining-nascent-transcripts-w">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Staining nascent transcripts with azide dyes (EU click chemistry)</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Need to purchase EU and one of the azide dyes ahead of time:
+5EU: Dissolve 5mg of 5-Ethynyl uridine in 186.5uL of DMSO to make a 100mM stock
+https://www.sigmaaldrich.com/catalog/product/sial/909475?lang=en&amp;region=US
+There are a bunch of azide alternatives to AF594 ($500 for 0.5mg because of patent), maybe we can just start with Azide CY3 because that has a mix of good signal, low background and we have the correct filters for it.
+Azide 488: Dissolve 1mg of dye in 174uL of DMSO to make a 10mM stock
+https://www.sigmaaldrich.com/catalog/product/aldrich/760765?lang=en&amp;region=US&amp;cm_sp=Insite-_-caContent_prodMerch_gruCrossEntropy-_-prodMerch10-4
+Azide CY3: Dissolve 1mg of dye in 124uL of DMSO to make a 10mM stock
+https://www.sigmaaldrich.com/catalog/product/aldrich/777315?lang=en&amp;region=US&amp;cm_sp=Insite-_-caContent_prodMerch_cooccuranceModel-_-prodMerch10-7
+Azide 545: Dissolve 1mg of dye in 158.5uL of DMSO to make a 10mM stock
+https://www.sigmaaldrich.com/catalog/product/aldrich/760757?lang=en&amp;region=US&amp;cm_sp=Insite-_-caContent_prodMerch_cooccuranceModel-_-prodMerch10-1
+Azide CY5: Dissolve 1mg of dye in 97uL of DMSO to make a 10mM stock
+https://www.sigmaaldrich.com/catalog/product/aldrich/777323?lang=en&amp;region=US&amp;cm_sp=Insite-_-caContent_prodMerch_gruCrossEntropy-_-prodMerch10-1
+Here is a quick protocol, its a combination of the Thermo RNA Click-it imaging kit protocol as well as the paper from Jao and Salic.
+Day 0:
+Plate cells onto 12 well dish with coverslips
+Day 1:
+Prepare the stocks
+100mM EU (909475 Sigma-Aldrich 5-Ethynyl uridine)
+DRB or other drugs
+PBSM buffer
+PBSM based fixative (4% PFA)
+Perm buffer (0.5% triton X in PBSM)
+1M TRIS buffer pH 7-8 (10x)
+100mM CuSO4 in water (100x)
+0.5M Ascorbic acid in water (5x)
+Dye dissolved at 1mM in DMSO (100x)
+Reaction buffer (order is very important!) - make 2mL for 6 coverslips
+1380uL of UP H2O
+200uL 1M TRIS
+20uL CuSO4
+2uL of 10mM dye in DMSO
+400uL of 0.5M ascorbic acid (add last)
+Use 350uL per coverslip
+Protocol for Day 2:
+Treat the cells with drug of interest (can block transcription as a control)
+In my case I used 50-100uM DRB for 30 minutes
+Remove media into falcon tube - add DRB and replace
+Label the cells with EU
+Remove 500uL media from cells with DRB and 500uL of media from each well of cells withoout DRB
+Add EU to a concebntration of 1mM, then replace the 500uL (0.5mM labeling finally)
+Label in incubator
+I did everything in PBS based buffers but maybe TBS would be better?
+Wash once with PBSM
+Fix with PFA based buffer
+Perm with 0.5% triton X 100 in PBSM for 15 minutes at room temp
+Wash once with PBSM
+Add 350uL of reaction buffer to each coverslip and incubate at room temp in the dark for half an hour
+Wash with perm buffer then PBSM 3x quickly
+Mount slides with prolong diamond + DAPI and image the following day</div>
+</div>
+<div class="proto-sub collapsed" id="sub-staining-cells-with-mitotracke">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Staining cells with MitoTracker Red CMXRos</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">The vial has 50ug of MitoTracker Red CMXRos
+Molecular Formula:
+C32H32Cl2N2O
+Molecular Weight:
+531.5236g/mol
+CAS Name/Number:
+1H,5H,11H,15H-Xantheno[2,3,4-ij:5,6,7-i&#x27;j&#x27;]diquinolizin-18-ium, 9-[4-(chloromethyl)phenyl]-2,3,6,7,12,13,16,17-octahydro-, chloride/ 167095-09-2
+For a 1mM stock (1mmol/L or 1umol/mL)
+50ug/(531.5236g/mol) = 0.09407umol
+0.09407umol/XmL = 1umol/mL
+10.6305uL of DMSO to make a 1mM stock
+Prepare 1mM master stock of MitoTracker dye in DMSO as master stock for all future imaging, save this vial at -20
+Will a 10uM working stock from this by diluting 0.5uL of dye in DMSO into 49.5uL of serum free media or PBS
+Use the stock to prepare 10mL serum free media
+Then use the media to incubate as many plates as you want
+Dilute the working stock into 10mL of serum free media
+For 25nM final concentration use 25uL
+For 5nM final concentration use 5uL or just dilute the above solution 5 fold
+Use media to incubate the cells (now at working concentration) for half an hour at 37 then image or perform the standard fixation protocol
+Prepared new AMP stocks that are sterile filtered
+Got 4 glycerol stocks from carolina
+VSVG
+TAT
+REV
+GAG/POL
+Also got the MBP-IMP2-HIS construct from her Box 1 in the -80 used that to start 5 Maxi ON cultures, will do the preps tomorrow</div>
+</div>
+</div>
+<div class="proto-section" id="sec-mass-spec-sample-prep">
+<h2>⚖️ Mass Spec Sample Prep</h2>
+<div class="proto-sub" id="sub-kappor-lab-lc-ms">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Kappor Lab LC/MS</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">To use the LC/MS you need to have your compounds in 80/20 acetonitrile and water - Make this mix in an eppendorf, then vortex and spin
+Add compound (2ul of 5mM max)
+Move compound in acetonitrile + water to ms sample tube
+To run the LC MS
+W - console
+Operate
+Lamp on
+Open left most drawer of HPLC and place ms sample tube into loading tray at specific numbers
+File -&gt; open -&gt; le Lc ms file
+Add columns for number of samples
+Run blank with each sample
+Right click to add 7 columns with each sample an additional blank (three samples with blank always before and after)
+Sample bottle number
+Blank 1:1
+1:37
+1:1
+1:38
+1:1
+1:39
+10uL max volume per sample</div>
+</div>
+<div class="proto-sub" id="sub-whole-proteome---sample-prep">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Whole Proteome - Sample Prep</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Need 200ug of proteome at 2mg/mL
+Day 1 - protein lysis, precipitation and tryptic digestion
+Day 2 - measurement of protein per condition and TMT labeling
+Day 3 - normalize the TMT channels and combine then measure on mass spec
+Day 4 -
+Micro BCA Assay
+For this protocol though lets just use the regular protein standards that we have
+Use 3uL of standard or sample per well
+Then add 150uL of working solution and incubate
+Read absorbance at 562nm</div>
+</div>
+<div class="proto-sub collapsed" id="sub-cys-sol-protocol---sample-prep">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>Cys-SoL Protocol - Sample Prep</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Day 0 - generate cell pellets (either before or after treatment with probes)
+Day 1 - lyse cells, isolate protein, react with iodoacetamine-desthiobiotin, precipitate and digest overnight
+Day 2 - resin based pull down biotinylated peptides with agarose - streptavidin
+Day 3 - TMT labeling and then desalting with SepPack
+Day 4 - HPLC fractionation
+Day 5 - Speedvac
+Day 6 - Mass spec
+
+Materials:
+45-50 million cells per pellet of sample
+BCA or DC assay for protein quantification
+Thermo Streptavidin Resin (#20353)
+Biorad micro bio-spin columns for purification of beads (#7326204)
+Chemicals:
+Iodoacetamide
+Iodoacetamide-Desthiobiotin
+Methanol
+Chloroform
+Urea
+DTT
+Triethylammonum bicarbonate buffer (TEAB)
+Calcium chloride solution
+Chloroform
+NP-40
+Acetonitrile
+Promega - Trpsin-LysC
+Formic acid
+Hydroxylinamine
+Equipment
+Sonicator
+Sonicating water bath
+Speedvac
+Day1:
+
+Day1 Protocol:
+Cells on ice
+DC assay for protein concentration (96 well plate)
+- Calculate number of wells that we will need (we will have 6 standards in duplicate in addition to samples) - (number of samples+1)*25uL
+- Add 20 μl of reagent S to each ml of reagent A that will be needed for the run.
+(This working reagent A&#x27; is stable for 1 week even though a precipitate will form after 1 day. If precipitate forms, warm the solution and vortex. Do not pipet the undissolved precipitate, as this will likely plug the tip of the pipet, thereby altering the volume of reagent that is added to the sample.) If samples do not contain detergent, you may omit step #1 and simply use
+reagent A as supplied.
+2. Prepare 3 - 5 dilutions of a protein standard containing from 0.2 mg/ml to about 1.5 mg/ml protein. A standard curve should be prepared each time the assay is performed. For best results, the standard should be prepared in the same buffer as the sample.
+3. Pipet 5 μl of standards and samples into a clean, dry microtiter plate. 
+4. Add 25 μl of reagent A&#x27; or reagent A (see note from step 1) into each well.
+5. Add 200 μl reagent B into each well. If microplate reader has a mixing function available, place plate in reader and let the plate mix for 5 seconds. If not, gently agitate the plate to mix the reagents. If bubbles form, pop them with a clean, dry pipet tip. Be careful to avoid cross-contamination of sample wells.
+6. After 15 minutes, absorbances can be read at 750 nm. The absorbances will be stable for about 1 hour. (See Troubleshooting Guide for recommendation on using a wavelength other than 750 nm.)
+
+Treat with IA-DTB
+Day2:
+Day3:
+Day4:
+Day5:
+Day6:
+TMTpro:</div>
+</div>
+<div class="proto-sub collapsed" id="sub-hplc-fractionation">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>HPLC Fractionation</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Mass Spec Data Analysis
+Before getting started
+Talk to IT and make sure you are added to IP2 and to the lab Synology
+Download Windows Remote Desktop from the App Store
+	Add PC - thermo-ad3quo64.rockefeller.edu
+Username: Orbitrap Eclipse
+	Pw: vinograd
+	Add PC - veritas.rockefeller.edu
+
+Download Windows remote desktop from the app store
+Join Rockefeller VPN
+Login to the orbitrap eclipse computer to transfer the data, also will want to make sure we login to the shared remote workstation (veritas)
+
+Make sure you have access to the VPN
+Watch the drobox has intro videos - Nathalie Ropek
+Familiarize yourself with pipelines for unriched proteomics, reactivity labeling and fractionation experiments
+There are several different computers and machines that will be interfaced during this protocol
+Your personal computer (for logging in remotely)
+The mass spec orbitrap computer
+There is a synology machine that has all the data stored
+The IP2 server
+The Virtual workstation in the vinogradova lab
+Overall workflow:
+Sample Prep -&gt; Run Samples on Mass Spec -&gt; RawConverter -&gt; IP2 search -&gt; raw census-out files
+Mass spec raw files transferred from Orbitrap to Synology and then converted to MS1, MS2, MS3 spectra using the Yates lab program RawConverter
+IP2 performs protein ID using protein fragmentation patterns and protein databases
+The raw census out files are filtered and converted using python scripts into excel files
+Processing raw mass spec data with rawconverter
+Login with RU ID and password to the windows PC
+The Synology can be accessed at - vinograd-syn.rockefeller.edu/shares
+Will need some network credentials to login if mapping this to veritas
+
+If you need to add it via go -&gt; connect to server on mac
+smb://vinograd-syn.rockefeller.edu/shares
+Will need to use Raw Converter (a piece of software from the Yates Lab)
+https://github.com/proteomicsyates/RawConverter
+Download from github and then can unzip to desktop
+Click on the application \RawConverter-main\Release
+Add files to convert
+Check data dependent experiment
+Set destination directory to the same folder
+Select checkbox for monoisotopic m/z
+Output formats should be MS1, MS2 and MS3 - make sure to check the corresponding check boxes
+3 or more threads (we can run with 8 threads without issues)
+Then press go when finished - should say finished converting successfully
+We can now upload the spectra files to IP2</div>
+</div>
+<div class="proto-sub collapsed" id="sub-ip2-based-peptide-search">
+<div class="proto-sub-header" onclick="this.parentElement.classList.toggle('collapsed')">
+  <span>IP2 based peptide search</span>
+  <span class="chevron">&#9660;</span>
+</div>
+<div class="proto-sub-body">Before you start - know the MW of your static and dynamic modifications
+We need to designate our static modifications and differential modifications
+Will also need to calculate the masses of these in chemdraw
+Static modifications - those present in every peptide - includes iodoacetamide and TMT tag
+Differential modifications - those that would be different between our peptide of interest
+Login to IP2 for peptide searching - best to do this through the remote desktop
+To login to IP2 from rockefeller network 
+The application can be reached at…
+https://vinograd.rockefeller.edu/ip2
+Your username is: jbiswas
+IP2 password that was assigned to you by research computing team
+Henry has FASTA files 
+Also has FASTA files for engineered enzymes
+Can add new FASTA database to facilitate the search
+Go to the project of interest (eg. Pooled Ligandability)
+Create a new experiment
+Paste information from the google form that we had submitted previously to the google form
+Then upload the .ms1, .ms2, .ms3 spectral files
+
+Once everything is uploaded and confirmed that the size matches in terms of number of spectra - we can begin our ProLucid search
+
+03/12/25 is the canonical database
+03/13/25 is the combined database
+Here are the filter parameters from RG91 (the same as what we used for our search)
+-p 1 -y 1 --trypstat --sfp 0.01 --modstat --extra --pI -DM 10 --DB --dm -m 0 -t 1 --brief --quiet
+Here is the XML file
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+&lt;!-- Parameters for ProLuCID database search --&gt;
+&lt;parameters&gt;
+&lt;database&gt;
+&lt;database_name&gt;/rugpfs/fs0/vino_lab/store/ip2/fasta/Henry_Homo_sapiens_contaminant_03-13-2024_reversed.fasta&lt;/database_name&gt;
+&lt;is_indexed&gt;false&lt;/is_indexed&gt;
+&lt;/database&gt;
+&lt;search_mode&gt;
+&lt;primary_score_type&gt;1&lt;/primary_score_type&gt;
+&lt;secondary_score_type&gt;2&lt;/secondary_score_type&gt;
+&lt;locus_type&gt;1&lt;/locus_type&gt;
+&lt;charge_disambiguation&gt;0&lt;/charge_disambiguation&gt;
+&lt;atomic_enrichement&gt;0&lt;/atomic_enrichement&gt;
+&lt;min_match&gt;0&lt;/min_match&gt;
+&lt;peak_rank_threshold&gt;200&lt;/peak_rank_threshold&gt;
+&lt;candidate_peptide_threshold&gt;500&lt;/candidate_peptide_threshold&gt;
+&lt;num_output&gt;5&lt;/num_output&gt;
+&lt;is_decharged&gt;0&lt;/is_decharged&gt;
+&lt;fragmentation_method&gt;CID&lt;/fragmentation_method&gt;
+&lt;multistage_activation_mode&gt;1&lt;/multistage_activation_mode&gt;
+&lt;preprocess&gt;1&lt;/preprocess&gt;
+&lt;/search_mode&gt;
+&lt;isotopes&gt;
+&lt;precursor&gt;mono&lt;/precursor&gt;
+&lt;fragment&gt;mono&lt;/fragment&gt;
+&lt;num_peaks&gt;3&lt;/num_peaks&gt;
+&lt;/isotopes&gt;
+&lt;tolerance&gt;
+&lt;precursor_high&gt;3000&lt;/precursor_high&gt;
+&lt;precursor_low&gt;3000&lt;/precursor_low&gt;
+&lt;precursor&gt;30.0&lt;/precursor&gt;
+&lt;fragment&gt;600.0&lt;/fragment&gt;
+&lt;high_resolution_data&gt;false&lt;/high_resolution_data&gt;
+&lt;low_frag_ion&gt;no&lt;/low_frag_ion&gt;
+&lt;/tolerance&gt;
+&lt;precursor_mass_limits&gt;
+&lt;minimum&gt;600.0&lt;/minimum&gt;
+&lt;maximum&gt;6000.0&lt;/maximum&gt;
+&lt;/precursor_mass_limits&gt;
+&lt;precursor_charge_limits&gt;
+&lt;minimum&gt;0&lt;/minimum&gt;
+&lt;maximum&gt;1000&lt;/maximum&gt;
+&lt;/precursor_charge_limits&gt;
+&lt;peptide_length_limits&gt;
+&lt;minimum&gt;5&lt;/minimum&gt;
+&lt;/peptide_length_limits&gt;
+&lt;num_peak_limits&gt;
+&lt;minimum&gt;10&lt;/minimum&gt;
+&lt;maximum&gt;5000&lt;/maximum&gt;
+&lt;/num_peak_limits&gt;
+&lt;max_num_diffmod&gt;1&lt;/max_num_diffmod&gt;
+&lt;modifications&gt;
+&lt;display_mod&gt;0&lt;/display_mod&gt;
+&lt;n_term&gt;
+&lt;static_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;304.2071&lt;/mass_shift&gt;
+&lt;/static_mod&gt;
+&lt;diff_mods&gt;
+&lt;diff_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;0.0&lt;/mass_shift&gt;
+&lt;/diff_mod&gt;
+&lt;/diff_mods&gt;
+&lt;/n_term&gt;
+&lt;c_term&gt;
+&lt;static_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;0.0&lt;/mass_shift&gt;
+&lt;/static_mod&gt;
+&lt;diff_mods&gt;
+&lt;diff_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;0.0&lt;/mass_shift&gt;
+&lt;/diff_mod&gt;
+&lt;/diff_mods&gt;
+&lt;/c_term&gt;
+&lt;static_mods&gt;
+&lt;static_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;57.02146&lt;/mass_shift&gt;
+&lt;residue&gt;C&lt;/residue&gt;
+&lt;/static_mod&gt;
+&lt;static_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;304.2071&lt;/mass_shift&gt;
+&lt;residue&gt;K&lt;/residue&gt;
+&lt;/static_mod&gt;
+&lt;/static_mods&gt;
+&lt;diff_mods&gt;
+&lt;diff_mod&gt;
+&lt;symbol&gt;*&lt;/symbol&gt;
+&lt;mass_shift&gt;398.25292&lt;/mass_shift&gt;
+&lt;residues&gt;
+&lt;residue&gt;C&lt;/residue&gt;
+&lt;/residues&gt;
+&lt;/diff_mod&gt;
+&lt;/diff_mods&gt;
+&lt;/modifications&gt;
+&lt;enzyme_info&gt;
+&lt;name&gt;trypsin&lt;/name&gt;
+&lt;specificity&gt;2&lt;/specificity&gt;
+&lt;max_num_internal_mis_cleavage&gt;-1&lt;/max_num_internal_mis_cleavage&gt;
+&lt;type&gt;true&lt;/type&gt;
+&lt;residues&gt;
+&lt;residue&gt;K&lt;/residue&gt;
+&lt;residue&gt;R&lt;/residue&gt;
+&lt;/residues&gt;
+&lt;/enzyme_info&gt;
+&lt;advanced_params&gt;
+&lt;scan_number&gt;0&lt;/scan_number&gt;
+&lt;/advanced_params&gt;
+&lt;/parameters&gt;
+The XML file from the canonical search only differs in the canonical database line
+&lt;database&gt;
+&lt;database_name&gt;/rugpfs/fs0/vino_lab/store/ip2/fasta/Henry_Homo_sapiens_contaminant_03-12-2024_reversed.fasta&lt;/database_name&gt;
+&lt;is_indexed&gt;false&lt;/is_indexed&gt;
+&lt;/database&gt;
+AFter pro lucid search
+QUant analysis - run now
+For everything but 6 plex - bottom option
+For 6 plex - second to last
+Remember that Trypsin cuts at K and R residues on the C-terminal side
+Delta mass
+Desthiobiotin ~ 398 MW
+Search parameters also have TMT tags as a static modification
+Diff mod (differential modification) - modification of interest and static modification
+Assuming everything already has iodoacetamide - static modification
+Fasta database  - use 03/12 which is the canonical one from henry
+03/13 - is the noncanonical - has the SF1 isoform
+Queued up both canonical and noncanonical databases
+Other parameters not changes - fragmentation parameter and which parameter was used
+CID or HCD
+Enzyme information -
+Tiff can share the standard parameters
+Will have more filters in these search parameter closer to publication
+Can have multiple resides in the box if using multiple proteases
+Static - IA and TMT16 plex
+Can look for ubiquitination and oxidation - if looking for different things probably best to do several searches separately
+IP2 has iodoacetamide as a constant option
+Can have up to two tryptic peptide sides - for publication will want to do two sides
+If there is a nontryptic peptide - one side or zero - to find noncanonical cleavage sites
+Manual has how the FDR is calculated
+Modification requirement - 0 for reactivity, 1 for unenriched proteomics
+Not filtering out for unique peptides - those that may map to multiple proteins (multimapped peptides)
+Can find protein of interest and see mapped peptides
+MS3 data can be used to look for quantative result
+Save census out then do off line processing - does normalization to controls
+After this has finished running - we will need to run analysis (select bottom option for 16 plex) - specify 16 plex and MS3
+If we are using a 6 plex we need to select ITRAQ
+Will see uniprot IDs and intensity ids
+Once that quantification is done - we will do the post-processing stepsw
+Output the census-out file (to be used in post-IP2 data analysis)
+After logging into IP2 - go to projects - go to ligandability project - click on the experiment you want - then click on the quantitative analysis “View Data” link - then right click and save census-out.txt
+Look at the protein graph view if you want to get an idea about ligading of your Uniprot ID binding - look at the non normalized chromatogram
+Output the prolist - can analyze this without additional processing / filters
+Protein graph view - chrome only, can look at different intensities
+Post processing of IP2 census out files - Overview
+Before you start - make sure you set up your account on the windows server and give Windows Powershell admin access (only need to do this once)
+Will need to be logged in as administrator to the powershell
+The admin password for powershell - V3r1t@s@diMn#01
+Overview of steps that will be performed
+Metadataprep and downloading of files - figure out which parameters you want to use and prepare the metadata excel files
+Navigate to the C:\Users\Public\01_analysis_pipeline_images_tar_backup
+Run the main pipeline (either canonical or beta for splicing)
+	.\start_pipeline.psi process_file_folder
+	.\start_pipeline.psi process_file_folder_beta
+
+This will allow you to combine files at the same time (if for some reason you need to do it later the command is: .\start_pipeline.ps1 combine_file_folder
+When prompted for the type of experiment - make sure you select “splicing ligandability (filter based on replicates, keep peptides specific to a gene)”
+Also make sure the replicates are named correctly and match the metadata sheet (if missing a dash this will throw everything off)
+If working with isoform data - after running the pipeline - will need to run the following command:
+./start_pipeline.ps1 annotate_non_canonical_peptides
+The input file for this is the output of the combined (beta) pipeline - it will pull from folder 4 and ask you to provide the canonical (not isoform inclusive) FASTA as the database
+
+Once that is done - post processing works with the 02_file in the combined file output folder, we generate averages, plot the correlation between replicates, and plot the number of reactive proteins per compound
+Post processing of IP2 census out files - Detailed Steps
+Before you start - save your census our files and make a metadata file
+Remember that after we completed our IP2 analysis we saved the census.out files - we can download those to the server or ideally to the synology so they are backed up
+Census out file is the protein out and peptide file
+Can be opened in excel
+Need to clean up to make this readable
+Protein - peptides - raw signal intensities per channel
+We need to specify the folder pathfully for the input and output - put the census-out file within the input folder - if not, you could get an invalid mount config error if trying to analyze on desktop or incorrect folder
+C:\Users\Public\jeet\input\
+C:\Users\Public\jeet\output\
+
+Need to prepare a metadata folder to keep track of the different census out folders
+There is a metadata spreadsheet example in:
+C:\Users\Public\02_analysis_pipeline_tests\wp_test\metadata_wp
+How to start the processing pipeline?
+It is written in pipeline within a docker container
+Windows remote desktop - powershell - prepare metadata
+cd C:\Users\Public
+
+We can open the file start_pipeline.ps1 with a text editor and find out the different possible commands that are available:
+process_file_folder
+process_file_folder_beta
+get_reactivity_changes
+combine_file_folder
+create_pca_plot_for_wp_data
+process_fraction_combined_data
+annotate_non_canonical_peptides
+annotate_peptode_list
+test
+Need a command to start the pipeline (if looking at canonical proteins use the first command, if looking at canonical and isoforms use the second - beta - command)
+
+.\start_pipeline.ps1 process_file_folder
+.\start_pipeline.ps1 process_file_folder_beta
+
+We will point to our input files from the metadata sheet after starting the program
+You can have multiple folders in the input folder - in case we want to look at multiple replicates or multiple experiments
+Pick your experiment - ligandability
+Decide to use raw or normalized channels - start first by analyzing hte raw chanels, we almost never use the IP2 normalized channels and instead do our normalization in this pipeline
+Which controls - the channels are in order so for our first experiment we used chanel 1 and 2 as DMSO controls
+For final values - do we want to average of the channels or do you want to sum the intensity across channels - average channel ratio is what we will use
+Filters - yes, standard or modified - standard
+Filters:
+Remove cystine containing peptides - usually no
+Whole proteome requires two unique peptides - other experiments require one unique peptide
+Filter based on control - main and coefficient of variation (we would say no for turbo ID) but here we will say yes
+If two control channels &gt;= 10000
+If three control channels &gt;= 15000
+CV 0.5 - both channels need to be close to one another to pass
+Number of missed cleavage sites - trypsin has high fidelity, use 1
+How to calculate protein ratio - raw signal intensity / sum of the whole row, per channel do you want to use median or mean? Median is standard
+Which protease? - Typsin
+How do you want to filter your control channels or technical replicates if more than 2 channels - if you have three but want to just have two of the three be sufficient passing (can select any pair) - for now we have two channels so we can just have it consider all control or replicate channels
+Once the program is done - you can either pause or you can combine the files
+If you wanted to combine later you have to .\start_pipeline.ps1 combine_file_folder
+Need the metadata sheet to - have to provide the condition names for each channel
+Need to copy from the excel file metadata and paste transpose into the excel file that was created by the program
+Will paste the names into “Rename channels” row - make sure each condition name is unique
+Then if you want ot create a PCA plot
+Select the output folder that you created
+Which file should be used - there is a file that excludes keratins and only includes proteins that appear in 4 replicates
+Which delimiter? The first or second “_” can be used to get the condition names
+Pick the delimiter that is before rep …
+Arrow length - can be modified later
+Length - can be modified later
+How big does the grid need to be in the background
+Colors - can add range of colors in the future
+Then look at what you created
+Processed files
+Filtered and used peptides
+Combined files
+Can use this to see why it might have filtered out certain proteins or peptides
+IP2 - for RNA seq folks you can think of this as the aligner
+Generates theoretical spectra from FASTA database – will then compare to get matching
+
+Census out file that is generated from IP2 can be opened in a text editor - there are lots of peptides with low abundance and large variation
+In the census out file – there are raw and normalized peptide signals
+Sometimes the peptide has a U before the peptide – that is only associated with only one sequence
+This is an issue with isoform studies – because most of the peptides will overlap
+
+
+When we are using the beta version of the pipeline from Henry - there were several tweaks
+If a peptide maps to three different proteins – it will be filtered out
+If peptide hits multiple isoforms of a single protein – it will be kept
+
+
+Generally
+Cystine aggregation – takes the mean labeling quantification of all peptides that all cystines are inside of
+Compensating for different cleavage sites
+
+Ligandability vs modified ligandibility
+Filters can be set only on control channels (ligandability) or based on all technical replicates (modified ligandability)
+Abundance threshold and CV filters
+
+Technical replicates
+Duplicates – we should use modified ligandibility for the canonical
+
+We should use the corresponding database
+
+Averaged channel ratio – use this
+Sum of signal intensity
+
+Some of the peptides we got were unique non-canonical
+Annotate non canonical peptides feature – will prompt for canonical fasta – select the human canonical because it will find novel peptides
+
+Output files – typically several census out files
+01 - processed files – will have each individual file post filtering without metadata attached – filtered to cystine containing residues because of ligadibility
+02 – which peptides got filtered out and the reasons why they got filtered out (CV, signal intensity, cleavage, not unique)
+03 – cystine aggregation step – mean of peptide for each labeled cystine even for peptides of different lengths
+03 – overview of cysaggregated files – log of how cystine aggregation happened and how the math worked from raw data
+04 – combined files – cystine aggregation file across biological replicates and metadata attached
+-          	First is most condensed output, taking the median across technical replicates and biological replicates, data presented as percent of control (see that DMSO has 100%)
+-          	Second – wont average across replicates, the DMSO is still is control and those two values will average to 100
+-          	Third – overview of cystine aggregation because we are using it a second time across biological replicates
+-          	Fourth – the second file but now without cystine aggregation
+-          	Fifth – files for PCA with cystine aggregation channel ratio – showing cystine aggregation but without normalization
+-          	Sixth – no normalization, no cystine aggregation (similar to fifth)
+-          	Seventh – 10th – all files that have a specific variability filter to control across many biological replicates – for stringent filtering
+Coverage – how many peptides detecting in general – number of rows in the excel file – aiming for &gt; 5000
+reproducibility between replicates – R2 value across two columns from the 5th file
+calulate the average between replicates - ??
+look at number of targets competed &gt;75% by each compound – use first output file and see how many cystines are competed to less than 25%
+Filters
+Average and insert to front of sheet
+Conditional formatting - three color scale, 0, 100, 200
+
+Calculate - total number of peptides detected
+Calculate lgandable cystines per each compound - using average counting those that are less than or equal to 25%
+Calculate the other conditions for how many peptides
+
+Plot each of the duplicates individually
+Rotation Students</div>
+</div>
+</div>
+
+    </main>
+  </div>
+</div>
+<footer>Jeet Biswas &bull; MSKCC &bull; <a href="https://scholar.google.com/citations?user=l0q1H94AAAAJ" target="_blank">Google Scholar</a> &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+<script>
+// Expand a subsection if URL hash targets it
+window.addEventListener('hashchange', function() { expandHash(); });
+function expandHash() {
+  var id = location.hash.slice(1);
+  if (!id) return;
+  var el = document.getElementById(id);
+  if (el && el.classList.contains('proto-sub')) el.classList.remove('collapsed');
+  else if (el) el.scrollIntoView({behavior:'smooth'});
+}
+document.addEventListener('DOMContentLoaded', expandHash);
+</script>
+<script src="/js/site.js"></script>
+</body>
+</html>

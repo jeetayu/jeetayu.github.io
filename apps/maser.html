@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rMATS / Maser Splicing Analysis — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.main{flex:1;padding:20px;max-width:1100px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.drop-zone{border:2px dashed #E2DDD8;border-radius:8px;padding:28px;text-align:center;background:#FAFAF9;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:8px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#C2185B;background:#FFF8F9}
+.drop-zone-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.drop-zone-sub{font-size:11px;color:#78716C}
+.file-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:4px;padding:3px 8px;font-size:11px;font-family:"IBM Plex Mono",monospace;color:#065F46;display:flex;align-items:center;gap:6px}
+.chip.missing{background:#FFF1F2;border-color:#FECDD3;color:#9F1239}
+.chip-rm{background:none;border:none;cursor:pointer;color:#9F1239;font-size:13px;padding:0 2px}
+.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ctrl-lbl{font-size:11px;font-weight:700;color:#78716C;white-space:nowrap;min-width:90px}
+.ctrl-val{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#C2185B;font-weight:700;min-width:40px}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 16px;text-align:center;min-width:90px}
+.pill-num{font-size:22px;font-weight:700;display:block;line-height:1.1}
+.pill-lbl{font-size:9px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.tab-bar{display:flex;gap:2px;margin-bottom:14px;border-bottom:2px solid #E2DDD8}
+.tab-btn{background:none;border:none;padding:8px 14px;font-size:12px;font-weight:600;color:#78716C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn.active{color:#C2185B;border-bottom-color:#C2185B}
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 22px;transition:background .15s}
+.action-btn:hover{background:#A3144E}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover{background:#F0EDE9}
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:6px 8px;text-align:left;border-bottom:2px solid #E2DDD8;white-space:nowrap}
+.data-table td{padding:5px 8px;border-top:1px solid #EDE9E5;font-family:"IBM Plex Mono",monospace;font-size:11px;vertical-align:middle;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-table tr:nth-child(even) td{background:#FAFAF9}
+.data-table tr:hover td{background:#FFF8F9}
+.table-wrap{overflow-x:auto;border:1px solid #E2DDD8;border-radius:6px;max-height:440px;overflow-y:auto}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.tag-SE{background:#EEF2FF;color:#3730A3}
+.tag-MXE{background:#FEF3C7;color:#92400E}
+.tag-A3SS{background:#ECFDF5;color:#065F46}
+.tag-A5SS{background:#F0FDF4;color:#166534}
+.tag-RI{background:#FFF1F2;color:#9F1239}
+.up-arrow{color:#C2185B;font-weight:700}
+.dn-arrow{color:#1D4ED8;font-weight:700}
+.search-box{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:7px 10px;font-size:12px;outline:none;width:220px}
+.search-box:focus{border-color:#C2185B}
+input[type=range]{accent-color:#C2185B}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+
+/* GO interactive chart */
+.go-chart{display:flex;flex-direction:column;gap:1px}
+.go-row{display:flex;align-items:center;gap:10px;padding:4px 6px;border-radius:5px;cursor:pointer;border:1.5px solid transparent;transition:background .1s,border-color .1s}
+.go-row:hover{background:#F5F4F1}
+.go-row.go-row-active{background:#EEF2FF;border-color:#A5B4FC}
+.go-row-label{font-family:"IBM Plex Mono",monospace;font-size:10px;color:#1C1917;text-align:right;width:260px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go-row-bar-wrap{flex:1;display:flex;align-items:center;gap:6px;min-width:0}
+.go-row-bar{height:18px;background:#3730A3;opacity:0.8;border-radius:3px;transition:opacity .12s,width .2s;min-width:2px}
+.go-row:hover .go-row-bar,.go-row.go-row-active .go-row-bar{opacity:1}
+.go-row.go-row-active .go-row-bar{background:#4F46E5}
+.go-row-val{font-size:9.5px;color:#78716C;white-space:nowrap;min-width:30px}
+
+/* GO detail panel */
+.go-detail-panel{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:18px;margin-top:16px}
+.go-detail-title{font-size:13px;font-weight:700;color:#3730A3;margin-bottom:3px}
+.go-detail-meta{font-size:11px;color:#78716C;margin-bottom:12px}
+.go-gene-pill{display:inline-flex;align-items:center;gap:3px;background:#F5F4F1;border:1px solid #E2DDD8;border-radius:4px;padding:2px 7px;margin:2px;font-size:10px;font-family:"IBM Plex Mono",monospace}
+
+/* GO/GSEA mode toggle */
+.go-mode-bar{display:flex;border:1px solid #E2DDD8;border-radius:6px;overflow:hidden;width:fit-content;margin-bottom:14px}
+.go-mode-btn{background:none;border:none;padding:7px 18px;font-size:12px;font-weight:600;color:#78716C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;transition:background .12s,color .12s}
+.go-mode-btn+.go-mode-btn{border-left:1px solid #E2DDD8}
+.go-mode-btn.active{background:#3730A3;color:#fff}
+.go-mode-btn:hover:not(.active){background:#F5F4F1;color:#1C1917}
+
+/* GSEA table row hover */
+#gsea-results .data-table tbody tr:hover td{background:#EEF2FF;cursor:pointer}
+#gsea-results .data-table tbody tr.gsea-selected td{background:#EEF2FF}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+  <div>
+    <div class="topbar-logo"><em>rMATS</em> Splicing Analysis</div>
+    <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; Upload rMATS JC output &middot; Filter, visualize, export</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Upload -->
+  <div class="vcard">
+    <div class="vcard-title">Upload rMATS Output Files</div>
+    <div class="vcard-sub">Upload any combination of the 5 rMATS JC output files. All are optional — upload what you have.</div>
+
+    <div class="banner banner-info">
+      Expected files: <strong>SE.MATS.JC.txt</strong>, <strong>MXE.MATS.JC.txt</strong>, <strong>A3SS.MATS.JC.txt</strong>, <strong>A5SS.MATS.JC.txt</strong>, <strong>RI.MATS.JC.txt</strong>
+      &mdash; produced by rMATS or rMATS-turbo. Files can be large; all processing is in-browser.
+    </div>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="handleDrop(event)">
+      <div class="drop-zone-title">&#128196; Drop rMATS files here or click to browse</div>
+      <div class="drop-zone-sub">SE.MATS.JC.txt, MXE.MATS.JC.txt, A3SS.MATS.JC.txt, A5SS.MATS.JC.txt, RI.MATS.JC.txt</div>
+    </div>
+    <input type="file" id="file-input" multiple accept=".txt" style="display:none" onchange="handleFiles(this.files)">
+    <div class="file-chips" id="file-chips"></div>
+
+    <div style="margin-top:14px">
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Condition 1</span>
+        <input type="text" id="cond1" value="Control" placeholder="e.g. WT" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:160px">
+        <span class="ctrl-lbl" style="margin-left:16px">Condition 2</span>
+        <input type="text" id="cond2" value="Treatment" placeholder="e.g. KD" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;width:160px">
+        <span class="ctrl-lbl" style="margin-left:16px">Genome</span>
+        <select id="ref-genome" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 8px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+          <option value="hg38">hg38 (GRCh38)</option>
+          <option value="hg19">hg19 (GRCh37)</option>
+          <option value="mm10">mm10 (GRCm38)</option>
+        </select>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Min Reads (avg)</span>
+        <input type="range" id="sl-reads" min="0" max="100" value="20" oninput="syncSlider('reads',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-reads">20</span>
+        <span class="ctrl-lbl" style="margin-left:16px">FDR &le;</span>
+        <input type="range" id="sl-fdr" min="0" max="1" step="0.01" value="0.05" oninput="syncSlider('fdr',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-fdr">0.05</span>
+        <span class="ctrl-lbl" style="margin-left:16px">|&Delta;PSI| &ge;</span>
+        <input type="range" id="sl-dpsi" min="0" max="1" step="0.01" value="0.1" oninput="syncSlider('dpsi',this.value)" style="width:140px">
+        <span class="ctrl-val" id="sv-dpsi">0.10</span>
+        <span class="ctrl-lbl" style="margin-left:16px">Y cap</span>
+        <input type="number" id="volcano-ycap" value="10" min="5" max="500" step="5" oninput="renderVolcano()" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:4px 6px;font-size:12px;width:60px;font-family:'IBM Plex Mono',monospace">
+      </div>
+      <button class="action-btn" onclick="analyze()" id="btn-analyze" disabled>Analyze</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-area" style="display:none">
+
+    <!-- Summary pills -->
+    <div class="vcard">
+      <div class="vcard-title">Summary</div>
+      <div class="pills" id="summary-pills"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="sec-btn" onclick="exportCSV()">&#128229; Export filtered events (CSV)</button>
+        <button class="sec-btn" onclick="exportVolcanoSVG()">&#128229; Volcano SVG</button>
+      </div>
+    </div>
+
+    <!-- Plots -->
+    <div class="vcard">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="showPlot('volcano')">Volcano</button>
+        <button class="tab-btn" onclick="showPlot('bartype')">Event Types</button>
+        <button class="tab-btn" onclick="showPlot('dpsi-dist')">&#916;PSI Distribution</button>
+        <button class="tab-btn" onclick="showPlot('scatter')">PSI Scatter</button>
+        <button class="tab-btn" onclick="showPlot('splice')">Splice Site Logos</button>
+        <button class="tab-btn" onclick="showPlot('go')">GO Analysis</button>
+      </div>
+      <div id="plot-volcano"></div>
+      <div id="plot-bartype" style="display:none"></div>
+      <div id="plot-dpsi-dist" style="display:none"></div>
+      <div id="plot-scatter" style="display:none"></div>
+      <div id="plot-splice" style="display:none">
+        <div style="margin-bottom:12px;font-size:12px;color:#78716C">
+          Fetches splice site sequences from Ensembl REST API and builds nucleotide frequency logos.
+          Fetches splice site sequences from Ensembl and builds nucleotide frequency logos.
+          Supports all 5 rMATS event types. Select event type below, then click Fetch.
+        </div>
+        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <label style="font-size:12px;font-weight:600;color:#1C1917">Event type:</label>
+          <select id="splice-type-select" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 9px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+            <option value="SE">SE — Skipped Exon</option>
+            <option value="MXE">MXE — Mutually Exclusive</option>
+            <option value="A3SS">A3SS — Alt 3′ Splice Site</option>
+            <option value="A5SS">A5SS — Alt 5′ Splice Site</option>
+            <option value="RI">RI — Retained Intron</option>
+          </select>
+          <button class="action-btn" id="btn-splice" onclick="analyzeSpliceSites()">Fetch Sequences &amp; Build Logos</button>
+          <span style="font-size:11px;color:#78716C">Top 500 excluded + 500 included · ~30–60 sec</span>
+        </div>
+        <div id="splice-progress"></div>
+        <div id="splice-results"></div>
+      </div>
+      <div id="plot-go" style="display:none">
+
+        <!-- Mode toggle -->
+        <div class="go-mode-bar">
+          <button class="go-mode-btn active" id="go-mode-ora" onclick="setGoMode('ora')">Gene Overlap (Enrichr)</button>
+          <button class="go-mode-btn" id="go-mode-gsea" onclick="setGoMode('gsea')">GSEA (MSigDB Preranked)</button>
+        </div>
+
+        <!-- ORA panel -->
+        <div id="ora-panel">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <select id="go-db" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 10px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+              <option value="GO_Biological_Process_2023">GO Biological Process 2023</option>
+              <option value="GO_Molecular_Function_2023">GO Molecular Function 2023</option>
+              <option value="GO_Cellular_Component_2023">GO Cellular Component 2023</option>
+              <option value="MSigDB_Hallmark_2020">MSigDB Hallmark 2020</option>
+              <option value="KEGG_2021_Human">KEGG 2021 Human</option>
+              <option value="Reactome_2022">Reactome 2022</option>
+            </select>
+            <input type="number" id="go-pcut" value="0.05" step="0.01" min="0.001" max="1"
+              style="width:80px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:6px 8px;font-size:12px;font-family:'IBM Plex Mono',monospace"
+              placeholder="p-cutoff">
+            <button class="action-btn" onclick="runMaserGO()">Run Enrichment</button>
+          </div>
+          <div style="font-size:11px;color:#78716C;margin-bottom:8px">
+            Uses <a href="https://maayanlab.cloud/Enrichr/" target="_blank" style="color:#3730A3">Enrichr</a> (over-representation analysis) on genes with significant splicing changes. Click any term to see PSI scatter for that gene set.
+          </div>
+          <div id="go-progress"></div>
+          <div id="go-results"></div>
+        </div>
+
+        <!-- GSEA panel -->
+        <div id="gsea-panel" style="display:none">
+          <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#78716C;margin-bottom:5px">MSigDB Collection</div>
+              <select id="gsea-category" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif;min-width:280px" onchange="onGseaCategoryChange()">
+                <option value="">Select a gene set collection…</option>
+                <option value="h">Hallmark Gene Sets (H) — 50 sets</option>
+                <option value="c2">Curated Gene Sets – KEGG, Reactome, BioCarta (C2)</option>
+                <option value="c3">Regulatory Target Gene Sets – TF, miRNA (C3)</option>
+                <option value="c4">Computational Gene Sets (C4)</option>
+                <option value="c5">Ontology Gene Sets – GO BP/MF/CC (C5)</option>
+                <option value="c6">Oncogenic Signature Gene Sets (C6)</option>
+                <option value="c7">Immunologic Signature Gene Sets (C7)</option>
+                <option value="c8">Cell Type Signature Gene Sets (C8)</option>
+                <option value="c1">Positional Gene Sets (C1)</option>
+              </select>
+              <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+                <span class="sec-btn" onclick="loadGMTFromServer()">&#8635; Load Collection</span>
+                <span id="gsea-gmt-status" style="font-size:11px;color:#78716C">No collection loaded</span>
+              </div>
+              <div style="margin-top:5px;font-size:10px;color:#A8A29E">Or upload a custom GMT file:
+                <label style="cursor:pointer;color:#3730A3;text-decoration:underline">
+                  <input type="file" accept=".gmt,.txt" id="gsea-gmt-input" onchange="loadGMTFile(this.files[0])" style="display:none">
+                  browse
+                </label>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <div>
+                <div style="font-size:11px;font-weight:600;color:#78716C;margin-bottom:5px">Permutations</div>
+                <select id="gsea-nperms" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+                  <option value="100">100 (fast)</option>
+                  <option value="500" selected>500</option>
+                  <option value="1000">1000 (slow)</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:600;color:#78716C;margin-bottom:5px">Gene set size</div>
+                <div style="display:flex;align-items:center;gap:5px">
+                  <input type="number" id="gsea-minsize" value="10" min="5" max="200"
+                    style="width:52px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 6px;font-size:12px;font-family:'IBM Plex Mono',monospace">
+                  <span style="font-size:11px;color:#78716C">–</span>
+                  <input type="number" id="gsea-maxsize" value="500" min="50" max="2000"
+                    style="width:62px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 6px;font-size:12px;font-family:'IBM Plex Mono',monospace">
+                </div>
+              </div>
+              <div style="padding-top:18px">
+                <button class="action-btn" onclick="runGSEA()">Run GSEA</button>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#78716C;margin-bottom:12px;line-height:1.6">
+            Ranks all genes by <strong>sign(ΔPSI) &times; &minus;log₁₀(FDR)</strong>, summed across all events per gene, then runs preranked GSEA with permutation testing.
+            Gene sets from <strong>MSigDB v2026.1</strong> (local server). Collections range from 50 (Hallmarks) to thousands of gene sets.
+          </div>
+          <div id="gsea-progress"></div>
+          <div id="gsea-results"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Data table -->
+    <div class="vcard">
+      <div class="vcard-title">Significant Splicing Events</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <input type="text" class="search-box" id="table-search" placeholder="Search gene…" oninput="filterTable()">
+        <div style="font-size:11px;color:#78716C" id="table-count"></div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="sec-btn" id="sort-dpsi" onclick="sortTable('dpsi')">Sort |&#916;PSI|</button>
+          <button class="sec-btn" id="sort-fdr" onclick="sortTable('fdr')">Sort FDR</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="events-table">
+          <thead><tr>
+            <th>Type</th><th>Gene</th><th>Chr</th><th>Strand</th>
+            <th>&#916;PSI</th><th>PSI&#8321;</th><th>PSI&#8322;</th>
+            <th>FDR</th><th>Coverage</th>
+          </tr></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = { files: {}, allEvents: [], filtEvents: [], sortKey: 'dpsi', sortDir: -1 };
+
+const EVENT_TYPES = ['SE','MXE','A3SS','A5SS','RI'];
+const TYPE_COLORS = { SE:'#818CF8', MXE:'#F59E0B', A3SS:'#34D399', A5SS:'#10B981', RI:'#F87171' };
+const TYPE_LABELS = {
+  SE:  'Skipped Exon',
+  MXE: 'Mutually Exclusive Exon',
+  A3SS:'Alternative 3\' Splice Site',
+  A5SS:'Alternative 5\' Splice Site',
+  RI:  'Retained Intron'
+};
+
+// ─── File handling ─────────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(fileList) {
+  for (const f of fileList) {
+    const matched = EVENT_TYPES.find(t => f.name.toUpperCase().includes(t+'.MATS'));
+    if (matched) S.files[matched] = f;
+    else if (f.name.match(/\.MATS\.JC\.txt$/i)) {
+      // try to detect from filename
+      const m = f.name.match(/^([A-Z0-9]+)\.MATS/i);
+      if (m && EVENT_TYPES.includes(m[1].toUpperCase())) S.files[m[1].toUpperCase()] = f;
+    }
+  }
+  renderChips();
+  document.getElementById('btn-analyze').disabled = Object.keys(S.files).length === 0;
+}
+
+function renderChips() {
+  const el = document.getElementById('file-chips');
+  el.innerHTML = EVENT_TYPES.map(t => {
+    const f = S.files[t];
+    if (!f) return '';
+    return `<div class="chip"><span class="tag tag-${t}">${t}</span> ${escH(f.name)} <button class="chip-rm" onclick="removeFile('${t}')">&#215;</button></div>`;
+  }).join('') || '<div style="font-size:11px;color:#A8A29E">No files loaded.</div>';
+}
+
+function removeFile(type) { delete S.files[type]; renderChips(); }
+
+// ─── Parsing ───────────────────────────────────────────────────────────────────
+function parseMATSFile(text, type) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const header = lines[0].split('\t');
+  const h = Object.fromEntries(header.map((k,i)=>[k.trim(),i]));
+
+  const events = [];
+  for (let i=1; i<lines.length; i++) {
+    const cols = lines[i].split('\t');
+    if (cols.length < 10) continue;
+
+    const gene = (cols[h['geneSymbol']||h['GeneID']||2]?.trim() || '?').replace(/^"|"$/g,'');
+    const chr  = cols[h['chr']||3]?.trim() || '';
+    const strand = cols[h['strand']||4]?.trim() || '.';
+    const pval = parseFloat(cols[h['PValue']||18]);
+    const fdr  = parseFloat(cols[h['FDR']||19]);
+
+    // PSI levels
+    const inc1raw = cols[h['IncLevel1']||20]||'';
+    const inc2raw = cols[h['IncLevel2']||21]||'';
+    const dpsiRaw = parseFloat(cols[h['IncLevelDifference']||22]);
+
+    const parsePSI = s => {
+      const vals = s.split(',').map(Number).filter(v=>!isNaN(v)&&v>=0);
+      return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : NaN;
+    };
+    const psi1 = parsePSI(inc1raw);
+    const psi2 = parsePSI(inc2raw);
+    const dpsi = isNaN(dpsiRaw) ? psi2-psi1 : dpsiRaw;
+
+    // Coverage (mean of IJC+SJC)
+    const ijc1 = (cols[h['IJC_SAMPLE_1']||12]||'').split(',').map(Number).filter(n=>!isNaN(n));
+    const sjc1 = (cols[h['SJC_SAMPLE_1']||13]||'').split(',').map(Number).filter(n=>!isNaN(n));
+    const ijc2 = (cols[h['IJC_SAMPLE_2']||14]||'').split(',').map(Number).filter(n=>!isNaN(n));
+    const sjc2 = (cols[h['SJC_SAMPLE_2']||15]||'').split(',').map(Number).filter(n=>!isNaN(n));
+    const avgCov = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+    const coverage = (avgCov(ijc1)+avgCov(sjc1)+avgCov(ijc2)+avgCov(sjc2))/2;
+
+    // Exon coordinates — primary cassette/alternative exon (col 5-6 for all types)
+    const exStart = parseInt(cols[h['exonStart_0base'] || h['longExonStart_0base'] || h['riExonStart_0base'] || h['1stExonStart_0base'] || 5]) || 0;
+    const exEnd   = parseInt(cols[h['exonEnd']         || h['longExonEnd']         || h['riExonEnd']         || h['1stExonEnd']         || 6]) || 0;
+
+    // Type-specific additional coordinates for splice logo analysis
+    let ex2Start = 0, ex2End = 0;   // MXE 2nd exon
+    let shortES = 0, shortEE = 0;   // A3SS/A5SS competing short exon
+    let upstreamEE = 0, downstreamES = 0;  // RI/SE flanking exons
+    if (type === 'SE') {
+      upstreamEE   = parseInt(cols[h['upstreamEE']   || 8])  || 0;
+      downstreamES = parseInt(cols[h['downstreamES'] || 9])  || 0;
+    } else if (type === 'MXE') {
+      ex2Start     = parseInt(cols[h['2ndExonStart_0base'] || 7]) || 0;
+      ex2End       = parseInt(cols[h['2ndExonEnd']         || 8]) || 0;
+      upstreamEE   = parseInt(cols[h['upstreamEE']         || 10]) || 0;
+      downstreamES = parseInt(cols[h['downstreamES']       || 11]) || 0;
+    } else if (type === 'A3SS' || type === 'A5SS') {
+      shortES = parseInt(cols[h['shortES'] || 7]) || 0;
+      shortEE = parseInt(cols[h['shortEE'] || 8]) || 0;
+    } else if (type === 'RI') {
+      upstreamEE   = parseInt(cols[h['upstreamEE']   || 8]) || 0;
+      downstreamES = parseInt(cols[h['downstreamES'] || 9]) || 0;
+    }
+
+    if (isNaN(fdr)||isNaN(dpsi)) continue;
+    events.push({ type, gene, chr, strand, psi1, psi2, dpsi, fdr, pval, coverage,
+                  exStart, exEnd, ex2Start, ex2End, shortES, shortEE, upstreamEE, downstreamES });
+  }
+  return events;
+}
+
+// ─── Analysis ─────────────────────────────────────────────────────────────────
+async function analyze() {
+  const btn = document.getElementById('btn-analyze');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Parsing…';
+
+  await new Promise(r => setTimeout(r, 30)); // let UI update
+
+  S.allEvents = [];
+  const fileEntries = Object.entries(S.files);
+  for (let fi = 0; fi < fileEntries.length; fi++) {
+    const [type, file] = fileEntries[fi];
+    btn.innerHTML = `<span class="spinner"></span>Parsing ${type} (${fi+1}/${fileEntries.length})…`;
+    await new Promise(r => setTimeout(r, 20)); // let UI breathe
+    const text = await file.text();
+    const parsed = parseMATSFile(text, type);
+    for (let k = 0; k < parsed.length; k++) S.allEvents.push(parsed[k]); // avoid spread on large arrays
+  }
+
+  btn.disabled = false; btn.textContent = 'Analyze';
+  document.getElementById('results-area').style.display = '';   // show before rendering
+  applyFilters();
+  document.getElementById('results-area').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function applyFilters() {
+  const minReads = parseFloat(document.getElementById('sl-reads').value)||0;
+  const maxFDR   = parseFloat(document.getElementById('sl-fdr').value)||0.05;
+  const minDPSI  = parseFloat(document.getElementById('sl-dpsi').value)||0.1;
+
+  S.filtEvents = S.allEvents.filter(e =>
+    e.coverage >= minReads &&
+    e.fdr <= maxFDR &&
+    Math.abs(e.dpsi) >= minDPSI
+  );
+
+  renderSummary();
+  renderVolcano();
+  renderBarType();
+  renderDPSIDist();
+  renderScatter();
+  renderTable();
+}
+
+function syncSlider(key, val) {
+  document.getElementById('sv-'+key).textContent = parseFloat(val).toFixed(key==='reads'?0:2);
+}
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+function renderSummary() {
+  const total = S.allEvents.length;
+  const sig   = S.filtEvents.length;
+  const nUp   = S.filtEvents.filter(e=>e.dpsi>0).length;
+  const nDn   = S.filtEvents.filter(e=>e.dpsi<0).length;
+  const genes = new Set(S.filtEvents.map(e=>e.gene)).size;
+  const cond1 = document.getElementById('cond1').value||'Cond1';
+  const cond2 = document.getElementById('cond2').value||'Cond2';
+
+  document.getElementById('summary-pills').innerHTML = `
+    <div class="pill"><span class="pill-num">${total.toLocaleString()}</span><span class="pill-lbl">Total Events</span></div>
+    <div class="pill"><span class="pill-num" style="color:#C2185B">${sig.toLocaleString()}</span><span class="pill-lbl">Significant</span></div>
+    <div class="pill"><span class="pill-num" style="color:#C2185B">${nUp.toLocaleString()}</span><span class="pill-lbl">&#8593; in ${escH(cond2)}</span></div>
+    <div class="pill"><span class="pill-num" style="color:#1D4ED8">${nDn.toLocaleString()}</span><span class="pill-lbl">&#8595; in ${escH(cond2)}</span></div>
+    <div class="pill"><span class="pill-num">${genes.toLocaleString()}</span><span class="pill-lbl">Unique Genes</span></div>
+  `;
+  // Per-type breakdown
+  let typeHtml = EVENT_TYPES.map(t => {
+    const n = S.filtEvents.filter(e=>e.type===t).length;
+    return n ? `<span class="tag tag-${t}" style="font-size:11px;padding:3px 8px">${t}: ${n}</span>` : '';
+  }).filter(Boolean).join(' ');
+  document.getElementById('summary-pills').insertAdjacentHTML('afterend',
+    `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${typeHtml}</div>`);
+}
+
+// ─── Plots ────────────────────────────────────────────────────────────────────
+function showPlot(id) {
+  ['volcano','bartype','dpsi-dist','scatter','splice','go'].forEach(p => {
+    document.getElementById('plot-'+p).style.display = p===id ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[['volcano','bartype','dpsi-dist','scatter','splice','go'].indexOf(id)].classList.add('active');
+  // Trigger resize to render properly
+  window.dispatchEvent(new Event('resize'));
+}
+
+function renderVolcano() {
+  const yCap = Math.max(5, parseFloat(document.getElementById('volcano-ycap').value) || 50);
+  const fdrLine = -Math.log10(parseFloat(document.getElementById('sl-fdr').value)||0.05);
+  const dpsiLine = parseFloat(document.getElementById('sl-dpsi').value)||0.1;
+
+  let maxAbsDPSI = 0.5;
+  for (const e of S.allEvents) {
+    const ad = Math.abs(e.dpsi);
+    if (ad > maxAbsDPSI) maxAbsDPSI = ad;
+  }
+
+  const traces = [];
+  for (const t of EVENT_TYPES) {
+    const evs = S.allEvents.filter(e=>e.type===t);
+    const normal = evs.filter(e => -Math.log10(Math.max(e.fdr,1e-300)) <= yCap);
+    const capped = evs.filter(e => -Math.log10(Math.max(e.fdr,1e-300)) >  yCap);
+
+    if (normal.length) traces.push({
+      type:'scatter', mode:'markers', name: TYPE_LABELS[t]||t,
+      x: normal.map(e=>e.dpsi),
+      y: normal.map(e=>-Math.log10(Math.max(e.fdr,1e-300))),
+      text: normal.map(e=>`<b>${e.gene}</b><br>Type: ${e.type}<br>ΔPSI: ${e.dpsi.toFixed(3)}<br>FDR: ${e.fdr.toExponential(2)}`),
+      hoverinfo:'text', legendgroup: t,
+      marker:{color:TYPE_COLORS[t], size:5, opacity:0.65, line:{width:0}}
+    });
+
+    if (capped.length) traces.push({
+      type:'scatter', mode:'markers', name:`${TYPE_LABELS[t]||t} (capped)`,
+      x: capped.map(e=>e.dpsi),
+      y: capped.map(()=>yCap),
+      text: capped.map(e=>`<b>${e.gene}</b><br>Type: ${e.type}<br>ΔPSI: ${e.dpsi.toFixed(3)}<br>FDR: ${e.fdr.toExponential(2)}<br><i>Capped — true −log₁₀(FDR) > ${yCap}</i>`),
+      hoverinfo:'text', legendgroup: t, showlegend: false,
+      marker:{color:TYPE_COLORS[t], size:7, opacity:0.9,
+              symbol:'triangle-up', line:{color:'white',width:1}}
+    });
+  }
+
+  const layout = {
+    title: `Volcano Plot — rMATS Splicing Events (▲ = capped at y=${yCap})`,
+    xaxis: {title:'ΔΨ (IncLevelDifference)', zeroline:true, zerolinecolor:'#E2DDD8'},
+    yaxis: {title:'-log₁₀(FDR)', range:[0, yCap*1.05]},
+    shapes: [
+      {type:'line', x0:-dpsiLine, x1:-dpsiLine, y0:0, y1:yCap*1.05, line:{color:'#A8A29E',dash:'dot',width:1}},
+      {type:'line', x0:dpsiLine,  x1:dpsiLine,  y0:0, y1:yCap*1.05, line:{color:'#A8A29E',dash:'dot',width:1}},
+      {type:'line', x0:-maxAbsDPSI*1.1, x1:maxAbsDPSI*1.1, y0:fdrLine, y1:fdrLine, line:{color:'#A8A29E',dash:'dot',width:1}},
+    ],
+    margin:{t:50,b:60,l:60,r:20},
+    legend:{orientation:'h',y:-0.15},
+    height:420,
+    paper_bgcolor:'#FAFAF9', plot_bgcolor:'#FAFAF9',
+    font:{family:'IBM Plex Sans',size:11}
+  };
+
+  Plotly.react('plot-volcano', traces, layout, {responsive:true, displayModeBar:false});
+}
+
+function renderBarType() {
+  const up = {}, dn = {};
+  for (const t of EVENT_TYPES) {
+    up[t] = S.filtEvents.filter(e=>e.type===t&&e.dpsi>0).length;
+    dn[t] = S.filtEvents.filter(e=>e.type===t&&e.dpsi<0).length;
+  }
+  const cond1 = document.getElementById('cond1').value||'Cond1';
+  const cond2 = document.getElementById('cond2').value||'Cond2';
+  const traces = [
+    { type:'bar', name:`Increased in ${cond2}`, x:EVENT_TYPES, y:EVENT_TYPES.map(t=>up[t]), marker:{color:'#F87171'} },
+    { type:'bar', name:`Decreased in ${cond2}`, x:EVENT_TYPES, y:EVENT_TYPES.map(t=>-dn[t]), marker:{color:'#60A5FA'} },
+  ];
+  const layout = {
+    title:'Significant Events by Type', barmode:'relative',
+    yaxis:{title:'Number of events', zeroline:true},
+    xaxis:{title:'Splicing event type'},
+    margin:{t:50,b:60,l:60,r:20}, height:380,
+    paper_bgcolor:'#FAFAF9', plot_bgcolor:'#FAFAF9',
+    font:{family:'IBM Plex Sans',size:11},
+    legend:{orientation:'h',y:-0.18}
+  };
+  Plotly.react('plot-bartype', traces, layout, {responsive:true, displayModeBar:false});
+}
+
+function renderDPSIDist() {
+  const traces = EVENT_TYPES.filter(t=>S.filtEvents.some(e=>e.type===t)).map(t => ({
+    type:'violin', name:t, y:S.filtEvents.filter(e=>e.type===t).map(e=>e.dpsi),
+    box:{visible:true}, meanline:{visible:true},
+    fillcolor:TYPE_COLORS[t], opacity:0.7, line:{color:TYPE_COLORS[t]}
+  }));
+  const layout = {
+    title:'ΔPSI Distribution by Event Type', yaxis:{title:'ΔΨ', zeroline:true},
+    margin:{t:50,b:60,l:60,r:20}, height:380,
+    paper_bgcolor:'#FAFAF9', plot_bgcolor:'#FAFAF9',
+    font:{family:'IBM Plex Sans',size:11}
+  };
+  Plotly.react('plot-dpsi-dist', traces, layout, {responsive:true, displayModeBar:false});
+}
+
+function renderScatter() {
+  const cond1 = document.getElementById('cond1').value||'Cond1';
+  const cond2 = document.getElementById('cond2').value||'Cond2';
+  const traces = EVENT_TYPES.filter(t=>S.filtEvents.some(e=>e.type===t)).map(t => {
+    const evs = S.filtEvents.filter(e=>e.type===t&&!isNaN(e.psi1)&&!isNaN(e.psi2));
+    return {
+      type:'scatter', mode:'markers', name:TYPE_LABELS[t]||t,
+      x:evs.map(e=>e.psi1), y:evs.map(e=>e.psi2),
+      text:evs.map(e=>`<b>${e.gene}</b><br>ΔPSI: ${e.dpsi.toFixed(3)}`),
+      hoverinfo:'text',
+      marker:{color:TYPE_COLORS[t],size:5,opacity:0.6}
+    };
+  });
+  traces.push({type:'scatter',mode:'lines',name:'y=x',x:[0,1],y:[0,1],
+    line:{color:'#E2DDD8',dash:'dot'},showlegend:false});
+  const layout = {
+    title:`PSI Scatter: ${cond1} vs ${cond2}`,
+    xaxis:{title:`PSI in ${cond1}`,range:[-0.05,1.05]},
+    yaxis:{title:`PSI in ${cond2}`,range:[-0.05,1.05]},
+    margin:{t:50,b:60,l:60,r:20}, height:400,
+    paper_bgcolor:'#FAFAF9', plot_bgcolor:'#FAFAF9',
+    font:{family:'IBM Plex Sans',size:11},
+    legend:{orientation:'h',y:-0.18}
+  };
+  Plotly.react('plot-scatter', traces, layout, {responsive:true, displayModeBar:false});
+}
+
+// ─── Table ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  const search  = (document.getElementById('table-search').value||'').toLowerCase();
+  const sorted  = [...S.filtEvents]
+    .filter(e=>!search || e.gene.toLowerCase().includes(search))
+    .sort((a,b)=>{
+      if (S.sortKey==='fdr') return S.sortDir*(a.fdr-b.fdr);
+      return S.sortDir*(Math.abs(b.dpsi)-Math.abs(a.dpsi));
+    });
+
+  document.getElementById('table-count').textContent = `${sorted.length} events`;
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = sorted.slice(0,2000).map(e => {
+    const dir  = e.dpsi>0 ? '<span class="up-arrow">&#8593;</span>' : '<span class="dn-arrow">&#8595;</span>';
+    const dpsi = (e.dpsi>0?'+':'')+e.dpsi.toFixed(3);
+    const fdr  = e.fdr < 0.001 ? e.fdr.toExponential(2) : e.fdr.toFixed(4);
+    return `<tr>
+      <td><span class="tag tag-${e.type}">${e.type}</span></td>
+      <td title="${escH(e.gene)}">${escH(e.gene)}</td>
+      <td>${escH(e.chr)}</td>
+      <td>${e.strand}</td>
+      <td>${dir} ${dpsi}</td>
+      <td>${isNaN(e.psi1)?'—':e.psi1.toFixed(3)}</td>
+      <td>${isNaN(e.psi2)?'—':e.psi2.toFixed(3)}</td>
+      <td>${fdr}</td>
+      <td>${e.coverage.toFixed(0)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() { renderTable(); }
+function sortTable(key) {
+  if (S.sortKey===key) S.sortDir*=-1; else { S.sortKey=key; S.sortDir=-1; }
+  renderTable();
+}
+
+// ─── Export ────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const cond1=document.getElementById('cond1').value||'Cond1';
+  const cond2=document.getElementById('cond2').value||'Cond2';
+  const cols=['Type','Gene','Chr','Strand','dPSI',`PSI_${cond1}`,`PSI_${cond2}`,'FDR','PValue','Coverage'];
+  const rows=[cols.join(',')];
+  for (const e of S.filtEvents) {
+    rows.push([e.type,`"${e.gene}"`,e.chr,e.strand,
+      e.dpsi.toFixed(4),isNaN(e.psi1)?'NA':e.psi1.toFixed(4),
+      isNaN(e.psi2)?'NA':e.psi2.toFixed(4),
+      e.fdr.toExponential(4),e.pval.toExponential(4),
+      e.coverage.toFixed(1)].join(','));
+  }
+  dl(rows.join('\n'),'rmats_significant_events.csv','text/csv');
+}
+
+function exportVolcanoSVG() {
+  Plotly.downloadImage('plot-volcano',{format:'svg',filename:'rmats_volcano'});
+}
+
+function dl(content,filename,mime){
+  const a=Object.assign(document.createElement('a'),
+    {href:URL.createObjectURL(new Blob([content],{type:mime})),download:filename});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ─── SVG download helper ──────────────────────────────────────────────────────
+function downloadSVGById(svgId, filename) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const blob = new Blob(['<?xml version="1.0"?>\n' + svg.outerHTML], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename || (svgId + '.svg');
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function downloadGoSVG() {
+  if (!_maserGoResults) return;
+  const results = _maserGoResults.results;
+  const top = results.slice(0, 25);
+  const logPs = top.map(r => -Math.log10(Math.max(r[2], 1e-300)));
+  const maxLogP = Math.max(...logPs, 1);
+  const W = 600, bH = 20, bGap = 3, padL = 270, padR = 90, padT = 14, padB = 24;
+  const bW = W - padL - padR;
+  const H = padT + top.length * (bH + bGap) + padB;
+  let bars = '';
+  top.forEach((r, i) => {
+    const term = r[1].replace(/_/g,' ').replace(/\s*\(GO:\d+\)$/,'').slice(0, 42);
+    const bw = ((logPs[i] / maxLogP) * bW).toFixed(1);
+    const by = padT + i * (bH + bGap);
+    bars += `<text x="${padL - 6}" y="${by + bH/2 + 4}" font-size="10" fill="#44403C" text-anchor="end" font-family="IBM Plex Sans,sans-serif">${term}</text>
+      <rect x="${padL}" y="${by}" width="${bw}" height="${bH}" fill="#3730A3" opacity="0.82" rx="3"/>
+      <text x="${padL + +bw + 5}" y="${by + bH/2 + 4}" font-size="9" fill="#78716C" font-family="IBM Plex Mono,monospace">${logPs[i].toFixed(2)}</text>`;
+  });
+  const xLabel = `<text x="${padL + bW/2}" y="${H - 4}" font-size="10" fill="#78716C" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">-log₁₀(p-value)</text>`;
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${bars}${xLabel}</svg>`;
+  const blob = new Blob(['<?xml version="1.0"?>\n' + svgStr], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'go_enrichment.svg';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ─── Splice Site Logos ────────────────────────────────────────────────────────
+function revComp(seq) {
+  const comp = {A:'T',T:'A',C:'G',G:'C',N:'N'};
+  return seq.toUpperCase().split('').reverse().map(b => comp[b]||'N').join('');
+}
+
+function drawFreqLogo(seqsArr, posLabels, title, svgId) {
+  if (!seqsArr.length) return `<div style="color:#78716C;font-size:12px">No sequences</div>`;
+  const len = posLabels.length;
+  const BASES = ['A','C','G','T'];
+  const COLORS = {A:'#22C55E', C:'#3B82F6', G:'#F59E0B', T:'#EF4444'};
+  const cw = 22, ch = 80, padL = 10, padT = 28, padB = 24;
+  const W = padL + len * cw + 70, H = padT + ch + padB;
+
+  // Compute per-position frequencies
+  const freq = Array.from({length: len}, () => ({A:0,C:0,G:0,T:0}));
+  seqsArr.forEach(seq => {
+    for (let i = 0; i < Math.min(seq.length, len); i++) {
+      const b = seq[i]?.toUpperCase();
+      if (b in freq[i]) freq[i][b]++;
+    }
+  });
+
+  let svg = '';
+  for (let i = 0; i < len; i++) {
+    const tot = BASES.reduce((s,b) => s + freq[i][b], 0) || 1;
+    let y = padT + ch;
+    BASES.forEach(b => {
+      const h = (freq[i][b] / tot) * ch;
+      if (h < 0.5) return;
+      y -= h;
+      svg += `<rect x="${padL + i*cw}" y="${y}" width="${cw-2}" height="${h}" fill="${COLORS[b]}"/>`;
+      if (h >= 12) svg += `<text x="${padL + i*cw + cw/2 - 1}" y="${y + h/2 + 4}" font-size="8" fill="white" text-anchor="middle">${b}</text>`;
+    });
+    svg += `<text x="${padL + i*cw + cw/2 - 1}" y="${padT + ch + 14}" font-size="8" fill="#78716C" text-anchor="middle" font-family="IBM Plex Mono">${escH(posLabels[i])}</text>`;
+  }
+
+  // Legend
+  const lx = padL + len * cw + 8;
+  BASES.forEach((b, i) => {
+    svg += `<rect x="${lx}" y="${padT + i*16}" width="10" height="10" fill="${COLORS[b]}" rx="1"/>`;
+    svg += `<text x="${lx+13}" y="${padT + i*16 + 9}" font-size="9" fill="#44403C" font-family="IBM Plex Mono">${b}</text>`;
+  });
+
+  const idAttr = svgId ? ` id="${svgId}"` : '';
+  const dlBtn = svgId
+    ? `<button onclick="downloadSVGById('${svgId}','${svgId}.svg')" style="margin-top:4px;font-size:10px;background:none;border:1px solid #E2DDD8;border-radius:4px;padding:2px 8px;cursor:pointer;color:#78716C;font-family:IBM Plex Sans,sans-serif">&#128229; SVG</button>`
+    : '';
+  return `<div style="margin-bottom:16px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">${escH(title)} <span style="font-size:10px;font-weight:400;color:#78716C">n=${seqsArr.length}</span></div>
+    <svg${idAttr} width="${W}" height="${H}" style="display:block;overflow:visible;font-family:IBM Plex Mono,monospace">${svg}</svg>
+    ${dlBtn}
+  </div>`;
+}
+
+function getEnsemblEndpoint() {
+  const g = document.getElementById('ref-genome')?.value || 'hg38';
+  const base = g === 'hg19' ? 'https://grch37.rest.ensembl.org' : 'https://rest.ensembl.org';
+  const species = g === 'mm10' ? 'mus_musculus' : 'human';
+  return `${base}/sequence/region/${species}`;
+}
+
+async function fetchEnsemblSeqs(regions) {
+  // regions: array of "chrNum:start..end:1" strings
+  const BATCH = 50;
+  const results = [];
+  for (let i = 0; i < regions.length; i += BATCH) {
+    const batch = regions.slice(i, i + BATCH);
+    try {
+      const resp = await fetch(getEnsemblEndpoint(), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify({regions: batch})
+      });
+      if (resp.ok) {
+        const seqs = await resp.json();
+        seqs.forEach(s => results.push(s.seq || null));
+      } else {
+        batch.forEach(() => results.push(null));
+      }
+    } catch { batch.forEach(() => results.push(null)); }
+    if (i + BATCH < regions.length) await new Promise(r => setTimeout(r, 350));
+  }
+  return results;
+}
+
+async function analyzeSpliceSites() {
+  const btn      = document.getElementById('btn-splice');
+  const prog     = document.getElementById('splice-progress');
+  const res      = document.getElementById('splice-results');
+  const selType  = document.getElementById('splice-type-select')?.value || 'SE';
+  btn.disabled = true;
+  res.innerHTML = '';
+
+  const typeEvents = S.filtEvents.filter(e => e.type === selType);
+  if (!typeEvents.length) {
+    prog.innerHTML = `<div class="banner banner-warn">No significant ${selType} events in the current filter. Adjust thresholds or select a different event type.</div>`;
+    btn.disabled = false; return;
+  }
+
+  // Top 500 each by |ΔPSI|
+  const excluded = typeEvents.filter(e => e.dpsi < 0).sort((a,b) => a.dpsi - b.dpsi).slice(0, 500);
+  const included = typeEvents.filter(e => e.dpsi > 0).sort((a,b) => b.dpsi - a.dpsi).slice(0, 500);
+  const total = excluded.length + included.length;
+
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching 5′SS sequences for ${total} ${selType} events…</div>`;
+  await new Promise(r => setTimeout(r, 20));
+
+  // ── Type-aware splice site coordinate functions ──────────────────────────
+  function donorRegion(e) {
+    const c = e.chr.replace(/^chr/i, '');
+    const plus = (e.strand === '+' || e.strand === '1');
+    let pos;
+    if (e.type === 'RI') {
+      // Donor = upstream exon 3' end (intron 5' start)
+      pos = plus ? e.upstreamEE : e.downstreamES;
+    } else if (e.type === 'A5SS') {
+      // Competing donor on + strand: longExonEnd (distal); on - strand: shortEE
+      pos = plus ? e.exEnd : e.shortEE;
+    } else {
+      // SE, MXE, A3SS: donor at cassette exon 3' end
+      pos = plus ? e.exEnd : e.exStart;
+    }
+    if (!pos) return null;
+    return plus
+      ? `${c}:${pos - 3}..${pos + 6}:1`
+      : `${c}:${pos - 5}..${pos + 4}:1`;
+  }
+
+  function acceptorRegion(e) {
+    const c = e.chr.replace(/^chr/i, '');
+    const plus = (e.strand === '+' || e.strand === '1');
+    let pos;
+    if (e.type === 'RI') {
+      // Acceptor = downstream exon 5' start (intron 3' end)
+      pos = plus ? e.downstreamES : e.upstreamEE;
+    } else if (e.type === 'A3SS') {
+      // Competing acceptor on + strand: longExonStart (distal); on - strand: exEnd
+      pos = plus ? e.exStart : e.exEnd;
+    } else {
+      // SE, MXE, A5SS: acceptor at cassette exon 5' start
+      pos = plus ? e.exStart : e.exEnd;
+    }
+    if (!pos) return null;
+    return plus
+      ? `${c}:${pos - 19}..${pos + 3}:1`
+      : `${c}:${pos - 2}..${pos + 19}:1`;
+  }
+
+  const allEvents = [...excluded, ...included];
+  const donorRegions    = allEvents.map(donorRegion);
+  const acceptorRegions = allEvents.map(acceptorRegion);
+
+  const donorSeqs = await fetchEnsemblSeqs(donorRegions);
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching 3′SS sequences…</div>`;
+  await new Promise(r => setTimeout(r, 20));
+  const acceptorSeqs = await fetchEnsemblSeqs(acceptorRegions);
+
+  function getSeqs(rawSeqs, events) {
+    return rawSeqs.map((seq, i) => {
+      if (!seq) return null;
+      const e = events[i];
+      if (e.strand === '-' || e.strand === '-1') return revComp(seq);
+      return seq.toUpperCase();
+    }).filter(Boolean);
+  }
+
+  const n = excluded.length;
+  const exclDonor    = getSeqs(donorSeqs.slice(0, n),    excluded);
+  const inclDonor    = getSeqs(donorSeqs.slice(n),       included);
+  const exclAcceptor = getSeqs(acceptorSeqs.slice(0, n), excluded);
+  const inclAcceptor = getSeqs(acceptorSeqs.slice(n),    included);
+
+  prog.innerHTML = `<div class="banner banner-ok">Done. 5′SS: ${exclDonor.length + inclDonor.length} seqs · 3′SS: ${exclAcceptor.length + inclAcceptor.length} seqs.</div>`;
+
+  const donorLabels    = ['-4','-3','-2','-1','G','T','+3','+4','+5','+6'];
+  const acceptorLabels = ['-20','-19','-18','-17','-16','-15','-14','-13','-12','-11','-10','-9','-8','-7','-6','-5','-4','-3','-2','-1','A','G','+3'];
+
+  const cond2 = document.getElementById('cond2')?.value || 'Cond2';
+  const cond1 = document.getElementById('cond1')?.value || 'Cond1';
+
+  // Donor label text differs per event type
+  const donorLabel = (selType === 'RI') ? "5′ Splice Site — Intron Donor"
+    : (selType === 'A5SS') ? "5′ Splice Site (Competing Donors)"
+    : "5′ Splice Site (Donor)";
+  const acceptorLabel = (selType === 'RI') ? "3′ Splice Site — Intron Acceptor"
+    : (selType === 'A3SS') ? "3′ Splice Site (Competing Acceptors)"
+    : "3′ Splice Site (Acceptor)";
+
+  res.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:10px;padding:6px 10px;background:#EFF6FF;border-radius:5px">
+          Increased PSI in ${escH(cond2)} (n=${included.length})
+        </div>
+        ${drawFreqLogo(inclDonor.map(s=>s.slice(0,10)), donorLabels, donorLabel, 'logo-incl-donor')}
+        ${drawFreqLogo(inclAcceptor.map(s=>s.slice(0,23)), acceptorLabels, acceptorLabel, 'logo-incl-acceptor')}
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#C2185B;margin-bottom:10px;padding:6px 10px;background:#FFF1F2;border-radius:5px">
+          Decreased PSI in ${escH(cond2)} (n=${excluded.length})
+        </div>
+        ${drawFreqLogo(exclDonor.map(s=>s.slice(0,10)), donorLabels, donorLabel, 'logo-excl-donor')}
+        ${drawFreqLogo(exclAcceptor.map(s=>s.slice(0,23)), acceptorLabels, acceptorLabel, 'logo-excl-acceptor')}
+      </div>
+    </div>
+    <div style="font-size:11px;color:#A8A29E;margin-top:10px">
+      ${selType} events · Ensembl REST API · Donor: 4 exon + 6 intron bp · Acceptor: 20 intron + 3 exon bp · Minus-strand reverse-complemented
+    </div>`;
+
+  btn.disabled = false;
+}
+
+// ─── Mode toggle ──────────────────────────────────────────────────────────────
+function setGoMode(mode) {
+  document.getElementById('ora-panel').style.display  = mode === 'ora'  ? '' : 'none';
+  document.getElementById('gsea-panel').style.display = mode === 'gsea' ? '' : 'none';
+  document.getElementById('go-mode-ora').classList.toggle('active',  mode === 'ora');
+  document.getElementById('go-mode-gsea').classList.toggle('active', mode === 'gsea');
+}
+
+// ─── GSEA (Preranked) ─────────────────────────────────────────────────────────
+let _gseaSets   = null;  // { setName: Set<upperGene> }
+let _gseaRanked = null;  // [{gene, score}, ...] descending
+let _gseaResults = null; // computed results array
+
+function parseGMT(text) {
+  const sets = {};
+  for (const line of text.split('\n')) {
+    const parts = line.trim().split('\t');
+    if (parts.length < 3) continue;
+    const name  = parts[0].trim();
+    const genes = new Set(parts.slice(2).map(g => g.trim().toUpperCase()).filter(Boolean));
+    if (name && genes.size > 0) sets[name] = genes;
+  }
+  return sets;
+}
+
+function onGseaCategoryChange() {
+  document.getElementById('gsea-gmt-status').innerHTML = '<span style="color:#78716C">Not loaded — click Load Collection</span>';
+}
+
+async function loadGMTFromServer() {
+  const cat = document.getElementById('gsea-category').value;
+  if (!cat) {
+    document.getElementById('gsea-gmt-status').innerHTML = '<span style="color:#92400E">Select a collection first</span>';
+    return;
+  }
+  const prog = document.getElementById('gsea-progress');
+  const statusEl = document.getElementById('gsea-gmt-status');
+  statusEl.innerHTML = '<span class="spinner"></span>Loading…';
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching ${cat.toUpperCase()} gene sets from server…</div>`;
+  try {
+    const resp = await fetch(`/api/baseedit/gmt/${cat}`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    _gseaSets = parseGMT(text);
+    const n = Object.keys(_gseaSets).length;
+    statusEl.innerHTML = `<span style="color:#065F46;font-weight:600">&#10003; ${n.toLocaleString()} gene sets loaded (${cat.toUpperCase()})</span>`;
+    prog.innerHTML = `<div class="banner banner-ok">&#10003; Loaded ${n.toLocaleString()} gene sets. Click <strong>Run GSEA</strong> to start analysis.</div>`;
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:#9F1239">Error: ${e.message}</span>`;
+    prog.innerHTML = `<div class="banner banner-err">Failed to load gene sets: ${e.message}</div>`;
+  }
+}
+
+function loadGMTFile(file) {
+  if (!file) return;
+  const prog = document.getElementById('gsea-progress');
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Parsing ${file.name}…</div>`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _gseaSets = parseGMT(e.target.result);
+    const n = Object.keys(_gseaSets).length;
+    document.getElementById('gsea-gmt-status').innerHTML =
+      `<span style="color:#065F46;font-weight:600">&#10003; ${n.toLocaleString()} gene sets — ${file.name}</span>`;
+    prog.innerHTML = '';
+  };
+  reader.readAsText(file);
+}
+
+function computeGeneRanking() {
+  // Use ALL loaded events (not just filtered) for unbiased ranking
+  const geneScores = {};
+  for (const e of S.allEvents) {
+    if (isNaN(e.dpsi) || isNaN(e.fdr) || !e.gene) continue;
+    const key = e.gene.toUpperCase();
+    const score = e.dpsi * -Math.log10(Math.max(e.fdr, 1e-10));
+    if (!geneScores[key]) geneScores[key] = { gene: e.gene, score: 0 };
+    geneScores[key].score += score;  // sum across events
+  }
+  return Object.values(geneScores).sort((a, b) => b.score - a.score);
+}
+
+function gseaOneSet(ranked, geneSet, nPerm) {
+  const N = ranked.length;
+  // Pre-compute membership and scores arrays
+  const inSet = new Uint8Array(N);
+  const scores = new Float64Array(N);
+  let Nh = 0;
+  for (let i = 0; i < N; i++) {
+    scores[i] = Math.abs(ranked[i].score);
+    if (geneSet.has(ranked[i].gene.toUpperCase())) { inSet[i] = 1; Nh++; }
+  }
+  if (Nh < 3 || Nh > N - 3) return null;
+
+  // Enrichment score
+  let sumSet = 0;
+  for (let i = 0; i < N; i++) if (inSet[i]) sumSet += scores[i];
+  const dec = 1 / (N - Nh);
+
+  let run = 0, maxES = 0, minES = 0, peakIdx = 0, troughIdx = 0;
+  const esTrace = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    run += inSet[i] ? scores[i] / sumSet : -dec;
+    esTrace[i] = run;
+    if (run > maxES) { maxES = run; peakIdx  = i; }
+    if (run < minES) { minES = run; troughIdx = i; }
+  }
+  const es     = Math.abs(maxES) >= Math.abs(minES) ? maxES : minES;
+  const isPos  = es >= 0;
+  const peakI  = isPos ? peakIdx : troughIdx;
+
+  // Permutation (shuffle inSet membership, keep scores/order fixed)
+  const perm = new Uint8Array(inSet);
+  let nMoreExtreme = 0;
+  const permESes = new Float32Array(nPerm);
+
+  for (let p = 0; p < nPerm; p++) {
+    // Fisher-Yates shuffle
+    for (let i = N - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      const t = perm[i]; perm[i] = perm[j]; perm[j] = t;
+    }
+    let pSum = 0;
+    for (let i = 0; i < N; i++) if (perm[i]) pSum += scores[i];
+    let pRun = 0, pMax = 0, pMin = 0;
+    for (let i = 0; i < N; i++) {
+      pRun += perm[i] ? scores[i] / pSum : -dec;
+      if (pRun > pMax) pMax = pRun;
+      if (pRun < pMin) pMin = pRun;
+    }
+    permESes[p] = Math.abs(pMax) >= Math.abs(pMin) ? pMax : pMin;
+  }
+
+  // NES and p-value
+  let posMean = 0, posN = 0, negMean = 0, negN = 0;
+  for (let p = 0; p < nPerm; p++) {
+    if (permESes[p] >= 0) { posMean += permESes[p]; posN++; }
+    else                  { negMean += permESes[p]; negN++; }
+  }
+  posMean = posN > 0 ? posMean / posN : 1;
+  negMean = negN > 0 ? negMean / negN : -1;
+
+  const nes = isPos
+    ? (posMean > 0 ? es / posMean : es)
+    : (Math.abs(negMean) > 0 ? es / Math.abs(negMean) : es);
+
+  let nEx = 0;
+  for (let p = 0; p < nPerm; p++) {
+    if (isPos ? permESes[p] >= es : permESes[p] <= es) nEx++;
+  }
+  const pval = nEx / nPerm;
+
+  // Leading edge (genes before the peak)
+  const leadingEdge = [];
+  for (let i = 0; i <= peakI && leadingEdge.length < 30; i++) {
+    if (inSet[i]) leadingEdge.push(ranked[i].gene);
+  }
+
+  return { es, nes, pval, esTrace, Nh, peakI, leadingEdge, isPos };
+}
+
+async function runGSEA() {
+  const prog = document.getElementById('gsea-progress');
+  const res  = document.getElementById('gsea-results');
+  res.innerHTML = '';
+
+  if (!_gseaSets) {
+    prog.innerHTML = '<div class="banner banner-warn">Upload a GMT file first.</div>';
+    return;
+  }
+  if (!S.allEvents.length) {
+    prog.innerHTML = '<div class="banner banner-warn">No events loaded. Upload rMATS files first.</div>';
+    return;
+  }
+
+  const nPerm   = parseInt(document.getElementById('gsea-nperms').value)  || 500;
+  const minSize = parseInt(document.getElementById('gsea-minsize').value)  || 10;
+  const maxSize = parseInt(document.getElementById('gsea-maxsize').value)  || 500;
+
+  _gseaRanked = computeGeneRanking();
+  const genePool = new Set(_gseaRanked.map(g => g.gene.toUpperCase()));
+
+  // Only sets with enough overlap
+  const validSets = [];
+  for (const [name, genes] of Object.entries(_gseaSets)) {
+    let n = 0;
+    for (const g of genes) if (genePool.has(g)) n++;
+    if (n >= minSize && n <= maxSize) validSets.push([name, genes]);
+  }
+
+  if (!validSets.length) {
+    prog.innerHTML = '<div class="banner banner-warn">No gene sets had sufficient overlap (check min/max size or genome build).</div>';
+    return;
+  }
+
+  const results = [];
+  const BATCH = 4;
+  for (let i = 0; i < validSets.length; i += BATCH) {
+    for (let j = i; j < Math.min(i + BATCH, validSets.length); j++) {
+      const [name, genes] = validSets[j];
+      const r = gseaOneSet(_gseaRanked, genes, nPerm);
+      if (r) results.push({ name, ...r });
+    }
+    const pct = Math.round((i + BATCH) / validSets.length * 100);
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>GSEA: ${Math.min(i+BATCH, validSets.length)} / ${validSets.length} sets &mdash; ${_gseaRanked.length} genes, ${nPerm} permutations each (${pct}%)</div>`;
+    await new Promise(r => setTimeout(r, 0)); // yield to browser
+  }
+
+  // BH multiple testing correction
+  results.sort((a, b) => a.pval - b.pval);
+  const m = results.length;
+  for (let i = 0; i < m; i++) results[i].qval = Math.min(1, (results[i].pval * m) / (i + 1));
+  for (let i = m - 2; i >= 0; i--) results[i].qval = Math.min(results[i].qval, results[i+1].qval);
+
+  // Sort by |NES| descending for display
+  results.sort((a, b) => Math.abs(b.nes) - Math.abs(a.nes));
+
+  _gseaResults = results;
+  prog.innerHTML = '';
+  renderGSEAResults(results);
+}
+
+function renderGSEAResults(results) {
+  const res = document.getElementById('gsea-results');
+  const cond1 = document.getElementById('cond1').value || 'Condition 1';
+  const cond2 = document.getElementById('cond2').value || 'Condition 2';
+  const nSig  = results.filter(r => r.pval < 0.05 && Math.abs(r.nes) >= 1).length;
+
+  const rows = results.slice(0, 75).map((r, i) => {
+    const col   = r.nes > 0 ? '#C2185B' : '#1D4ED8';
+    const arrow = r.nes > 0 ? '↑' : '↓';
+    const sig   = r.pval < 0.05 && Math.abs(r.nes) >= 1;
+    const fwStr = sig ? 'font-weight:700' : '';
+    return `<tr onclick="showGSEADetail(${i})" class="gsea-result-row">
+      <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${fwStr}" title="${r.name}">${r.name.replace(/_/g,' ')}</td>
+      <td style="font-weight:700;color:${col};white-space:nowrap">${arrow} ${r.nes.toFixed(3)}</td>
+      <td style="${fwStr}">${r.pval === 0 ? '&lt;' + (1/parseInt(document.getElementById('gsea-nperms').value||500)).toFixed(4) : r.pval < 0.001 ? r.pval.toExponential(1) : r.pval.toFixed(3)}${sig ? ' &#10003;' : ''}</td>
+      <td>${r.qval.toFixed(3)}</td>
+      <td>${r.Nh}</td>
+      <td style="font-size:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'IBM Plex Mono',monospace">${r.leadingEdge.slice(0,8).join(', ')}${r.leadingEdge.length > 8 ? '…' : ''}</td>
+    </tr>`;
+  }).join('');
+
+  res.innerHTML = `
+    <div style="font-size:12px;font-weight:700;margin-bottom:10px">
+      ${results.length} gene sets tested &bull;
+      <span style="color:#C2185B">${results.filter(r=>r.nes>0&&r.pval<0.05&&Math.abs(r.nes)>=1).length} positively enriched</span> &bull;
+      <span style="color:#1D4ED8">${results.filter(r=>r.nes<0&&r.pval<0.05&&Math.abs(r.nes)>=1).length} negatively enriched</span> (p&lt;0.05, |NES|≥1) &bull;
+      <span style="font-weight:400;color:#78716C">click a row for enrichment plot</span>
+    </div>
+    <div class="table-wrap" style="max-height:420px">
+      <table class="data-table" id="gsea-table">
+        <thead><tr><th>Gene Set</th><th>NES</th><th>p-value</th><th>FDR q</th><th>n</th><th>Leading Edge</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div id="gsea-detail" style="margin-top:20px"></div>`;
+}
+
+function showGSEADetail(idx) {
+  const r = _gseaResults[idx];
+  const cond1 = document.getElementById('cond1').value || 'Condition 1';
+  const cond2 = document.getElementById('cond2').value || 'Condition 2';
+  const col   = r.nes > 0 ? '#C2185B' : '#1D4ED8';
+  const label = r.nes > 0 ? `enriched toward higher inclusion (↑ ${cond2})` : `enriched toward lower inclusion (↓ ${cond1})`;
+
+  // Highlight selected table row
+  document.querySelectorAll('.gsea-result-row').forEach((el, i) => el.classList.toggle('gsea-selected', i === idx));
+
+  const N     = _gseaRanked.length;
+  const geneSet = _gseaSets[r.name];
+  // Barcode positions (0-1 normalized rank of set members)
+  const barcodePos = [];
+  for (let i = 0; i < N; i++) {
+    if (geneSet?.has(_gseaRanked[i].gene.toUpperCase())) barcodePos.push(i / (N - 1));
+  }
+
+  const det = document.getElementById('gsea-detail');
+  det.innerHTML = `<div class="go-detail-panel">
+    <div class="go-detail-title">${r.name.replace(/_/g,' ')}</div>
+    <div class="go-detail-meta">
+      NES <span style="font-weight:700;color:${col}">${r.nes > 0 ? '+' : ''}${r.nes.toFixed(3)}</span> &bull;
+      ES = ${r.es.toFixed(3)} &bull;
+      p = ${r.pval === 0 ? '&lt;1/nPerm' : r.pval < 0.001 ? r.pval.toExponential(2) : r.pval.toFixed(3)} &bull;
+      FDR = ${r.qval.toFixed(3)} &bull;
+      n = ${r.Nh} genes in set &bull;
+      ${label}
+    </div>
+
+    <!-- Mountain plot -->
+    <div id="gsea-es-plot" style="width:100%;height:250px"></div>
+
+    <!-- Barcode (set member positions) -->
+    <div id="gsea-barcode" style="position:relative;height:32px;margin:2px 0 0">
+      <svg width="100%" height="32" style="display:block;overflow:visible" id="gsea-barcode-svg">
+        <defs>
+          <linearGradient id="rankGrad" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stop-color="#1D4ED8"/>
+            <stop offset="50%" stop-color="#F5F4F1"/>
+            <stop offset="100%" stop-color="#C2185B"/>
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="14" y="18" fill="url(#rankGrad)" rx="2"/>
+        ${barcodePos.map(p => `<line x1="${(p*100).toFixed(2)}%" y1="0" x2="${(p*100).toFixed(2)}%" y2="15" stroke="${col}" stroke-width="1.2" opacity="0.7"/>`).join('')}
+      </svg>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:#78716C;margin-bottom:14px">
+      <span>Higher in ${cond1} (ΔPSI &lt; 0)</span>
+      <span style="text-align:center">Ranked gene list (${N.toLocaleString()} genes)</span>
+      <span>Higher in ${cond2} (ΔPSI &gt; 0)</span>
+    </div>
+
+    <!-- Leading edge -->
+    <div style="font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Leading Edge (${r.leadingEdge.length} genes)</div>
+    <div style="line-height:2">
+      ${r.leadingEdge.map(g => {
+        const evts = S.filtEvents.filter(e => e.gene === g);
+        const dpsi = evts.length ? evts.reduce((a,e)=>a+e.dpsi,0)/evts.length : null;
+        const gc = dpsi === null ? '#44403C' : dpsi > 0 ? '#C2185B' : '#1D4ED8';
+        const arrow = dpsi === null ? '' : dpsi > 0 ? '↑' : '↓';
+        const dpsiStr = dpsi !== null ? ` ${dpsi>0?'+':''}${dpsi.toFixed(2)}` : '';
+        return `<span class="go-gene-pill" style="border-color:${gc};background:${gc==='#C2185B'?'#FFF1F2':gc==='#1D4ED8'?'#EFF6FF':'#F5F4F1'}"><span style="color:${gc};font-weight:700">${arrow}</span>${g}<span style="color:#78716C;font-size:9px">${dpsiStr}</span></span>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // ES curve Plotly trace
+  const xArr = Array.from({length: N}, (_, i) => i);
+  const yArr = Array.from(r.esTrace);
+  const peakX = r.peakI, peakY = r.esTrace[r.peakI];
+
+  Plotly.react('gsea-es-plot', [
+    { type:'scatter', mode:'lines', x: xArr, y: yArr,
+      line:{color: col, width:2}, name:'Running ES',
+      hovertemplate:'Rank %{x}<br>ES: %{y:.4f}<extra></extra>' },
+    { type:'scatter', mode:'markers', x:[peakX], y:[peakY],
+      marker:{color: col, size:10, symbol:'diamond'},
+      name:`Peak ES = ${r.es.toFixed(3)}`,
+      hovertemplate:`Peak ES: ${r.es.toFixed(4)}<extra></extra>` }
+  ], {
+    paper_bgcolor:'transparent', plot_bgcolor:'#FAFAF9',
+    font:{family:'IBM Plex Sans,sans-serif', size:11, color:'#1C1917'},
+    margin:{l:55, r:20, t:8, b:35},
+    xaxis:{title:'Rank', showgrid:true, gridcolor:'#F0EDE9', zeroline:false},
+    yaxis:{title:'Enrichment Score', showgrid:true, gridcolor:'#F0EDE9',
+           zeroline:true, zerolinecolor:'#D6D3D1', zerolinewidth:1.5},
+    shapes:[{type:'line', x0:peakX, y0:Math.min(0, peakY)*1.1,
+             x1:peakX, y1:peakY, line:{color:col, dash:'dot', width:1.5}}],
+    legend:{orientation:'h', y:-0.12, x:0.5, xanchor:'center'}
+  }, {responsive:true, displayModeBar:false});
+
+  // Add SVG download button below the plot
+  const existingBtn = document.getElementById('gsea-svg-dl-btn');
+  if (!existingBtn) {
+    const dlBtn = document.createElement('button');
+    dlBtn.id = 'gsea-svg-dl-btn';
+    dlBtn.textContent = '⬇ Download Enrichment Plot SVG';
+    dlBtn.style.cssText = 'margin-top:6px;font-size:11px;background:none;border:1px solid #E2DDD8;border-radius:4px;padding:3px 10px;cursor:pointer;color:#78716C;font-family:IBM Plex Sans,sans-serif';
+    dlBtn.onclick = () => Plotly.downloadImage(document.getElementById('gsea-es-plot'), {format:'svg', filename: r.name.replace(/\s+/g,'_').slice(0,40) + '_GSEA'});
+    document.getElementById('gsea-es-plot').insertAdjacentElement('afterend', dlBtn);
+  }
+
+  det.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ─── GO / Pathway Enrichment (Enrichr) ────────────────────────────────────
+let _maserGoResults = null;
+
+async function runMaserGO() {
+  const prog = document.getElementById('go-progress');
+  const res  = document.getElementById('go-results');
+  res.innerHTML = '';
+
+  // Collect unique gene names from filtered significant events
+  const genes = [...new Set(S.filtEvents.map(e => e.gene).filter(Boolean))];
+  if (genes.length === 0) {
+    prog.innerHTML = '<div class="banner banner-warn">No filtered events to analyze. Adjust filters and re-analyze first.</div>';
+    return;
+  }
+
+  const db   = document.getElementById('go-db').value;
+  const pcut = parseFloat(document.getElementById('go-pcut').value) || 0.05;
+
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Uploading ${genes.length} genes to Enrichr...</div>`;
+
+  try {
+    const fd = new FormData();
+    fd.append('list', genes.join('\n'));
+    fd.append('description', 'rMATS splicing genes');
+    const r1 = await fetch('https://maayanlab.cloud/Enrichr/addList', {method:'POST', body:fd});
+    if (!r1.ok) throw new Error(`Enrichr addList failed: ${r1.status}`);
+    const { userListId } = await r1.json();
+
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Running enrichment against ${db}...</div>`;
+    const r2 = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${db}`);
+    if (!r2.ok) throw new Error(`Enrichr enrich failed: ${r2.status}`);
+    const data = await r2.json();
+    const results = (data[db] || []).filter(r => r[2] <= pcut);
+    _maserGoResults = { db, results };
+    prog.innerHTML = '';
+    renderMaserGO(_maserGoResults, pcut);
+  } catch(e) {
+    prog.innerHTML = `<div class="banner banner-err">Enrichr error: ${e.message}</div>`;
+  }
+}
+
+function renderMaserGO({ db, results }, pcut) {
+  const res = document.getElementById('go-results');
+  if (!results.length) {
+    res.innerHTML = `<div class="banner banner-warn">No significant terms at p &le; ${pcut}.</div>`;
+    return;
+  }
+  const top = results.slice(0, 25);
+  // Enrichr result fields: [rank, term, pval, zscore, combinedScore, genes[], adjPval, ...]
+  const logPs = top.map(r => -Math.log10(Math.max(r[2], 1e-300)));
+  const maxLogP = Math.max(...logPs);
+
+  const rows = top.map((r, i) => {
+    const term = r[1].replace(/_/g,' ').replace(/\s*\(GO:\d+\)$/,'');
+    const pct = (logPs[i] / maxLogP * 100).toFixed(1);
+    const nGenes = (r[5]||[]).length;
+    return `<div class="go-row" onclick="showGoTermDetail(${i})" title="${term} — ${nGenes} genes, -log₁₀(p)=${logPs[i].toFixed(2)}">
+      <div class="go-row-label">${term}</div>
+      <div class="go-row-bar-wrap">
+        <div class="go-row-bar" style="width:${pct}%"></div>
+        <span class="go-row-val">${logPs[i].toFixed(2)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  res.innerHTML = `
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px">Top ${top.length} terms &mdash; ${db.replace(/_/g,' ')} (p &le; ${pcut}) &mdash; <span style="font-weight:400;color:#78716C">click a term to explore</span></div>
+    <div style="margin-bottom:8px">
+      <button onclick="downloadGoSVG()" style="font-size:11px;background:none;border:1px solid #E2DDD8;border-radius:4px;padding:3px 10px;cursor:pointer;color:#78716C;font-family:IBM Plex Sans,sans-serif">&#128229; Download SVG</button>
+    </div>
+    <div class="go-chart">${rows}</div>
+    <div id="go-detail"></div>`;
+}
+
+function showGoTermDetail(idx) {
+  const r = _maserGoResults.results[idx];
+  const enrichrGenes = new Set((r[5] || []).map(g => g.toUpperCase()));
+  const term = r[1].replace(/_/g,' ').replace(/\s*\(GO:\d+\)$/,'');
+  const cond1 = document.getElementById('cond1').value || 'Condition 1';
+  const cond2 = document.getElementById('cond2').value || 'Condition 2';
+
+  // Highlight selected row
+  document.querySelectorAll('.go-row').forEach((el, i) => {
+    el.classList.toggle('go-row-active', i === idx);
+  });
+
+  // Filter events for genes in this GO term
+  const events = S.filtEvents.filter(e =>
+    enrichrGenes.has((e.gene || '').toUpperCase()) && !isNaN(e.psi1) && !isNaN(e.psi2)
+  );
+
+  const det = document.getElementById('go-detail');
+
+  if (!events.length) {
+    det.innerHTML = `<div class="go-detail-panel"><div class="go-detail-title">${term}</div>
+      <div class="banner banner-warn" style="margin-top:10px">No filtered events matched for genes in this term. Gene symbols may differ between Enrichr and rMATS output.</div></div>`;
+    return;
+  }
+
+  const upEvts = events.filter(e => e.dpsi > 0);
+  const dnEvts = events.filter(e => e.dpsi < 0);
+
+  // Per-gene summary
+  const geneMap = {};
+  for (const e of events) {
+    if (!geneMap[e.gene]) geneMap[e.gene] = [];
+    geneMap[e.gene].push(e);
+  }
+  const geneList = Object.keys(geneMap).sort();
+
+  const genePills = geneList.map(g => {
+    const evts = geneMap[g];
+    const meanDPSI = evts.reduce((a, e) => a + e.dpsi, 0) / evts.length;
+    const arrow = meanDPSI > 0 ? '↑' : '↓';
+    const col = meanDPSI > 0 ? '#C2185B' : '#1D4ED8';
+    const bg = meanDPSI > 0 ? '#FFF1F2' : '#EFF6FF';
+    const nEvt = evts.length > 1 ? ` ×${evts.length}` : '';
+    return `<span class="go-gene-pill" style="border-color:${col};background:${bg}">
+      <span style="color:${col};font-weight:700">${arrow}</span>${g}
+      <span style="color:#78716C;font-size:9px">${nEvt} ${meanDPSI>0?'+':''}${meanDPSI.toFixed(2)}</span>
+    </span>`;
+  }).join('');
+
+  det.innerHTML = `<div class="go-detail-panel">
+    <div class="go-detail-title">${term}</div>
+    <div class="go-detail-meta">
+      ${events.length} events &bull; ${geneList.length} genes &bull;
+      <span style="color:#C2185B;font-weight:600">${upEvts.length} ↑ higher inclusion in ${cond2}</span> &bull;
+      <span style="color:#1D4ED8;font-weight:600">${dnEvts.length} ↓ higher inclusion in ${cond1}</span>
+    </div>
+    <div id="go-psi-plot" style="width:100%;height:340px"></div>
+    <div style="font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.7px;margin:14px 0 6px">Genes (${geneList.length})</div>
+    <div style="line-height:2">${genePills}</div>
+  </div>`;
+
+  // PSI scatter: x = PSI in cond1, y = PSI in cond2, color by direction, size by |ΔPSI|
+  const mkTrace = (evts, color, name) => ({
+    type: 'scatter', mode: 'markers', name,
+    x: evts.map(e => e.psi1),
+    y: evts.map(e => e.psi2),
+    text: evts.map(e =>
+      `<b>${e.gene}</b><br>Type: ${e.type}<br>ΔPSI: ${e.dpsi > 0 ? '+' : ''}${e.dpsi.toFixed(3)}<br>FDR: ${e.fdr.toExponential(2)}`
+    ),
+    hoverinfo: 'text',
+    marker: {
+      color, opacity: 0.85,
+      size: evts.map(e => Math.max(6, Math.abs(e.dpsi) * 22)),
+      sizemode: 'area',
+      line: { color: '#fff', width: 0.8 }
+    }
+  });
+
+  const traces = [
+    mkTrace(dnEvts, '#1D4ED8', `↓ Higher in ${cond1}`),
+    mkTrace(upEvts, '#C2185B', `↑ Higher in ${cond2}`),
+    { type:'scatter', mode:'lines', showlegend:false, hoverinfo:'skip',
+      x:[0,1], y:[0,1], line:{color:'#D6D3D1', dash:'dot', width:1.5} }
+  ];
+
+  const layout = {
+    paper_bgcolor: 'transparent', plot_bgcolor: '#FAFAF9',
+    font: { family: 'IBM Plex Sans,sans-serif', size: 11, color: '#1C1917' },
+    margin: { l: 55, r: 20, t: 10, b: 55 },
+    xaxis: { title: `PSI — ${cond1}`, range: [-0.05, 1.05], showgrid: true, gridcolor: '#F0EDE9', zeroline: false },
+    yaxis: { title: `PSI — ${cond2}`, range: [-0.05, 1.05], showgrid: true, gridcolor: '#F0EDE9', zeroline: false },
+    legend: { orientation: 'h', y: -0.18, x: 0.5, xanchor: 'center' },
+    shapes: [{ type:'line', x0:0, y0:0, x1:1, y1:1, line:{color:'#D6D3D1', dash:'dot', width:1.5} }]
+  };
+
+  det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  Plotly.react('go-psi-plot', traces, layout, { responsive: true, displayModeBar: false });
+}
+</script>
+<script src="/js/site.js"></script>
+<script src="/js/sessions.js"></script>
+<script>
+// ─── Session persistence ───────────────────────────────────────────────────────
+async function getMaserState() {
+  const ui = {
+    cond1:       document.getElementById('cond1').value,
+    cond2:       document.getElementById('cond2').value,
+    refGenome:   document.getElementById('ref-genome').value,
+    slReads:     document.getElementById('sl-reads').value,
+    slFdr:       document.getElementById('sl-fdr').value,
+    slDpsi:      document.getElementById('sl-dpsi').value,
+    volcanoYcap: document.getElementById('volcano-ycap').value,
+    sortKey:     S.sortKey,
+    sortDir:     S.sortDir,
+    allEvents:   S.allEvents,
+    fileNames:   Object.fromEntries(Object.entries(S.files).map(([k,v]) => [k, v.name])),
+    gseaSets:    _gseaSets ? JSON.stringify(_gseaSets) : null,
+  };
+  const files = [];
+  for (const [slot, fileObj] of Object.entries(S.files)) {
+    const data = await fileObj.arrayBuffer();
+    files.push({ slot, fileName: fileObj.name, data });
+  }
+  return { stateJson: JSON.stringify(ui), files };
+}
+
+function loadMaserState(stateJson, files) {
+  let ui; try { ui = JSON.parse(stateJson); } catch(_) { ui = {}; }
+
+  if (ui.cond1       !== undefined) document.getElementById('cond1').value = ui.cond1;
+  if (ui.cond2       !== undefined) document.getElementById('cond2').value = ui.cond2;
+  if (ui.refGenome   !== undefined) document.getElementById('ref-genome').value = ui.refGenome;
+  if (ui.slReads     !== undefined) { document.getElementById('sl-reads').value = ui.slReads; document.getElementById('reads-val').textContent = ui.slReads; }
+  if (ui.slFdr       !== undefined) { document.getElementById('sl-fdr').value = ui.slFdr;   document.getElementById('fdr-val').textContent = ui.slFdr; }
+  if (ui.slDpsi      !== undefined) { document.getElementById('sl-dpsi').value = ui.slDpsi;  document.getElementById('dpsi-val').textContent = ui.slDpsi; }
+  if (ui.volcanoYcap !== undefined) document.getElementById('volcano-ycap').value = ui.volcanoYcap;
+
+  S.files = {};
+  for (const [slot, f] of Object.entries(files)) {
+    if (slot === '__gmt__') continue;
+    S.files[slot] = new File([f.data], f.fileName, { type: 'text/plain' });
+  }
+  if (ui.gseaSets) {
+    try {
+      _gseaSets = JSON.parse(ui.gseaSets);
+      const setCount = Object.keys(_gseaSets).length;
+      document.getElementById('gsea-gmt-status').innerHTML =
+        `<span style="color:#065F46;font-weight:600">&#10003; ${setCount.toLocaleString()} gene sets (restored from session)</span>`;
+    } catch(_) {}
+  }
+
+  S.allEvents = ui.allEvents || [];
+  S.sortKey   = ui.sortKey   || 'dpsi';
+  S.sortDir   = ui.sortDir   || -1;
+
+  renderChips();
+  document.getElementById('btn-analyze').disabled = Object.keys(S.files).length === 0;
+
+  if (S.allEvents.length) {
+    applyFilters();
+    document.getElementById('results-area').style.display = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  SessionManager.mount('maser', getMaserState, loadMaserState);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Apps – Jeet Biswas</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Transcriptomics &bull; Chemo-Proteomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/publications.html">Publications</a></div>
+  <div class="nav-item"><a class="nav-link" href="/people.html">People</a></div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link active" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title">
+  <h2>Lab Apps</h2>
+  <p>Interactive data analysis and visualization tools &bull; pure JavaScript, no server required</p>
+</div>
+<style>
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.app-tile {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem 1.1rem 1rem;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .15s, border-color .15s;
+  box-shadow: var(--card-shadow);
+}
+.app-tile:hover {
+  box-shadow: 0 4px 14px rgba(0,0,0,.11);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+.app-tile .app-icon {
+  font-size: 1.75rem;
+  margin-bottom: .5rem;
+  line-height: 1;
+}
+.app-tile h3 {
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: .35rem;
+}
+.app-tile p {
+  font-size: .79rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+</style>
+
+<div class="container">
+
+  <div class="app-grid">
+    <a class="app-tile" href="/apps/sf1.html">
+      <div class="app-icon">&#129516;</div>
+      <h3>Isoform Expression Viewer</h3>
+      <p>Browse transcript-level expression for any gene across 53 GTEx tissues and 33 TCGA cancer types.</p>
+    </a>
+    <a class="app-tile" href="/apps/venn.html">
+      <div class="app-icon">&#128309;</div>
+      <h3>Venn Diagram</h3>
+      <p>Create multi-set Venn diagrams from gene lists.</p>
+    </a>
+    <a class="app-tile" href="/apps/tribe.html">
+      <div class="app-icon">&#129514;</div>
+      <h3>TRIBE Bedgraph Processor</h3>
+      <p>Intersect HyperTRIBE replicates and identify confident RNA editing targets.</p>
+    </a>
+    <a class="app-tile" href="/apps/isoform-compare.html">
+      <div class="app-icon">&#128202;</div>
+      <h3>Isoform Compare</h3>
+      <p>Visualize differential isoform usage between conditions.</p>
+    </a>
+    <a class="app-tile" href="/apps/hypertribe.html">
+      <div class="app-icon">&#9889;</div>
+      <h3>HyperTRIBE Pipeline</h3>
+      <p>Submit and monitor HyperTRIBE RNA editing detection jobs.</p>
+    </a>
+    <a class="app-tile" href="/apps/maser.html">
+      <div class="app-icon">&#128300;</div>
+      <h3>rMATS Splicing Analysis</h3>
+      <p>Analyze alternative splicing events with GO enrichment and splice site logos.</p>
+    </a>
+    <a class="app-tile" href="/apps/baseedit.html">
+      <div class="app-icon">&#9986;&#xfe0f;</div>
+      <h3>Base Editor Design Tool</h3>
+      <p>Design sgRNA guides for base editing across 30 editor types.</p>
+    </a>
+    <a class="app-tile" href="/apps/tcr.html">
+      <div class="app-icon">&#129428;</div>
+      <h3>TCR Repertoire Analysis</h3>
+      <p>Analyze T-cell receptor diversity, gene usage, and clone tracking from ImmunoSEQ data.</p>
+    </a>
+    <a class="app-tile" href="/apps/splice-protein.html">
+      <div class="app-icon">&#128268;</div>
+      <h3>Splice&#8594;Protein Impact</h3>
+      <p>Predict frameshift, NMD, and protein domain disruption from rMATS splicing events.</p>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-heading">Deployment Notes</div>
+
+  <div class="card">
+    <h2>How Apps Are Served</h2>
+    <p>All lab apps are pure JavaScript/HTML — no R, Shiny, or server-side processing required. To add a new app:</p>
+    <ol>
+      <li>Place the <code>.html</code> file in <code>/Users/clawdbot/Sites/lab-website/apps/</code></li>
+      <li>Add a card to this page linking to <code>/apps/&lt;appname&gt;.html</code></li>
+      <li>nginx serves it automatically as a static file</li>
+    </ol>
+    <div class="info-box">
+      Server IP: <strong>192.168.68.37</strong> &bull; Static files served by nginx &bull; No R/Shiny process needed
+    </div>
+    <p style="margin-top:.6rem;">Large data files (e.g. pre-cached gene expression JSON) live in <code>/apps/gene-cache/</code> and are served as static assets.</p>
+  </div>
+
+</div>
+<footer>Jeet Biswas &bull; MSKCC &bull; <a href="https://scholar.google.com/citations?user=l0q1H94AAAAJ" target="_blank">Google Scholar</a> &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

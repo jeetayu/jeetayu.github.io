@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRIBE Bedgraph Processor — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+
+/* Shell */
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+
+/* Body split */
+.body-split{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:288px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;display:flex;flex-direction:column}
+.sb-group{border-bottom:1px solid #EDE9E5;padding:14px 16px}
+.sb-group:last-child{border-bottom:none;flex:1}
+.sb-heading{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:10px}
+
+/* File status */
+.file-status{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:#44403C}
+.status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#CBD5E1}
+.status-dot.loaded{background:#10B981}
+.status-count{font-size:10px;color:#78716C;margin-left:auto;font-family:"IBM Plex Mono",monospace}
+
+/* Step nav buttons */
+.step-btn{display:block;width:100%;text-align:left;background:none;border:none;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:500;padding:7px 10px;transition:background .15s;margin-bottom:2px}
+.step-btn:hover{background:#F5F4F1}
+.step-btn.active{background:#FFF1F5;color:#C2185B;font-weight:600}
+.step-num{display:inline-block;width:18px;height:18px;border-radius:50%;background:#E2DDD8;color:#78716C;font-size:10px;font-weight:700;text-align:center;line-height:18px;margin-right:6px;flex-shrink:0}
+.step-btn.active .step-num{background:#C2185B;color:#fff}
+
+/* Pipeline checklist */
+.check-item{display:flex;align-items:center;gap:7px;font-size:11px;color:#78716C;padding:3px 0}
+.check-item.done{color:#065F46}
+.check-icon{font-size:12px;width:16px;text-align:center}
+
+/* Main panel */
+.main-panel{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* Tabs */
+.vtabs{display:flex;gap:2px;background:#fff;border:1px solid #E2DDD8;border-radius:7px;padding:3px;width:fit-content;flex-wrap:wrap}
+.vtab-btn{background:none;border:none;border-radius:5px;color:#78716C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:6px 14px;transition:all .15s;white-space:nowrap}
+.vtab-btn.active{background:#C2185B;color:#fff}
+.vtab-btn:hover:not(.active){background:#F5F4F1;color:#1C1917}
+.vpane{display:none}.vpane.active{display:block}
+
+/* Cards */
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.vcard-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:16px}
+
+/* Banners */
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+
+/* Pills / stat boxes */
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 16px;text-align:center;min-width:90px}
+.pill-num{font-size:22px;font-weight:700;display:block;line-height:1.1;color:#C2185B}
+.pill-lbl{font-size:9px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+
+/* Upload zones */
+.upload-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:14px}
+.drop-zone{border:2px dashed #E2DDD8;border-radius:8px;padding:24px 16px;text-align:center;transition:border-color .15s,background .15s;cursor:pointer;position:relative;background:#FAFAF9}
+.drop-zone:hover,.drop-zone.drag-over{border-color:#C2185B;background:#FFF1F5}
+.drop-zone.has-file{border-color:#10B981;border-style:solid;background:#F0FDF4}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{font-size:24px;margin-bottom:6px}
+.dz-title{font-size:13px;font-weight:700;color:#1C1917;margin-bottom:4px}
+.dz-hint{font-size:11px;color:#78716C}
+.dz-filename{font-size:11px;color:#065F46;font-family:"IBM Plex Mono",monospace;margin-top:6px;word-break:break-all}
+.dz-meta{font-size:10px;color:#78716C;margin-top:4px}
+
+/* Data tables */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:2px solid #E2DDD8;cursor:pointer;user-select:none;white-space:nowrap}
+.data-table th:hover{background:#EDE9E5}
+.data-table td{padding:6px 10px;border-top:1px solid #EDE9E5;font-family:"IBM Plex Mono",monospace;font-size:11px}
+.data-table tr:nth-child(even) td{background:#FAFAF9}
+.table-wrap{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid #E2DDD8;border-radius:6px}
+
+/* Controls */
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ctrl-lbl{font-size:11px;font-weight:600;color:#78716C;min-width:120px}
+.ctrl-row input[type=number],.ctrl-row input[type=range]{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.ctrl-row input:focus{border-color:#C2185B}
+.ctrl-row input[type=range]{padding:2px 0;cursor:pointer;accent-color:#C2185B}
+.ctrl-val{font-size:12px;font-weight:700;color:#C2185B;min-width:40px;text-align:right;font-family:"IBM Plex Mono",monospace}
+
+/* Action buttons */
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 20px;transition:background .15s,transform .1s}
+.action-btn:hover{background:#A3144E}
+.action-btn:active{transform:scale(.98)}
+.action-btn:disabled{background:#E2DDD8;color:#A8A29E;cursor:default;transform:none}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover:not(:disabled){background:#F0EDE9}
+.sec-btn:disabled{opacity:.4;cursor:default}
+
+/* Threshold cards */
+.thresh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.thresh-card{border:1px solid #E2DDD8;border-radius:8px;padding:16px;background:#FAFAF9}
+.thresh-title{font-size:13px;font-weight:700;margin-bottom:2px}
+.thresh-file{font-size:10px;color:#78716C;font-family:"IBM Plex Mono",monospace;margin-bottom:10px;word-break:break-all}
+
+/* SVG histogram */
+.histogram-wrap{margin-top:12px;overflow-x:auto}
+.histogram-wrap svg{display:block}
+
+/* Search bar */
+.search-bar{display:flex;gap:8px;margin-bottom:10px}
+.search-bar input{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.search-bar input:focus{border-color:#C2185B}
+
+/* Export buttons */
+.export-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.export-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:8px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:14px 16px;transition:background .15s;text-align:left;line-height:1.5}
+.export-btn:hover:not(:disabled){background:#F0EDE9;border-color:#C4BCB7}
+.export-btn:disabled{opacity:.35;cursor:default}
+.export-btn strong{display:block;font-size:13px;color:#1C1917;margin-bottom:2px}
+.export-btn span{font-size:10px;color:#78716C}
+
+/* Spinner */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Tag */
+.tag{display:inline-block;background:#F5F4F1;border:1px solid #E2DDD8;border-radius:3px;color:#78716C;font-size:10px;font-weight:600;letter-spacing:.4px;padding:2px 7px;margin-right:4px;margin-top:4px}
+
+/* Scatter */
+.scatter-wrap{position:relative;overflow:visible}
+.scatter-tip{display:none;position:fixed;background:#1C1917;color:#fff;border-radius:6px;padding:6px 10px;font-size:11px;pointer-events:none;z-index:200;line-height:1.5;font-family:"IBM Plex Mono",monospace;max-width:220px;word-break:break-word}
+.scatter-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:#44403C;align-items:center}
+.scatter-legend span{display:flex;align-items:center;gap:5px}
+.scatter-swatch{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Genome split counts */
+.counts-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.count-box{background:#F5F4F1;border:1px solid #E2DDD8;border-radius:5px;padding:5px 10px;font-size:11px;text-align:center}
+.count-box b{display:block;font-size:15px;color:#1C1917}
+.count-box small{color:#78716C;font-size:9px;text-transform:uppercase;letter-spacing:.6px}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+    <div>
+      <div class="topbar-logo"><em>TRIBE</em> Bedgraph Processor</div>
+      <div class="topbar-sub">HyperTRIBE &middot; Biswas Lab &middot; MSKCC &middot; RBP Target Identification</div>
+    </div>
+  </div>
+
+  <div class="body-split">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <div class="sb-group">
+        <div class="sb-heading">File Status</div>
+        <div class="file-status">
+          <span class="status-dot" id="dot-adar"></span>
+          <span>ADARcd (control)</span>
+          <span class="status-count" id="cnt-adar">—</span>
+        </div>
+        <div class="file-status">
+          <span class="status-dot" id="dot-rep1"></span>
+          <span>TRIBE Rep 1</span>
+          <span class="status-count" id="cnt-rep1">—</span>
+        </div>
+        <div class="file-status">
+          <span class="status-dot" id="dot-rep2"></span>
+          <span>TRIBE Rep 2</span>
+          <span class="status-count" id="cnt-rep2">—</span>
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-heading">Pipeline</div>
+        <div class="check-item" id="chk-loaded"><span class="check-icon">&#9675;</span> Files loaded</div>
+        <div class="check-item" id="chk-thresh"><span class="check-icon">&#9675;</span> Thresholded</div>
+        <div class="check-item" id="chk-intersect"><span class="check-icon">&#9675;</span> Intersected</div>
+        <div class="check-item" id="chk-bg"><span class="check-icon">&#9675;</span> Background removed</div>
+        <div class="check-item" id="chk-annot"><span class="check-icon">&#9675;</span> Annotated (optional)</div>
+      </div>
+
+      <div class="sb-group" id="genome-badge-group" style="display:none">
+        <div class="sb-heading">Reference Genome</div>
+        <div id="genome-badge" style="font-size:12px;font-weight:600;color:#1C1917;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:5px;padding:5px 10px;font-family:IBM Plex Mono,monospace"></div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-heading">Navigate</div>
+        <button class="step-btn active" onclick="goTab(0)" id="sbtn-0"><span class="step-num">1</span>Load Files</button>
+        <button class="step-btn" onclick="goTab(1)" id="sbtn-1"><span class="step-num">2</span>Re-threshold</button>
+        <button class="step-btn" onclick="goTab(2)" id="sbtn-2"><span class="step-num">3</span>Intersect</button>
+        <button class="step-btn" onclick="goTab(3)" id="sbtn-3"><span class="step-num">4</span>Background Removal</button>
+        <button class="step-btn" onclick="goTab(4)" id="sbtn-4"><span class="step-num">5</span>Annotate</button>
+        <button class="step-btn" onclick="goTab(5)" id="sbtn-5"><span class="step-num">6</span>Summary</button>
+        <button class="step-btn" onclick="goTab(6)" id="sbtn-6"><span class="step-num">7</span>Scatter Plot</button>
+        <button class="step-btn" onclick="goTab(7)" id="sbtn-7"><span class="step-num">8</span>Triplet Analysis</button>
+        <button class="step-btn" onclick="goTab(8)" id="sbtn-8"><span class="step-num">9</span>Metagene Plot</button>
+        <button class="step-btn" onclick="goTab(9)" id="sbtn-9"><span class="step-num">10</span>Export</button>
+      </div>
+
+    </div>
+
+    <!-- Main panel -->
+    <div class="main-panel">
+
+      <!-- Tab strip -->
+      <div class="vtabs">
+        <button class="vtab-btn active" onclick="goTab(0)">1 · Load Files</button>
+        <button class="vtab-btn" onclick="goTab(1)">2 · Re-threshold</button>
+        <button class="vtab-btn" onclick="goTab(2)">3 · Intersect</button>
+        <button class="vtab-btn" onclick="goTab(3)">4 · Background</button>
+        <button class="vtab-btn" onclick="goTab(4)">5 · Annotate</button>
+        <button class="vtab-btn" onclick="goTab(5)">6 · Summary</button>
+        <button class="vtab-btn" onclick="goTab(6)">7 · Scatter</button>
+        <button class="vtab-btn" onclick="goTab(7)">8 · Triplet</button>
+        <button class="vtab-btn" onclick="goTab(8)">9 · Metagene</button>
+        <button class="vtab-btn" onclick="goTab(9)">10 · Export</button>
+      </div>
+
+      <!-- ===== TAB 1: Load Files ===== -->
+      <div class="vpane active" id="tab-0">
+        <!-- Genome selector lives here — locked on subsequent tabs -->
+        <div class="vcard" id="genome-card">
+          <div class="vcard-title">Reference Genome</div>
+          <div class="vcard-sub">Select the reference genome used to generate these bedgraph files. This affects Step 5 gene annotation and triplet sequence analysis.</div>
+          <select id="global-genome" onchange="onGenomeChange()" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:7px 10px;font-size:13px;color:#1C1917;font-family:IBM Plex Sans,sans-serif;min-width:200px">
+            <option value="hg38">Human hg38 (GRCh38)</option>
+            <option value="hg19">Human hg19 (GRCh37)</option>
+            <option value="mm10">Mouse mm10 (GRCm38)</option>
+          </select>
+        </div>
+        <div class="vcard">
+          <div class="vcard-title">Load Bedgraph Files</div>
+          <div class="vcard-sub">Drag and drop or click to upload bedgraph files. Tab-delimited with 4 columns: chr, start, end, score (editing %).</div>
+          <div class="banner banner-info">
+            <strong>Workflow:</strong> ADARcd (no RBP fusion) provides background editing sites. TRIBE replicates (RBP-ADAR fusion) provide signal sites. Sites unique to TRIBE = putative RBP targets.
+          </div>
+          <div class="upload-grid" id="upload-grid">
+            <div class="drop-zone" id="dz-adar" ondragover="dzDragOver(event,'dz-adar')" ondragleave="dzDragLeave('dz-adar')" ondrop="dzDrop(event,'adar')">
+              <input type="file" accept=".bedgraph,.bed,.txt" onchange="handleFile(this.files[0],'adar')">
+              <div class="dz-icon">&#128203;</div>
+              <div class="dz-title">ADARcd Control</div>
+              <div class="dz-hint">Drag &amp; drop or click</div>
+              <div class="dz-hint" style="margin-top:4px;font-size:10px;color:#A8A29E">.bedgraph / .bed / .txt</div>
+              <div class="dz-filename" id="fn-adar"></div>
+              <div class="dz-meta" id="meta-adar"></div>
+            </div>
+            <div class="drop-zone" id="dz-rep1" ondragover="dzDragOver(event,'dz-rep1')" ondragleave="dzDragLeave('dz-rep1')" ondrop="dzDrop(event,'rep1')">
+              <input type="file" accept=".bedgraph,.bed,.txt" onchange="handleFile(this.files[0],'rep1')">
+              <div class="dz-icon">&#128202;</div>
+              <div class="dz-title">TRIBE Replicate 1</div>
+              <div class="dz-hint">Drag &amp; drop or click</div>
+              <div class="dz-hint" style="margin-top:4px;font-size:10px;color:#A8A29E">.bedgraph / .bed / .txt</div>
+              <div class="dz-filename" id="fn-rep1"></div>
+              <div class="dz-meta" id="meta-rep1"></div>
+            </div>
+            <div class="drop-zone" id="dz-rep2" ondragover="dzDragOver(event,'dz-rep2')" ondragleave="dzDragLeave('dz-rep2')" ondrop="dzDrop(event,'rep2')">
+              <input type="file" accept=".bedgraph,.bed,.txt" onchange="handleFile(this.files[0],'rep2')">
+              <div class="dz-icon">&#128202;</div>
+              <div class="dz-title">TRIBE Replicate 2 <span style="font-weight:400;color:#A8A29E">(optional)</span></div>
+              <div class="dz-hint">Drag &amp; drop or click</div>
+              <div class="dz-hint" style="margin-top:4px;font-size:10px;color:#A8A29E">.bedgraph / .bed / .txt</div>
+              <div class="dz-filename" id="fn-rep2"></div>
+              <div class="dz-meta" id="meta-rep2"></div>
+            </div>
+          </div>
+          <div id="preview-area"></div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 2: Re-threshold ===== -->
+      <div class="vpane" id="tab-1">
+        <div class="vcard">
+          <div class="vcard-title">Re-threshold Editing Sites</div>
+          <div class="vcard-sub">Raise the minimum editing % threshold per file. Cannot go below the auto-detected minimum from the file.</div>
+          <div id="thresh-content">
+            <div class="banner banner-warn">Load files first (Step 1) before adjusting thresholds.</div>
+          </div>
+          <div style="margin-top:14px" id="thresh-apply-row" style="display:none">
+            <button class="action-btn" onclick="applyThresholds()" id="btn-apply-thresh" disabled>Apply Thresholds</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 3: Intersect ===== -->
+      <div class="vpane" id="tab-2">
+        <div class="vcard">
+          <div class="vcard-title">Intersect TRIBE Replicates</div>
+          <div class="vcard-sub">Find editing sites common to both TRIBE replicates. If only Rep 1 loaded, those sites are used directly.</div>
+          <div id="intersect-content">
+            <div class="banner banner-warn">Load TRIBE files first (Step 1).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 4: Background Removal ===== -->
+      <div class="vpane" id="tab-3">
+        <div class="vcard">
+          <div class="vcard-title">Background Removal</div>
+          <div class="vcard-sub">Remove sites present in ADARcd control from TRIBE intersected sites. Remaining sites = putative RBP targets (true positives).</div>
+          <div id="bg-content">
+            <div class="banner banner-warn">Complete Steps 1–3 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 5: Annotate ===== -->
+      <div class="vpane" id="tab-4">
+        <div class="vcard">
+          <div class="vcard-title">Annotate with Ensembl Genes <span style="font-size:11px;font-weight:400;color:#78716C">(optional)</span></div>
+          <div class="vcard-sub">Query the Ensembl REST API to find overlapping genes for each site. Slow for large datasets (&gt;5000 sites).</div>
+          <div id="annot-content">
+            <div class="banner banner-warn">Complete Steps 1–4 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 6: Summary ===== -->
+      <div class="vpane" id="tab-5">
+        <div class="vcard">
+          <div class="vcard-title">Summary</div>
+          <div id="summary-content">
+            <div class="banner banner-warn">Complete Steps 1–4 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 7: Scatter Plot ===== -->
+      <div class="vpane" id="tab-6">
+        <div class="vcard">
+          <div class="vcard-title">Editing Site Scatter Plot</div>
+          <div class="vcard-sub">Derived from processed bedgraph files. Gene scatter requires Step 5 annotation; replicate correlation is available after Step 4.</div>
+          <div id="scatter-content">
+            <div class="banner banner-warn">Complete Steps 1–4 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 8: Triplet Analysis ===== -->
+      <div class="vpane" id="tab-7">
+        <div class="vcard">
+          <div class="vcard-title">Triplet Preference Analysis <span style="font-size:11px;font-weight:400;color:#78716C">(5&#x2032;-NAN-3&#x2032;)</span></div>
+          <div class="vcard-sub">Nucleotide preferences at &#x2212;1 and +1 positions around each edited A. Fetches flanking sequence via Ensembl REST API.</div>
+          <div id="triplet-content">
+            <div class="banner banner-warn">Complete Steps 1–4 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 9: Metagene Plot ===== -->
+      <div class="vpane" id="tab-8">
+        <div class="vcard">
+          <div class="vcard-title">Metagene Plot</div>
+          <div class="vcard-sub">Distribution of editing sites across the normalized gene body (0% = TSS → 100% = TES). Requires annotation (Step 5) and Ensembl gene coordinates.</div>
+          <div id="metagene-content">
+            <div class="banner banner-warn">Complete Steps 1–5 first.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 10: Export ===== -->
+      <div class="vpane" id="tab-9">
+        <div class="vcard">
+          <div class="vcard-title">Export Results</div>
+          <div class="vcard-sub">Download processed files in various formats. Scatter SVG export is available from the Scatter tab.</div>
+          <div id="export-content">
+            <div class="banner banner-warn">Complete Steps 1–4 first.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-panel -->
+  </div><!-- /body-split -->
+</div><!-- /shell -->
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const S = {
+  adar: null, rep1: null, rep2: null,   // raw parsed arrays [{chr,start,end,score}]
+  adarMin: 0, rep1Min: 0, rep2Min: 0,   // auto-detected minimums
+  adarThresh: 0, rep1Thresh: 0, rep2Thresh: 0,  // current thresholds
+  adarFilt: null, rep1Filt: null, rep2Filt: null, // after threshold
+  intersected: null,   // after step 3
+  bgRemoved: null,     // after step 4 (final sites)
+  annotated: false,
+  sortCol: null, sortDir: 1,
+  _tripletCounts: null,
+  _metagenoData: null,
+  _fastaFile: null,
+  _fai: null
+};
+
+// ─── Tab navigation ──────────────────────────────────────────────────────────
+const TAB_COUNT = 10;
+function goTab(i) {
+  for (let t = 0; t < TAB_COUNT; t++) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === i);
+    document.querySelectorAll('.vtab-btn')[t].classList.toggle('active', t === i);
+    document.getElementById('sbtn-' + t).classList.toggle('active', t === i);
+  }
+  // Show genome badge in sidebar when leaving tab 0; hide when on tab 0 (selector is visible)
+  const badgeGroup = document.getElementById('genome-badge-group');
+  if (badgeGroup) {
+    badgeGroup.style.display = i === 0 ? 'none' : '';
+    if (i !== 0) _updateGenomeBadge();
+  }
+  if (i === 1) buildThresholdTab();
+  if (i === 2) buildIntersectTab();
+  if (i === 3) buildBgTab();
+  if (i === 4) buildAnnotTab();
+  if (i === 5) buildSummaryTab();
+  if (i === 6) buildScatterTab();
+  if (i === 7) buildTripletTab();
+  if (i === 8) buildMetageneTab();
+  if (i === 9) buildExportTab();
+}
+
+// ─── Drag and drop ───────────────────────────────────────────────────────────
+function dzDragOver(e, id) {
+  e.preventDefault();
+  document.getElementById(id).classList.add('drag-over');
+}
+function dzDragLeave(id) {
+  document.getElementById(id).classList.remove('drag-over');
+}
+function dzDrop(e, key) {
+  e.preventDefault();
+  const id = 'dz-' + key;
+  document.getElementById(id).classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f, key);
+}
+
+// ─── File parsing ─────────────────────────────────────────────────────────────
+function handleFile(file, key) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const sites = parseBedgraph(e.target.result);
+    if (sites.length === 0) {
+      alert('No valid bedgraph rows found in ' + file.name);
+      return;
+    }
+    let minScore = Infinity;
+    for (const s of sites) { if (s.score < minScore) minScore = s.score; }
+    S[key] = sites;
+    S[key + 'Name'] = file.name;
+    S[key + 'Min'] = minScore;
+    S[key + 'Thresh'] = minScore;
+    S[key + 'Filt'] = sites.slice();
+    updateFileUI(key, file.name, sites.length, minScore);
+    buildPreview();
+    updateSidebar();
+    updatePipelineChecks();
+  };
+  reader.onerror = function() {
+    alert('Error reading file "' + file.name + '". The file may be corrupted or too large for your browser.');
+  };
+  reader.readAsText(file);
+}
+
+function parseBedgraph(text) {
+  const lines = text.split(/\r?\n/);
+  const sites = [];
+  // First pass: parse all rows and detect scale from raw scores
+  let maxScore = -Infinity;
+  for (const line of lines) {
+    if (!line.trim() || line.startsWith('#') || line.startsWith('track') || line.startsWith('browser')) continue;
+    const parts = line.split(/\t/);
+    if (parts.length < 4) continue;
+    const chr = parts[0].trim();
+    const start = parseInt(parts[1], 10);
+    const end = parseInt(parts[2], 10);
+    const score = parseFloat(parts[3]);
+    if (isNaN(start) || isNaN(end) || isNaN(score)) continue;
+    if (score > maxScore) maxScore = score;
+    // Auto-detect 0-1 vs 0-100 scale: store raw score, resolve after full scan
+    const site = { chr, start, end, score };
+    // Parse optional columns: col 7 = gene, col 8 = feature (if bedgraph has ≥9 columns)
+    if (parts.length >= 9) {
+      const g = (parts[7] || '').trim(); if (g) site.gene = g;
+      const f = (parts[8] || '').trim(); if (f) site.feature = f;
+    }
+    sites.push(site);
+  }
+  // Apply scale in-place to avoid creating a second full copy of the array
+  const scale = maxScore <= 1.0 ? 100 : 1;
+  if (scale !== 1) {
+    for (const s of sites) s.score = +(s.score * scale).toFixed(4);
+  }
+  return sites;
+}
+
+function updateFileUI(key, name, count, minScore) {
+  const dz = document.getElementById('dz-' + key);
+  dz.classList.add('has-file');
+  document.getElementById('fn-' + key).textContent = name;
+  document.getElementById('meta-' + key).textContent =
+    count.toLocaleString() + ' sites · min editing: ' + minScore.toFixed(2) + '%';
+}
+
+function updateSidebar() {
+  ['adar', 'rep1', 'rep2'].forEach(k => {
+    const dot = document.getElementById('dot-' + k);
+    const cnt = document.getElementById('cnt-' + k);
+    if (S[k]) {
+      dot.classList.add('loaded');
+      cnt.textContent = (S[k + 'Filt'] || S[k]).length.toLocaleString();
+    } else {
+      dot.classList.remove('loaded');
+      cnt.textContent = '—';
+    }
+  });
+}
+
+function updatePipelineChecks() {
+  const filesLoaded = S.rep1 !== null;
+  setCheck('chk-loaded', filesLoaded);
+  const threshed = filesLoaded && S.rep1Filt !== null;
+  setCheck('chk-thresh', threshed);
+  setCheck('chk-intersect', S.intersected !== null);
+  setCheck('chk-bg', S.bgRemoved !== null);
+  setCheck('chk-annot', S.annotated);
+}
+
+function setCheck(id, done) {
+  const el = document.getElementById(id);
+  el.classList.toggle('done', done);
+  el.querySelector('.check-icon').textContent = done ? '✓' : '○';
+}
+
+// ─── Preview ──────────────────────────────────────────────────────────────────
+function buildPreview() {
+  const area = document.getElementById('preview-area');
+  let html = '';
+  [['adar', 'ADARcd Control'], ['rep1', 'TRIBE Replicate 1'], ['rep2', 'TRIBE Replicate 2']].forEach(([k, label]) => {
+    if (!S[k]) return;
+    const rows = S[k].slice(0, 20);
+    html += `<div style="margin-top:14px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:#44403C">${label} — first ${rows.length} of ${S[k].length.toLocaleString()} sites</div>
+      <div class="table-wrap">${makeTable(rows, ['chr','start','end','score'], ['chr','start','end','score'])}</div>
+    </div>`;
+  });
+  area.innerHTML = html;
+}
+
+function makeTable(rows, keys, headers) {
+  if (!rows || rows.length === 0) return '<p style="padding:10px;color:#78716C;font-size:12px">No data</p>';
+  let th = headers.map(h => `<th>${h}</th>`).join('');
+  let tb = rows.map(r => '<tr>' + keys.map(k => `<td>${r[k] !== undefined ? r[k] : ''}</td>`).join('') + '</tr>').join('');
+  return `<table class="data-table"><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>`;
+}
+
+// ─── TAB 2: Thresholds ───────────────────────────────────────────────────────
+function buildThresholdTab() {
+  if (!S.rep1) {
+    document.getElementById('thresh-content').innerHTML = '<div class="banner banner-warn">Load TRIBE files first (Step 1).</div>';
+    document.getElementById('btn-apply-thresh').disabled = true;
+    return;
+  }
+  const files = [
+    { key: 'adar', label: 'ADARcd Control' },
+    { key: 'rep1', label: 'TRIBE Replicate 1' },
+    { key: 'rep2', label: 'TRIBE Replicate 2' }
+  ].filter(f => S[f.key]);
+
+  let html = '<div class="thresh-grid">';
+  files.forEach(({ key, label }) => {
+    const minV = S[key + 'Min'].toFixed(2);
+    const cur = S[key + 'Thresh'].toFixed(2);
+    const count = S[key].filter(s => s.score >= S[key + 'Thresh']).length;
+    html += `<div class="thresh-card">
+      <div class="thresh-title">${label}</div>
+      <div class="thresh-file">Min detected: ${minV}% · Current: <span id="tv-${key}">${cur}%</span></div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Threshold (%)</span>
+        <input type="range" min="${minV}" max="50" step="0.5" value="${cur}"
+          oninput="updateThreshUI('${key}',this.value)">
+        <span class="ctrl-val" id="tnum-${key}">${cur}</span>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Or enter value</span>
+        <input type="number" min="${minV}" max="100" step="0.1" value="${cur}"
+          id="tinput-${key}" oninput="updateThreshUI('${key}',this.value)">
+      </div>
+      <div style="font-size:11px;color:#78716C;margin-top:6px">
+        Sites ≥ threshold: <b id="tcount-${key}">${count.toLocaleString()}</b> / ${S[key].length.toLocaleString()}
+      </div>
+      <div class="histogram-wrap">${makeHistSVG(S[key].map(s => s.score), S[key + 'Thresh'], 'hist-' + key)}</div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('thresh-content').innerHTML = html;
+  document.getElementById('btn-apply-thresh').disabled = false;
+}
+
+function updateThreshUI(key, val) {
+  const v = parseFloat(val);
+  const minV = S[key + 'Min'];
+  const safe = Math.max(v, minV);
+  S[key + 'Thresh'] = safe;
+  const el1 = document.getElementById('tnum-' + key);
+  const el2 = document.getElementById('tv-' + key);
+  const el3 = document.getElementById('tinput-' + key);
+  if (el1) el1.textContent = safe.toFixed(2);
+  if (el2) el2.textContent = safe.toFixed(2) + '%';
+  if (el3) el3.value = safe.toFixed(2);
+  const count = S[key].filter(s => s.score >= safe).length;
+  const elc = document.getElementById('tcount-' + key);
+  if (elc) elc.textContent = count.toLocaleString();
+  // Redraw histogram marker
+  const svgEl = document.getElementById('hist-' + key + '-line');
+  if (svgEl) {
+    const svgW = 340, padL = 32, padR = 10;
+    let maxVal = 100;
+    for (const s of S[key]) { if (s.score > maxVal) maxVal = s.score; }
+    const x = padL + ((safe / maxVal) * (svgW - padL - padR));
+    svgEl.setAttribute('x1', x); svgEl.setAttribute('x2', x);
+  }
+}
+
+function applyThresholds() {
+  ['adar', 'rep1', 'rep2'].forEach(k => {
+    if (S[k]) {
+      S[k + 'Filt'] = S[k].filter(s => s.score >= S[k + 'Thresh']);
+    }
+  });
+  // Reset downstream
+  S.intersected = null;
+  S.bgRemoved = null;
+  S.annotated = false;
+  S._metagenoData = null;
+  updateSidebar();
+  updatePipelineChecks();
+  const banner = document.createElement('div');
+  banner.className = 'banner banner-ok';
+  banner.style.marginTop = '10px';
+  banner.textContent = 'Thresholds applied. Proceed to Step 3 (Intersect).';
+  const old = document.querySelector('#tab-1 .banner-ok');
+  if (old) old.remove();
+  document.getElementById('thresh-content').after(banner);
+  setTimeout(() => banner.remove(), 4000);
+}
+
+// ─── SVG Histogram ───────────────────────────────────────────────────────────
+function makeHistSVG(values, threshold, svgId) {
+  if (!values || values.length === 0) return '';
+  const W = 340, H = 100, padL = 32, padR = 10, padT = 8, padB = 20;
+  const nBins = 25;
+  // Use loop instead of spread to avoid stack overflow on large arrays
+  let maxVal = -Infinity, minVal = Infinity;
+  for (const v of values) { if (v > maxVal) maxVal = v; if (v < minVal) minVal = v; }
+  const binW = (maxVal - minVal) / nBins || 1;
+  const bins = Array(nBins).fill(0);
+  values.forEach(v => {
+    const i = Math.min(Math.floor((v - minVal) / binW), nBins - 1);
+    bins[i]++;
+  });
+  const maxCount = Math.max(...bins, 1);
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+  const rw = drawW / nBins;
+  let rects = '';
+  bins.forEach((c, i) => {
+    const rh = (c / maxCount) * drawH;
+    const rx = padL + i * rw;
+    const ry = padT + drawH - rh;
+    rects += `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${(rw - 1).toFixed(1)}" height="${rh.toFixed(1)}" fill="#C2185B" opacity="0.7"/>`;
+  });
+  // Threshold line
+  const tx = padL + ((threshold - minVal) / (maxVal - minVal || 1)) * drawW;
+  // X axis labels
+  const xLabels = [minVal, maxVal].map((v, i) => {
+    const lx = i === 0 ? padL : W - padR;
+    return `<text x="${lx}" y="${H - 4}" font-size="9" fill="#78716C" text-anchor="${i === 0 ? 'start' : 'end'}">${v.toFixed(1)}%</text>`;
+  }).join('');
+  // Y axis label
+  const yLabel = `<text x="10" y="${padT + drawH / 2}" font-size="9" fill="#78716C" text-anchor="middle" transform="rotate(-90,10,${padT + drawH / 2})">Count</text>`;
+  return `<svg id="${svgId}" width="${W}" height="${H}" style="font-family:IBM Plex Mono,monospace">
+    ${yLabel}
+    <rect x="${padL}" y="${padT}" width="${drawW}" height="${drawH}" fill="#FAFAF9" rx="2"/>
+    ${rects}
+    <line id="${svgId}-line" x1="${tx.toFixed(1)}" y1="${padT}" x2="${tx.toFixed(1)}" y2="${padT + drawH}" stroke="#92400E" stroke-width="1.5" stroke-dasharray="3,2"/>
+    <text x="${Math.min(tx + 3, W - 30).toFixed(1)}" y="${padT + 10}" font-size="8" fill="#92400E">threshold</text>
+    ${xLabels}
+    <line x1="${padL}" y1="${padT + drawH}" x2="${W - padR}" y2="${padT + drawH}" stroke="#E2DDD8"/>
+  </svg>`;
+}
+
+// ─── TAB 3: Intersect ────────────────────────────────────────────────────────
+function buildIntersectTab() {
+  const c = document.getElementById('intersect-content');
+  if (!S.rep1Filt) {
+    c.innerHTML = '<div class="banner banner-warn">Load and threshold TRIBE files first (Steps 1–2).</div>';
+    return;
+  }
+  let html = '';
+  if (!S.rep2Filt) {
+    html += '<div class="banner banner-info">Only Replicate 1 loaded — its sites will be used directly (no intersection needed).</div>';
+    html += `<div class="pills">
+      <div class="pill"><span class="pill-num">${S.rep1Filt.length.toLocaleString()}</span><span class="pill-lbl">Rep 1 Sites</span></div>
+    </div>`;
+    html += '<button class="action-btn" onclick="doIntersect()">Use Rep 1 Sites &#8594; Step 4</button>';
+  } else {
+    const exactMode = S._exactMatch !== false; // default: exact match
+    const overlapVal = S._overlapFrac || 0.5;
+    html += `<div class="banner banner-info" style="margin-bottom:10px">
+      <strong>Exact coordinate match</strong> (recommended for HyperTRIBE bedgraph files — requires identical chr:start:end in both replicates).
+      Switch to <em>overlap</em> mode only if your sites have variable widths.
+    </div>`;
+    html += `<div class="ctrl-row" style="margin-bottom:10px">
+      <span class="ctrl-lbl">Match mode</span>
+      <label style="cursor:pointer;font-size:12px"><input type="radio" name="match-mode" value="exact" ${exactMode?'checked':''} onchange="setMatchMode('exact')"> Exact (chr:start:end)</label>
+      &nbsp;&nbsp;
+      <label style="cursor:pointer;font-size:12px"><input type="radio" name="match-mode" value="overlap" ${!exactMode?'checked':''} onchange="setMatchMode('overlap')"> Overlap-based</label>
+    </div>`;
+    html += `<div id="overlap-ctrl" style="${exactMode?'display:none':''}margin-bottom:12px">
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Min reciprocal overlap</span>
+        <input type="range" min="0.1" max="1" step="0.05" value="${overlapVal}" id="overlap-slider" oninput="updateOverlapUI(this.value)">
+        <span class="ctrl-val" id="overlap-val">${(overlapVal * 100).toFixed(0)}%</span>
+      </div>
+    </div>`;
+    html += `<div id="intersect-preview"></div>`;
+    html += `<button class="action-btn" style="margin-top:10px" onclick="doIntersect()">Run Intersection &#8594; Step 4</button>`;
+  }
+  c.innerHTML = html;
+  if (S.rep2Filt) previewIntersect();
+}
+
+function setMatchMode(mode) {
+  S._exactMatch = (mode === 'exact');
+  const ctrl = document.getElementById('overlap-ctrl');
+  if (ctrl) ctrl.style.display = S._exactMatch ? 'none' : '';
+  previewIntersect();
+}
+
+function updateOverlapUI(val) {
+  S._overlapFrac = parseFloat(val);
+  document.getElementById('overlap-val').textContent = (S._overlapFrac * 100).toFixed(0) + '%';
+  previewIntersect();
+}
+
+function previewIntersect() {
+  const result = intersectSites(S.rep1Filt, S.rep2Filt, S._overlapFrac || 0.5, S._exactMatch !== false);
+  const el = document.getElementById('intersect-preview');
+  if (!el) return;
+  const pct = S.rep1Filt.length ? (result.length / S.rep1Filt.length * 100).toFixed(1) : '0';
+  const chrMismatch = detectChrMismatch(S.rep1Filt, S.rep2Filt);
+  let warn = '';
+  if (result.length === 0 && chrMismatch) {
+    warn = `<div class="banner banner-warn" style="margin-top:8px">&#9888; Chromosome naming mismatch detected: Rep 1 uses <strong>"${chrMismatch[0]}"</strong>, Rep 2 uses <strong>"${chrMismatch[1]}"</strong>. Check that both files use the same chr prefix convention (e.g. "chr1" vs "1").</div>`;
+  } else if (result.length === 0) {
+    warn = `<div class="banner banner-warn" style="margin-top:8px">&#9888; No sites in common. If using HyperTRIBE bedgraph files, try <strong>Exact match</strong> mode. Verify both files are from the same reference genome.</div>`;
+  }
+  el.innerHTML = `<div class="pills">
+    <div class="pill"><span class="pill-num">${S.rep1Filt.length.toLocaleString()}</span><span class="pill-lbl">Rep 1 Sites</span></div>
+    <div class="pill"><span class="pill-num">${S.rep2Filt.length.toLocaleString()}</span><span class="pill-lbl">Rep 2 Sites</span></div>
+    <div class="pill"><span class="pill-num" style="color:#10B981">${result.length.toLocaleString()}</span><span class="pill-lbl">In Common</span></div>
+    <div class="pill"><span class="pill-num" style="font-size:16px">${pct}%</span><span class="pill-lbl">of Rep 1</span></div>
+  </div>${warn}`;
+}
+
+function detectChrMismatch(sites1, sites2) {
+  const chr1 = sites1[0]?.chr || '';
+  const chr2 = sites2[0]?.chr || '';
+  if (!chr1 || !chr2) return null;
+  const has1 = chr1.startsWith('chr');
+  const has2 = chr2.startsWith('chr');
+  if (has1 !== has2) return [chr1, chr2];
+  return null;
+}
+
+// Normalize chr name: strip or add "chr" prefix to match
+function normChr(chr, addPrefix) {
+  if (addPrefix && !chr.startsWith('chr')) return 'chr' + chr;
+  if (!addPrefix && chr.startsWith('chr')) return chr.slice(3);
+  return chr;
+}
+
+function intersectSites(sites1, sites2, overlapFrac, exactMatch) {
+  // Detect chr naming convention from site sets
+  const chr1 = sites1[0]?.chr || '';
+  const chr2 = sites2[0]?.chr || '';
+  const s1HasChr = chr1.startsWith('chr');
+  const s2HasChr = chr2.startsWith('chr');
+  const normalizeChr = s1HasChr !== s2HasChr;
+
+  if (exactMatch) {
+    // O(n+m) exact match using hash set
+    const set2 = new Set();
+    for (const s of sites2) {
+      const c = normalizeChr ? normChr(s.chr, s1HasChr) : s.chr;
+      set2.add(c + '\x00' + s.start + '\x00' + s.end);
+    }
+    const map2 = new Map();
+    for (const s of sites2) {
+      const c = normalizeChr ? normChr(s.chr, s1HasChr) : s.chr;
+      map2.set(c + '\x00' + s.start + '\x00' + s.end, s);
+    }
+    const result = [];
+    for (const s1 of sites1) {
+      const key = s1.chr + '\x00' + s1.start + '\x00' + s1.end;
+      const s2 = map2.get(key);
+      if (s2) result.push({ chr: s1.chr, start: s1.start, end: s1.end, score: s1.score, score2: s2.score });
+    }
+    return result;
+  }
+
+  // Overlap-based: O((n+m) log m) with binary search
+  const map2 = new Map();
+  for (const s of sites2) {
+    const c = normalizeChr ? normChr(s.chr, s1HasChr) : s.chr;
+    if (!map2.has(c)) map2.set(c, []);
+    map2.get(c).push(s);
+  }
+  map2.forEach(arr => arr.sort((a, b) => a.start - b.start));
+
+  const result = [];
+  for (const s1 of sites1) {
+    const arr = map2.get(s1.chr);
+    if (!arr) continue;
+    const len1 = s1.end - s1.start || 1;
+
+    // Binary search: find rightmost index where arr[i].start < s1.end
+    let lo = 0, hi = arr.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (arr[mid].start < s1.end) lo = mid + 1; else hi = mid;
+    }
+    // Scan backward from lo-1 to find all entries whose interval overlaps s1.
+    // Since arr is sorted by start, we stop when s2.start < s1.start AND s2.end <= s1.start
+    // (i.e., s2 ends before s1 begins — no overlap possible, and all earlier entries
+    // start even earlier, so they also cannot extend into s1's range).
+    let matched = false;
+    for (let i = lo - 1; i >= 0 && !matched; i--) {
+      const s2 = arr[i];
+      // If s2 ends at or before s1 starts, there is no overlap.
+      // Since arr is start-sorted, earlier entries have smaller starts.
+      // Once s2.start < s1.start AND s2.end <= s1.start we can safely stop.
+      if (s2.start < s1.start && s2.end <= s1.start) break;
+      const overlapLen = Math.min(s1.end, s2.end) - Math.max(s1.start, s2.start);
+      if (overlapLen <= 0) continue;
+      const len2 = s2.end - s2.start || 1;
+      if ((overlapLen / len1) >= overlapFrac && (overlapLen / len2) >= overlapFrac) {
+        result.push({ chr: s1.chr, start: s1.start, end: s1.end, score: s1.score, score2: s2.score });
+        matched = true;
+      }
+    }
+  }
+  return result;
+}
+
+function doIntersect() {
+  const frac = S._overlapFrac || 0.5;
+  const exact = S._exactMatch !== false;
+  if (S.rep2Filt) {
+    S.intersected = intersectSites(S.rep1Filt, S.rep2Filt, frac, exact);
+  } else {
+    S.intersected = S.rep1Filt.map(s => ({ ...s, score2: null }));
+  }
+  S.bgRemoved = null;
+  S.annotated = false;
+  updatePipelineChecks();
+  goTab(3);
+}
+
+// ─── TAB 4: Background Removal ───────────────────────────────────────────────
+function buildBgTab() {
+  const c = document.getElementById('bg-content');
+  if (!S.intersected) {
+    c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–3 first.</div>';
+    return;
+  }
+  // Build lookup set from ADARcd
+  const adarSet = new Set();
+  if (S.adarFilt) {
+    for (const s of S.adarFilt) {
+      adarSet.add(s.chr + ':' + s.start + '-' + s.end);
+    }
+  }
+  const removed = S.intersected.filter(s => adarSet.has(s.chr + ':' + s.start + '-' + s.end));
+  const kept = S.intersected.filter(s => !adarSet.has(s.chr + ':' + s.start + '-' + s.end));
+
+  let html = `<div class="pills">
+    <div class="pill"><span class="pill-num">${S.intersected.length.toLocaleString()}</span><span class="pill-lbl">TRIBE Sites</span></div>
+    <div class="pill"><span class="pill-num" style="color:#92400E">${removed.length.toLocaleString()}</span><span class="pill-lbl">ADARcd Removed</span></div>
+    <div class="pill"><span class="pill-num" style="color:#10B981">${kept.length.toLocaleString()}</span><span class="pill-lbl">Unique (FP removed)</span></div>
+  </div>`;
+
+  if (S.adarFilt) {
+    const fpr = S.intersected.length > 0 ? ((removed.length / S.intersected.length) * 100).toFixed(1) : '0.0';
+    html += `<div class="banner banner-info">ADARcd background (FPR): <strong>${fpr}%</strong> of TRIBE sites were also in ADARcd and were removed as likely background.</div>`;
+  } else {
+    html += `<div class="banner banner-warn">No ADARcd file loaded — no background removal performed. All intersected sites retained.</div>`;
+  }
+
+  html += `<button class="action-btn" style="margin-top:10px" onclick="doBgRemoval()">Apply Background Removal &#8594; Step 5</button>`;
+
+  if (S.bgRemoved) {
+    html += `<div class="banner banner-ok" style="margin-top:10px">Background removal applied. ${S.bgRemoved.length.toLocaleString()} final unique sites.</div>`;
+    html += `<div class="table-wrap" style="margin-top:12px;max-height:280px">${makeTable(S.bgRemoved.slice(0,50), ['chr','start','end','score','score2'], ['chr','start','end','editing% Rep1','editing% Rep2'])}</div>`;
+    if (S.bgRemoved.length > 50) html += `<p style="font-size:11px;color:#78716C;margin-top:6px">Showing first 50 of ${S.bgRemoved.length.toLocaleString()} sites.</p>`;
+  }
+  c.innerHTML = html;
+}
+
+function doBgRemoval() {
+  const adarSet = new Set();
+  if (S.adarFilt) {
+    for (const s of S.adarFilt) {
+      adarSet.add(s.chr + ':' + s.start + '-' + s.end);
+    }
+  }
+  S.bgRemoved = S.intersected.filter(s => !adarSet.has(s.chr + ':' + s.start + '-' + s.end));
+  S.annotated = false;
+  S._metagenoData = null;
+  updatePipelineChecks();
+  buildBgTab(); // refresh
+}
+
+// ─── TAB 5: Annotate ─────────────────────────────────────────────────────────
+function buildAnnotTab() {
+  const c = document.getElementById('annot-content');
+  if (!S.bgRemoved) {
+    c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>';
+    return;
+  }
+  const BIOTYPE_PRIORITY = ['protein_coding','lncRNA','processed_transcript','antisense','retained_intron','nonsense_mediated_decay'];
+  let html = '';
+  html += `<div class="banner banner-info">Gene annotation uses a <strong>local hg38 cache</strong> (GRCh38, ~60K genes) for instant in-browser lookup — no API calls needed. Falls back to Ensembl REST if cache is unavailable. Biotype priority: protein_coding &gt; lncRNA &gt; processed_transcript &gt; others.</div>`;
+  html += `<button class="action-btn" onclick="runAnnotation()" id="btn-annot">Annotate ${S.bgRemoved.length.toLocaleString()} Sites</button>`;
+  html += ` <button class="action-btn" style="background:#78716C;font-size:11px;padding:5px 12px" onclick="localStorage.removeItem(getGeneCacheLSKey());_geneCache=null;alert('Cache cleared — will re-download on next annotation.')">&#x21ba; Refresh Cache</button>`;
+  html += `<div id="annot-progress" style="margin-top:10px"></div>`;
+  html += `<div id="annot-table" style="margin-top:10px"></div>`;
+  c.innerHTML = html;
+
+  if (S.bgRemoved[0] && S.bgRemoved[0].gene !== undefined) {
+    document.getElementById('annot-table').innerHTML = `<div class="table-wrap">${makeTable(S.bgRemoved.slice(0,50), ['chr','start','end','score','gene','biotype'], ['chr','start','end','editing%','gene','biotype'])}</div>`;
+    if (S.bgRemoved.length > 50) document.getElementById('annot-table').innerHTML += `<p style="font-size:11px;color:#78716C;margin-top:6px">Showing first 50 of ${S.bgRemoved.length.toLocaleString()} sites.</p>`;
+  }
+}
+
+// ─── Gene coordinate cache (multi-genome) ────────────────────────────────────
+// Loaded once from the appropriate genome JSON, then kept in
+// module-level variable + localStorage so subsequent visits are instant.
+let _geneCache = null;  // { version, chrs: { "1": [[start,end,name,biotype],...] } }
+
+function getGeneCacheUrl() {
+  const g = document.getElementById('global-genome')?.value || 'hg38';
+  const map = {
+    hg38: '/apps/gene-cache/hg38_gene_coords.json',
+    hg19: '/apps/gene-cache/hg19_gene_coords.json',
+    mm10: '/apps/gene-cache/mm10_gene_coords.json',
+  };
+  return map[g] || map.hg38;
+}
+
+function getGeneCacheLSKey() {
+  const g = document.getElementById('global-genome')?.value || 'hg38';
+  return `tribe_gene_cache_${g}_v1`;
+}
+
+function onGenomeChange() {
+  const g = document.getElementById('global-genome').value;
+  // Sync triplet genome selector if it exists
+  const tg = document.getElementById('triplet-genome');
+  if (tg) {
+    if (g === 'hg38') tg.value = 'human/GRCh38';
+    else if (g === 'hg19') tg.value = 'human/GRCh37';
+    else if (g === 'mm10') tg.value = 'mouse/GRCm38';
+  }
+  // Clear annotation state so step 5 will re-annotate with correct genome
+  S.annotated = false;
+  S._metagenoData = null;
+  _geneCache = null;
+  _updateGenomeBadge();
+}
+
+function _updateGenomeBadge() {
+  const g = document.getElementById('global-genome')?.value || 'hg38';
+  const labels = { hg38: 'Human hg38 (GRCh38)', hg19: 'Human hg19 (GRCh37)', mm10: 'Mouse mm10 (GRCm38)' };
+  const badge = document.getElementById('genome-badge');
+  if (badge) badge.textContent = labels[g] || g;
+}
+
+async function loadGeneCache(prog) {
+  if (_geneCache) return _geneCache;
+
+  // Try localStorage first (avoids re-download on repeat sessions)
+  try {
+    const cached = localStorage.getItem(getGeneCacheLSKey());
+    if (cached) {
+      _geneCache = JSON.parse(cached);
+      return _geneCache;
+    }
+  } catch {}
+
+  // Fetch from server
+  const genome = document.getElementById('global-genome')?.value || 'hg38';
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Loading gene annotation cache (~3 MB, one-time download)...</div>`;
+  try {
+    const resp = await fetch(getGeneCacheUrl());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    _geneCache = await resp.json();
+    // Save to localStorage for next session (ignore quota errors)
+    try { localStorage.setItem(getGeneCacheLSKey(), JSON.stringify(_geneCache)); } catch {}
+    return _geneCache;
+  } catch (e) {
+    if (genome !== 'hg38') {
+      prog.innerHTML = `<div class="banner banner-warn">Gene cache for ${escHtml(genome)} not yet built. Falling back to Ensembl REST API. Run build_hg38_gene_coords.py with the appropriate BioMart dataset to generate the cache.</div>`;
+    }
+    return null;  // caller will fall back to API
+  }
+}
+
+// Binary-search the sorted gene list for a chromosome to find all genes
+// overlapping [qStart, qEnd] (0-based, half-open).
+function queryGeneCache(chrGenes, qStart, qEnd) {
+  if (!chrGenes || chrGenes.length === 0) return [];
+  // Find leftmost entry whose end > qStart
+  let lo = 0, hi = chrGenes.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (chrGenes[mid][1] <= qStart) lo = mid + 1; else hi = mid;
+  }
+  const hits = [];
+  for (let i = lo; i < chrGenes.length && chrGenes[i][0] < qEnd; i++) {
+    hits.push({ start: chrGenes[i][0], end: chrGenes[i][1],
+                external_name: chrGenes[i][2], biotype: chrGenes[i][3] });
+  }
+  return hits;
+}
+
+const BIOTYPE_PRIORITY = [
+  'protein_coding','lncRNA','processed_transcript','antisense',
+  'retained_intron','nonsense_mediated_decay','processed_pseudogene'
+];
+
+function pickBestGene(genes) {
+  if (!genes || genes.length === 0) return { gene: '', biotype: '' };
+  let best = null, bestRank = Infinity;
+  for (const g of genes) {
+    const rank = BIOTYPE_PRIORITY.indexOf(g.biotype);
+    const effectiveRank = rank === -1 ? 99 : rank;
+    if (effectiveRank < bestRank) { bestRank = effectiveRank; best = g; }
+  }
+  return { gene: best ? (best.external_name || '') : '', biotype: best ? (best.biotype || '') : '' };
+}
+
+async function runAnnotation() {
+  const btn = document.getElementById('btn-annot');
+  const prog = document.getElementById('annot-progress');
+  const tbl = document.getElementById('annot-table');
+  btn.disabled = true;
+
+  const sites = S.bgRemoved;
+  const total = sites.length;
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Preparing annotation...</div>`;
+
+  // ── Try local cache first ────────────────────────────────────────────────
+  const cache = await loadGeneCache(prog);
+
+  if (cache) {
+    // Fast path: in-browser binary search, no per-site API calls
+    const cacheVersion = cache.version || 'GRCh38';
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Annotating ${total.toLocaleString()} sites from local cache (${cacheVersion})...</div>`;
+
+    let unannotated = 0;
+    for (const s of sites) {
+      const chrKey = s.chr.replace(/^chr/i, '');
+      const chrGenes = cache.chrs[chrKey] || [];
+      const hits = queryGeneCache(chrGenes, s.start, s.end);
+      const { gene, biotype } = pickBestGene(hits);
+      s.gene = gene;
+      s.biotype = biotype;
+      if (!gene) unannotated++;
+    }
+
+    S.annotated = true;
+    updatePipelineChecks();
+    const note = unannotated > 0 ? ` (${unannotated.toLocaleString()} intergenic)` : '';
+    prog.innerHTML = `<div class="banner banner-ok">Annotation complete — ${total.toLocaleString()} sites annotated from local cache${note}. <span style="font-size:11px;opacity:.7">Cache: ${cacheVersion} built ${cache.built||'?'}</span></div>`;
+
+  } else {
+    // ── Slow path: per-site Ensembl REST API ────────────────────────────────
+    prog.innerHTML = `<div class="banner banner-warn">Local gene cache not found — falling back to Ensembl REST API (slow). <a href="#" onclick="location.reload()">Run build_hg38_gene_coords.py first for instant annotation.</a></div>`;
+    await new Promise(r => setTimeout(r, 1500));
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Annotating 0 / ${total.toLocaleString()} sites via Ensembl API...</div>`;
+
+    let done = 0;
+    for (let i = 0; i < sites.length; i++) {
+      const s = sites[i];
+      const chrNum = s.chr.replace(/^chr/i, '');
+      const url = `https://rest.ensembl.org/overlap/region/human/${chrNum}:${s.start + 1}-${s.end}?feature=gene;content-type=application/json`;
+      try {
+        const resp = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+        if (resp.ok) {
+          const genes = await resp.json();
+          const { gene, biotype } = pickBestGene(Array.isArray(genes) ? genes.map(g => ({...g, external_name: g.external_name})) : []);
+          s.gene = gene; s.biotype = biotype;
+        } else { s.gene = ''; s.biotype = ''; }
+      } catch { s.gene = ''; s.biotype = ''; }
+      done++;
+      if (done % 10 === 0 || done === total) {
+        prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Annotating ${done.toLocaleString()} / ${total.toLocaleString()} sites... (${Math.round(done / total * 100)}%)</div>`;
+      }
+      if (i % 15 === 14) await new Promise(r => setTimeout(r, 1000));
+    }
+
+    S.annotated = true;
+    updatePipelineChecks();
+    prog.innerHTML = `<div class="banner banner-ok">Annotation complete. ${total.toLocaleString()} sites annotated.</div>`;
+  }
+
+  tbl.innerHTML = `<div class="table-wrap">${makeTable(sites.slice(0,50), ['chr','start','end','score','gene','biotype'], ['chr','start','end','editing%','gene','biotype'])}</div>`;
+  if (sites.length > 50) tbl.innerHTML += `<p style="font-size:11px;color:#78716C;margin-top:6px">Showing first 50 of ${sites.length.toLocaleString()} sites.</p>`;
+  btn.disabled = false;
+}
+
+// ─── TAB 6: Summary ──────────────────────────────────────────────────────────
+function buildSummaryTab() {
+  const c = document.getElementById('summary-content');
+  if (!S.bgRemoved) {
+    c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>';
+    return;
+  }
+  const sites = S.bgRemoved;
+  const scores = sites.map(s => s.score);
+  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const sorted = scores.slice().sort((a, b) => a - b);
+  const median = sorted.length % 2 === 0
+    ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+    : sorted[Math.floor(sorted.length / 2)];
+
+  // Unique genes
+  const geneSet = new Set(sites.map(s => s.gene).filter(Boolean));
+
+  // Chr counts
+  const chrCounts = {};
+  for (const s of sites) { chrCounts[s.chr] = (chrCounts[s.chr] || 0) + 1; }
+  const chrList = Object.entries(chrCounts).sort((a, b) => {
+    const na = a[0].replace('chr', '').replace('X', '23').replace('Y', '24').replace('M', '25');
+    const nb = b[0].replace('chr', '').replace('X', '23').replace('Y', '24').replace('M', '25');
+    return parseInt(na) - parseInt(nb);
+  });
+
+  let html = `<div class="pills">
+    <div class="pill"><span class="pill-num">${sites.length.toLocaleString()}</span><span class="pill-lbl">Total Sites</span></div>
+    <div class="pill"><span class="pill-num">${geneSet.size.toLocaleString()}</span><span class="pill-lbl">Unique Genes</span></div>
+    <div class="pill"><span class="pill-num">${mean.toFixed(1)}%</span><span class="pill-lbl">Mean Editing</span></div>
+    <div class="pill"><span class="pill-num">${median.toFixed(1)}%</span><span class="pill-lbl">Median Editing</span></div>
+  </div>`;
+
+  html += `<div style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">Editing % Distribution</div>
+    ${makeHistSVG(scores, S.rep1Thresh, 'hist-final')}
+  </div>`;
+
+  // Chr bar chart
+  if (chrList.length > 0) {
+    html += `<div style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">Sites per Chromosome</div>
+      ${makeChrBarSVG(chrList)}
+    </div>`;
+  }
+
+  // Searchable table
+  html += `<div style="font-size:13px;font-weight:700;margin-bottom:8px">All Sites</div>
+  <div class="search-bar"><input type="text" id="summary-search" placeholder="Search by chr, gene..." oninput="filterSummaryTable(this.value)"></div>
+  <div id="summary-table-wrap" class="table-wrap"></div>`;
+
+  c.innerHTML = html;
+  S._summaryFiltered = sites;
+  renderSummaryTable(sites, 0, 'chr', 1);
+}
+
+function filterSummaryTable(q) {
+  const sites = S.bgRemoved;
+  if (!q) { S._summaryFiltered = sites; }
+  else {
+    const lq = q.toLowerCase();
+    S._summaryFiltered = sites.filter(s =>
+      s.chr.toLowerCase().includes(lq) ||
+      (s.gene && s.gene.toLowerCase().includes(lq)) ||
+      (s.biotype && s.biotype.toLowerCase().includes(lq))
+    );
+  }
+  renderSummaryTable(S._summaryFiltered, 0, S._sortCol || 'chr', S._sortDir || 1);
+}
+
+function renderSummaryTable(sites, sortCol, sortKey, sortDir) {
+  S._sortCol = sortKey;
+  S._sortDir = sortDir;
+  const keys = ['chr','start','end','score','score2','gene','biotype'];
+  const headers = ['Chr','Start','End','Editing% R1','Editing% R2','Gene','Biotype'];
+  const sorted = sites.slice().sort((a, b) => {
+    const av = a[sortKey]; const bv = b[sortKey];
+    if (typeof av === 'number') return (av - bv) * sortDir;
+    return String(av || '').localeCompare(String(bv || '')) * sortDir;
+  });
+  let th = headers.map((h, i) => {
+    const dir = S._sortCol === keys[i] ? (S._sortDir === 1 ? ' ▲' : ' ▼') : '';
+    return `<th onclick="renderSummaryTable(S._summaryFiltered,${i},'${keys[i]}',S._sortCol==='${keys[i]}'?-S._sortDir:1)">${h}${dir}</th>`;
+  }).join('');
+  const rows = sorted.slice(0, 200);
+  let tb = rows.map(r => '<tr>' + keys.map(k => {
+    const v = r[k];
+    return `<td>${v !== null && v !== undefined ? v : ''}</td>`;
+  }).join('') + '</tr>').join('');
+  const wrap = document.getElementById('summary-table-wrap');
+  if (wrap) wrap.innerHTML = `<table class="data-table"><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table>` +
+    (sorted.length > 200 ? `<p style="font-size:11px;color:#78716C;padding:6px 10px">Showing first 200 of ${sorted.length.toLocaleString()} results.</p>` : '');
+}
+
+function makeChrBarSVG(chrList) {
+  const W = 560, H = 120, padL = 45, padR = 10, padT = 8, padB = 30;
+  const drawW = W - padL - padR;
+  const drawH = H - padT - padB;
+  const maxCount = Math.max(...chrList.map(([, c]) => c), 1);
+  const barW = drawW / chrList.length;
+  let bars = '';
+  let labels = '';
+  chrList.forEach(([chr, count], i) => {
+    const bh = (count / maxCount) * drawH;
+    const bx = padL + i * barW + 1;
+    const by = padT + drawH - bh;
+    bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${(barW - 2).toFixed(1)}" height="${bh.toFixed(1)}" fill="#C2185B" opacity="0.75" rx="1"/>`;
+    const lbl = chr.replace('chr', '');
+    if (i % Math.ceil(chrList.length / 20) === 0 || chrList.length <= 25) {
+      labels += `<text x="${(bx + (barW - 2) / 2).toFixed(1)}" y="${H - 6}" font-size="8" fill="#78716C" text-anchor="middle">${lbl}</text>`;
+    }
+  });
+  return `<svg width="${W}" height="${H}" style="font-family:IBM Plex Mono,monospace;overflow:visible">
+    <rect x="${padL}" y="${padT}" width="${drawW}" height="${drawH}" fill="#FAFAF9" rx="2"/>
+    ${bars}
+    <line x1="${padL}" y1="${padT+drawH}" x2="${W-padR}" y2="${padT+drawH}" stroke="#E2DDD8"/>
+    ${labels}
+    <text x="${padL-4}" y="${padT+drawH/2}" font-size="9" fill="#78716C" text-anchor="middle" transform="rotate(-90,${padL-4},${padT+drawH/2})">Sites</text>
+  </svg>`;
+}
+
+// ─── TAB 7: Scatter Plot ─────────────────────────────────────────────────────
+function buildScatterTab() {
+  const c = document.getElementById('scatter-content');
+  if (!S.bgRemoved) {
+    c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>';
+    return;
+  }
+
+  const hasGenes = S.bgRemoved[0] && S.bgRemoved[0].gene !== undefined;
+  const hasTwoReps = S.rep2 !== null;
+
+  let html = '';
+
+  // ── Plot 1: Gene-level scatter (requires annotation) ──────────────────────
+  html += `<div style="margin-bottom:24px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:4px">Gene-Level Scatter</div>
+    <div style="font-size:11px;color:#78716C;margin-bottom:10px">Each point = one gene. X = mean editing %, Y = number of unique editing sites in that gene.</div>`;
+
+  if (!hasGenes) {
+    html += `<div class="banner banner-info">Run <strong>Step 5 (Annotate)</strong> first to assign editing sites to genes, then return here for the gene scatter.</div>`;
+  } else {
+    // Aggregate by gene
+    const geneMap = {};
+    for (const s of S.bgRemoved) {
+      const g = s.gene || '';
+      if (!g) continue;
+      if (!geneMap[g]) geneMap[g] = { scores: [], scores2: [] };
+      geneMap[g].scores.push(s.score);
+      if (s.score2 !== null && s.score2 !== undefined) geneMap[g].scores2.push(s.score2);
+    }
+    const geneData = Object.entries(geneMap).map(([gene, d]) => ({
+      gene,
+      count: d.scores.length,
+      meanScore: d.scores.reduce((a, b) => a + b, 0) / d.scores.length,
+      meanScore2: d.scores2.length > 0 ? d.scores2.reduce((a, b) => a + b, 0) / d.scores2.length : null
+    }));
+    S._scatterGeneData = geneData;
+
+    html += `<div class="ctrl-row" style="margin-bottom:10px">
+      <span class="ctrl-lbl">Highlight genes</span>
+      <input type="text" id="scatter-hl" placeholder="SF1, PCBP2, HNRNPA1 ..."
+        style="flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:IBM Plex Sans,sans-serif;font-size:12px;outline:none;transition:border-color .15s"
+        oninput="renderGeneScatter(this.value)">
+    </div>
+    <div id="gene-scatter-wrap" class="scatter-wrap"></div>
+    <div class="scatter-legend">
+      <span><span class="scatter-swatch" style="background:#C2185B;opacity:.45"></span>All genes (${geneData.length.toLocaleString()})</span>
+      <span><span class="scatter-swatch" style="background:#F59E0B;border:1.5px solid #92400E"></span>Highlighted</span>
+    </div>
+    <div style="margin-top:6px;font-size:11px;color:#78716C">${S.bgRemoved.length.toLocaleString()} total sites → ${geneData.length.toLocaleString()} annotated genes</div>`;
+    html += `<div style="margin-top:10px"><button class="sec-btn" onclick="exportScatterSVG('gene-scatter-svg','gene_scatter.svg')">&#128229; Export SVG</button></div>`;
+  }
+  html += `</div>`;
+
+  // ── Plot 2: Rep1 vs Rep2 correlation (requires 2 reps + bgRemoved) ─────────
+  if (hasTwoReps) {
+    const repSites = S.bgRemoved.filter(s => s.score2 !== null && s.score2 !== undefined);
+    S._scatterRepData = repSites;
+    html += `<div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Replicate Correlation</div>
+      <div style="font-size:11px;color:#78716C;margin-bottom:10px">X = Rep 1 editing %, Y = Rep 2 editing % · ${repSites.length.toLocaleString()} sites</div>
+      <div id="rep-scatter-wrap" class="scatter-wrap"></div>
+      <div style="margin-top:10px"><button class="sec-btn" onclick="exportScatterSVG('rep-scatter-svg','rep_correlation.svg')">&#128229; Export SVG</button></div>
+    </div>`;
+
+    // Gene-level replicate count correlation
+    html += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #E2DDD8">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Gene Edit-Count Correlation</div>
+      <div style="font-size:11px;color:#78716C;margin-bottom:10px">Each point = one gene. X = number of editing sites found in Replicate 1, Y = in Replicate 2. Points on the diagonal indicate equal representation across replicates.</div>
+      <div id="gene-rep-corr-wrap" class="scatter-wrap"></div>
+    </div>`;
+  }
+
+  // ── GO / Pathway Enrichment (requires annotation) ────────────────────────
+  if (hasGenes) {
+    html += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #E2DDD8">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">GO / Pathway Enrichment</div>
+      <div style="font-size:11px;color:#78716C;margin-bottom:12px">Uses <a href="https://maayanlab.cloud/Enrichr/" target="_blank" style="color:#3730A3">Enrichr</a> to identify enriched biological processes, pathways, and functions among annotated TRIBE target genes. Click a term to highlight its genes on the scatter plot above.</div>
+      <div class="ctrl-row" style="flex-wrap:wrap;gap:10px;align-items:center">
+        <select id="go-db" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-size:12px;color:#1C1917">
+          <option value="GO_Biological_Process_2023">GO Biological Process 2023</option>
+          <option value="GO_Molecular_Function_2023">GO Molecular Function 2023</option>
+          <option value="KEGG_2021_Human">KEGG Pathways 2021</option>
+          <option value="Reactome_2022">Reactome 2022</option>
+        </select>
+        <span style="font-size:11px;color:#78716C">Adj. p \u2264</span>
+        <input type="number" id="go-pval" value="0.05" min="0.001" max="0.5" step="0.01"
+          style="width:70px;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-size:12px">
+        <button class="action-btn" onclick="runGOEnrichment()">Run Enrichment</button>
+      </div>
+      <div id="go-progress" style="margin-top:8px"></div>
+      <div id="go-results" style="margin-top:8px"></div>
+    </div>`;
+  }
+
+  c.innerHTML = html;
+  if (hasGenes) renderGeneScatter('');
+  if (hasTwoReps && S._scatterRepData) renderRepScatter();
+  if (hasTwoReps) setTimeout(buildAndRenderGeneRepCorr, 50); // async so UI renders first
+}
+
+function renderGeneScatter(hlVal) {
+  const wrap = document.getElementById('gene-scatter-wrap');
+  if (!wrap || !S._scatterGeneData) return;
+  const hl = new Set(hlVal.split(/[,\s]+/).map(g => g.trim().toUpperCase()).filter(Boolean));
+  wrap.innerHTML = makeScatterSVG('gene-scatter-svg', S._scatterGeneData, hl,
+    d => d.meanScore, d => d.count,
+    'Mean Editing %', 'Number of Sites',
+    d => `${d.gene}\n${d.count} site${d.count === 1 ? '' : 's'} · ${d.meanScore.toFixed(2)}% mean editing`,
+    d => d.gene);
+  initScatterZoom('gene-scatter-svg-zoom');
+}
+
+function renderRepScatter() {
+  const wrap = document.getElementById('rep-scatter-wrap');
+  if (!wrap || !S._scatterRepData) return;
+  wrap.innerHTML = makeScatterSVG('rep-scatter-svg', S._scatterRepData, new Set(),
+    d => d.score, d => d.score2,
+    'Rep 1 Editing %', 'Rep 2 Editing %',
+    d => `${d.chr}:${d.start}-${d.end}\nRep1: ${d.score.toFixed(2)}%  Rep2: ${d.score2.toFixed(2)}%`,
+    () => null,
+    { diagonal: true, showR: true });
+  initScatterZoom('rep-scatter-svg-zoom');
+}
+
+function makeScatterSVG(svgId, data, hlSet, xFn, yFn, xLabel, yLabel, tipFn, labelFn, opts={}) {
+  if (!data || data.length === 0) return '<div class="banner banner-warn">No data.</div>';
+  const W = 560, H = 360, padL = 58, padR = 20, padT = 20, padB = 52;
+  const drawW = W - padL - padR, drawH = H - padT - padB;
+
+  let xMax = -Infinity, xMin = Infinity, yMax = -Infinity, yMin = Infinity;
+  for (const d of data) {
+    const x = xFn(d), y = yFn(d);
+    if (x > xMax) xMax = x; if (x < xMin) xMin = x;
+    if (y > yMax) yMax = y; if (y < yMin) yMin = y;
+  }
+  xMax = xMax || 1; yMax = yMax || 1;
+  const xRange = xMax - xMin || 1, yRange = yMax - yMin || 1;
+
+  const px = d => padL + ((xFn(d) - xMin) / xRange) * drawW;
+  const py = d => padT + drawH - ((yFn(d) - yMin) / yRange) * drawH;
+
+  let bg = '', fg = '', labels = '';
+  for (const d of data) {
+    const cx = px(d).toFixed(1), cy = py(d).toFixed(1);
+    const gene = labelFn(d);
+    const isHL = gene && hlSet.has(gene.toUpperCase());
+    const tip = encodeURIComponent(tipFn(d));
+    if (!isHL) {
+      bg += `<circle cx="${cx}" cy="${cy}" r="4" fill="#C2185B" opacity="0.4" data-tip="${tip}"/>`;
+    } else {
+      fg += `<circle cx="${cx}" cy="${cy}" r="6.5" fill="#F59E0B" stroke="#92400E" stroke-width="1.5" data-tip="${tip}"/>`;
+      labels += `<text x="${(+cx + 9).toFixed(1)}" y="${(+cy + 4).toFixed(1)}" font-size="10" fill="#92400E" font-weight="700">${escHtml(gene)}</text>`;
+    }
+  }
+
+  // Ticks
+  const nTicks = 5;
+  let xTks = '', yTks = '';
+  for (let i = 0; i <= nTicks; i++) {
+    const v = xMin + (xRange * i / nTicks);
+    const tx = (padL + (v - xMin) / xRange * drawW).toFixed(1);
+    xTks += `<line x1="${tx}" y1="${padT+drawH}" x2="${tx}" y2="${padT+drawH+4}" stroke="#E2DDD8"/>
+      <text x="${tx}" y="${padT+drawH+15}" font-size="9" fill="#78716C" text-anchor="middle">${v.toFixed(1)}</text>`;
+  }
+  for (let i = 0; i <= nTicks; i++) {
+    const v = yMin + (yRange * i / nTicks);
+    const ty = (padT + drawH - (v - yMin) / yRange * drawH).toFixed(1);
+    yTks += `<line x1="${padL-4}" y1="${ty}" x2="${padL}" y2="${ty}" stroke="#E2DDD8"/>
+      <text x="${padL-6}" y="${(+ty+3).toFixed(1)}" font-size="9" fill="#78716C" text-anchor="end">${Number.isInteger(+v.toFixed(0)) ? Math.round(v) : v.toFixed(1)}</text>`;
+  }
+
+  // Diagonal reference line
+  const diagLine = opts.diagonal ?
+    `<line x1="${padL}" y1="${padT+drawH}" x2="${(padL+drawW).toFixed(1)}" y2="${padT}" stroke="#CBD5E1" stroke-dasharray="4,3" stroke-width="1"/>` : '';
+
+  // Pearson r annotation
+  let rAnnot = '';
+  if (opts.showR && data.length >= 3) {
+    const r = pearsonR(data, xFn, yFn);
+    if (r !== null) rAnnot = `<text x="${W-padR-4}" y="${padT+15}" font-size="10" fill="#44403C" text-anchor="end" font-family="IBM Plex Mono,monospace" font-weight="600">r = ${r.toFixed(3)}</text>`;
+  }
+
+  return `<div id="${svgId}-zoom" style="overflow:hidden;position:relative;display:inline-block;border-radius:4px;cursor:crosshair" title="Scroll to zoom \u00B7 Drag to pan \u00B7 Double-click to reset">
+  <div class="scatter-zoom-inner" style="transform-origin:0 0;user-select:none">
+  <svg id="${svgId}" width="${W}" height="${H}" style="font-family:'IBM Plex Mono',monospace;overflow:visible;display:block"
+    onmousemove="scatterTip(event,this)" onmouseleave="scatterTipHide()">
+    <rect x="${padL}" y="${padT}" width="${drawW}" height="${drawH}" fill="#FAFAF9" rx="2"/>
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+drawH}" stroke="#E2DDD8"/>
+    <line x1="${padL}" y1="${padT+drawH}" x2="${W-padR}" y2="${padT+drawH}" stroke="#E2DDD8"/>
+    ${diagLine}${xTks}${yTks}${bg}${fg}${labels}${rAnnot}
+    <text x="${padL+drawW/2}" y="${H-6}" font-size="11" fill="#44403C" text-anchor="middle" font-weight="600">${escHtml(xLabel)}</text>
+    <text x="13" y="${padT+drawH/2}" font-size="11" fill="#44403C" text-anchor="middle" font-weight="600" transform="rotate(-90,13,${padT+drawH/2})">${escHtml(yLabel)}</text>
+  </svg>
+  </div>
+</div>
+<div style="font-size:10px;color:#9C9189;margin-top:3px">Scroll to zoom \u00B7 Drag to pan \u00B7 Double-click to reset</div>`;
+}
+
+// ─── Scatter zoom/pan ─────────────────────────────────────────────────────────
+const _zoomState = {};
+let _activeDrag = null;
+
+function initScatterZoom(zoomWrapId) {
+  const wrap = document.getElementById(zoomWrapId);
+  if (!wrap) return;
+  const inner = wrap.querySelector('.scatter-zoom-inner');
+  if (!inner) return;
+  const z = { scale: 1, tx: 0, ty: 0 };
+  _zoomState[zoomWrapId] = z;
+  function applyT() { inner.style.transform = `translate(${z.tx.toFixed(1)}px,${z.ty.toFixed(1)}px) scale(${z.scale})`; }
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
+    const ns = Math.max(0.4, Math.min(10, z.scale * factor));
+    z.tx = mx - (mx - z.tx) * (ns / z.scale);
+    z.ty = my - (my - z.ty) * (ns / z.scale);
+    z.scale = ns; applyT();
+  }, { passive: false });
+  wrap.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    _activeDrag = { id: zoomWrapId, lx: e.clientX, ly: e.clientY };
+    wrap.style.cursor = 'grabbing'; e.preventDefault();
+  });
+  wrap.addEventListener('dblclick', () => { z.scale = 1; z.tx = 0; z.ty = 0; applyT(); });
+}
+
+window.addEventListener('mousemove', e => {
+  if (!_activeDrag) return;
+  const z = _zoomState[_activeDrag.id]; if (!z) return;
+  z.tx += e.clientX - _activeDrag.lx; z.ty += e.clientY - _activeDrag.ly;
+  _activeDrag.lx = e.clientX; _activeDrag.ly = e.clientY;
+  const inner = document.getElementById(_activeDrag.id)?.querySelector('.scatter-zoom-inner');
+  if (inner) inner.style.transform = `translate(${z.tx.toFixed(1)}px,${z.ty.toFixed(1)}px) scale(${z.scale})`;
+});
+window.addEventListener('mouseup', () => {
+  if (_activeDrag) { const w = document.getElementById(_activeDrag.id); if (w) w.style.cursor = 'crosshair'; _activeDrag = null; }
+});
+
+function scatterTip(e, svg) {
+  const tip = document.getElementById('scatter-tip');
+  if (!tip) return;
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const sp = pt.matrixTransform(svg.getScreenCTM().inverse());
+  let nearest = null, minDist = 20;
+  for (const c of svg.querySelectorAll('circle')) {
+    const dx = sp.x - parseFloat(c.getAttribute('cx'));
+    const dy = sp.y - parseFloat(c.getAttribute('cy'));
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < minDist) { minDist = dist; nearest = c; }
+  }
+  if (nearest) {
+    tip.innerHTML = decodeURIComponent(nearest.getAttribute('data-tip')).replace(/\n/g, '<br>');
+    tip.style.display = 'block';
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY - 10) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+}
+function scatterTipHide() {
+  const tip = document.getElementById('scatter-tip');
+  if (tip) tip.style.display = 'none';
+}
+
+function exportScatterSVG(svgId, filename) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const blob = new Blob(['<?xml version="1.0"?>\n' + svg.outerHTML], { type: 'image/svg+xml' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function pearsonR(data, xFn, yFn) {
+  const n = data.length;
+  if (n < 2) return null;
+  let sx=0, sy=0, sxy=0, sx2=0, sy2=0;
+  for (const d of data) {
+    const x=xFn(d), y=yFn(d);
+    sx+=x; sy+=y; sxy+=x*y; sx2+=x*x; sy2+=y*y;
+  }
+  const num = n*sxy - sx*sy;
+  const den = Math.sqrt((n*sx2 - sx*sx)*(n*sy2 - sy*sy));
+  return den === 0 ? null : num/den;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Gene-level replicate count correlation ───────────────────────────────────
+function annotateAndCountByGene(sites) {
+  if (!_geneCache || !sites) return null;
+  const counts = {};
+  for (const s of sites) {
+    const chrKey = s.chr.replace(/^chr/i,'');
+    const hits = queryGeneCache(_geneCache.chrs[chrKey]||[], s.start, s.end);
+    const { gene } = pickBestGene(hits);
+    if (gene) counts[gene] = (counts[gene]||0) + 1;
+  }
+  return counts;
+}
+
+async function buildAndRenderGeneRepCorr() {
+  const wrap = document.getElementById('gene-rep-corr-wrap');
+  if (!wrap) return;
+  // Load cache if needed
+  if (!_geneCache) {
+    wrap.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Loading gene cache for correlation...</div>`;
+    await loadGeneCache({ innerHTML: '' });
+  }
+  if (!_geneCache) {
+    wrap.innerHTML = `<div class="banner banner-warn">Gene cache unavailable. Run Step 5 (Annotate) first.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Counting editing sites per gene in each replicate...</div>`;
+  await new Promise(r => setTimeout(r, 20));
+
+  const c1 = annotateAndCountByGene(S.rep1Filt);
+  const c2 = annotateAndCountByGene(S.rep2Filt);
+  if (!c1 || !c2) { wrap.innerHTML = '<div class="banner banner-warn">Could not annotate replicates.</div>'; return; }
+
+  const allGenes = new Set([...Object.keys(c1), ...Object.keys(c2)]);
+  const data = [];
+  for (const gene of allGenes) {
+    const n1 = c1[gene]||0, n2 = c2[gene]||0;
+    if (n1>0 || n2>0) data.push({ gene, count1: n1, count2: n2 });
+  }
+  S._geneRepCorrData = data;
+  wrap.innerHTML = makeScatterSVG('gene-rep-corr-svg', data, new Set(),
+    d=>d.count1, d=>d.count2,
+    'Rep 1 sites per gene', 'Rep 2 sites per gene',
+    d=>`${d.gene}\nRep1: ${d.count1} sites \u00B7 Rep2: ${d.count2} sites`,
+    d=>d.gene,
+    { showR: true, diagonal: true }
+  );
+  initScatterZoom('gene-rep-corr-svg-zoom');
+  const r = pearsonR(data, d=>d.count1, d=>d.count2);
+  const rLabel = r !== null ? ` \u00B7 Pearson r = ${r.toFixed(3)}` : '';
+  wrap.insertAdjacentHTML('afterend',
+    `<div style="font-size:11px;color:#78716C;margin-top:4px">${data.length.toLocaleString()} genes \u00B7 includes all rep1+rep2 sites${rLabel}</div>
+     <div style="margin-top:8px"><button class="sec-btn" onclick="exportScatterSVG('gene-rep-corr-svg','gene_rep_correlation.svg')">&#128229; Export SVG</button></div>`
+  );
+}
+
+// ─── GO / Pathway Enrichment (Enrichr) ───────────────────────────────────────
+let _goResults = null;
+
+async function runGOEnrichment() {
+  const genes = [...new Set((S.bgRemoved||[]).map(s=>s.gene).filter(g=>g&&g.length>1&&g!=='?'))];
+  const prog = document.getElementById('go-progress');
+  const res  = document.getElementById('go-results');
+  if (genes.length < 5) {
+    prog.innerHTML = '<div class="banner banner-warn">Need \u22655 annotated genes. Run Step 5 (Annotate) first.</div>';
+    return;
+  }
+  const db = document.getElementById('go-db').value;
+  const pcut = parseFloat(document.getElementById('go-pval').value)||0.05;
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Uploading ${genes.length} genes to Enrichr...</div>`;
+  res.innerHTML = '';
+  try {
+    const fd = new FormData();
+    fd.append('list', genes.join('\n'));
+    fd.append('description', 'TRIBE_targets');
+    const r1 = await fetch('https://maayanlab.cloud/Enrichr/addList', {method:'POST', body:fd});
+    if (!r1.ok) throw new Error(`Upload failed: ${r1.status}`);
+    const { userListId } = await r1.json();
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Running ${db.replace(/_/g,' ')} enrichment...</div>`;
+    const r2 = await fetch(`https://maayanlab.cloud/Enrichr/enrich?userListId=${userListId}&backgroundType=${db}`);
+    if (!r2.ok) throw new Error(`Enrichr failed: ${r2.status}`);
+    const raw = await r2.json();
+    const results = (raw[db]||[]);
+    _goResults = { db, results, listId: userListId };
+    prog.innerHTML = '';
+    renderGOResults(_goResults, pcut);
+  } catch(e) {
+    prog.innerHTML = `<div class="banner banner-err">Enrichment error: ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderGOResults({ db, results }, pcut) {
+  const el = document.getElementById('go-results');
+  // Enrichr: [rank, term, pval, zscore, combinedScore, genes[], adjPval, ...]
+  const sig = results.filter(r => (r[6]||1) <= pcut);
+  if (sig.length === 0) {
+    el.innerHTML = `<div class="banner banner-warn">No terms with adj.p \u2264 ${pcut} in ${results.length} total terms. Try a higher threshold.</div>`;
+    return;
+  }
+  // Bar chart — top 20
+  const top = sig.slice(0, 20);
+  const W=600, bH=22, bGap=3, padL=290, padR=80, padT=12, padB=24;
+  const H = padT + top.length*(bH+bGap) + padB;
+  let maxS = 1;
+  for (const r of top) { const s=-Math.log10(Math.max(r[6],1e-300)); if(s>maxS) maxS=s; }
+  _goTermGenes = [];
+  let bars = '';
+  top.forEach((r,i) => {
+    const term = r[1].replace(/_\d+$/,'').replace(/_/g,' ');
+    const score = -Math.log10(Math.max(r[6],1e-300));
+    const bw = ((score/maxS)*(W-padL-padR)).toFixed(1);
+    const y = padT + i*(bH+bGap);
+    const gList = r[5]||[];
+    _goTermGenes.push(gList);
+    const tip = encodeURIComponent(`${term}\nadj.p=${r[6].toExponential(2)}\n${gList.length} genes`);
+    bars += `<text x="${padL-6}" y="${y+bH/2+4}" font-size="10" fill="#44403C" text-anchor="end">${escHtml(term.length>40?term.slice(0,39)+'\u2026':term)}</text>
+    <rect x="${padL}" y="${y}" width="${bw}" height="${bH}" fill="#3730A3" opacity="0.75" rx="2" data-tip="${tip}" style="cursor:pointer" onclick="highlightFromGOIdx(${i})"/>
+    <text x="${(+padL + +bw + 4).toFixed(1)}" y="${y+bH/2+4}" font-size="9" fill="#78716C">${r[6].toExponential(1)}</text>`;
+  });
+  const svg = `<svg width="${W}" height="${H}" style="font-family:IBM Plex Sans,sans-serif;display:block;margin-bottom:12px;overflow:visible"
+    onmousemove="scatterTip(event,this)" onmouseleave="scatterTipHide()">
+    <rect x="${padL}" y="${padT}" width="${W-padL-padR}" height="${top.length*(bH+bGap)}" fill="#F8F7F4" rx="2"/>
+    ${bars}
+    <text x="${padL+(W-padL-padR)/2}" y="${H-4}" font-size="10" fill="#78716C" text-anchor="middle">\u2212log\u2081\u2080(adj. p-value)</text>
+  </svg>`;
+  // Table — also registers genes in _goTermGenes for rows beyond the bar chart (indices 20-29)
+  const rows = sig.slice(0,30).map((r, idx) => {
+    const term = r[1].replace(/_\d+$/,'').replace(/_/g,' ');
+    const gList = r[5]||[];
+    if (idx >= _goTermGenes.length) _goTermGenes.push(gList); // extend for rows 20-29
+    const gStr = gList.join(', ');
+    return `<tr style="border-bottom:1px solid #F0EDEA">
+      <td style="padding:4px 8px;font-size:11px">${escHtml(term)}</td>
+      <td style="padding:4px 8px;font-size:11px;font-family:IBM Plex Mono,monospace;text-align:right">${r[6].toExponential(2)}</td>
+      <td style="padding:4px 8px;font-size:11px;text-align:right">${gList.length}</td>
+      <td style="padding:4px 8px;font-size:11px;color:#78716C;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(gStr.length>100?gStr.slice(0,98)+'\u2026':gStr)}</td>
+      <td style="padding:4px 8px"><button class="sec-btn" style="font-size:10px;padding:2px 8px" onclick="highlightFromGOIdx(${idx})">\u25B6 Highlight</button></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;margin-bottom:8px">${db.replace(/_/g,' ')} \u2014 ${sig.length} significant terms (adj.p \u2264 ${pcut})</div>
+  ${svg}
+  <div class="table-wrap"><table style="width:100%;border-collapse:collapse">
+    <thead><tr style="border-bottom:2px solid #E2DDD8;font-size:10px;color:#78716C;text-transform:uppercase;background:#FAFAF9">
+      <th style="padding:4px 8px;text-align:left">Term</th>
+      <th style="padding:4px 8px;text-align:right">Adj. P</th>
+      <th style="padding:4px 8px;text-align:right">Genes</th>
+      <th style="padding:4px 8px;text-align:left">Overlapping Genes</th>
+      <th style="padding:4px 8px"></th>
+    </tr></thead><tbody>${rows}</tbody>
+  </table></div>
+  <div style="margin-top:8px"><button class="sec-btn" onclick="exportGOTable()">&#128229; Export CSV</button></div>`;
+}
+
+// Called by index into _goResults to avoid JSON-in-onclick attribute quoting issues
+let _goTermGenes = []; // populated by renderGOResults; indexed by display order
+function highlightFromGOIdx(termIdx) {
+  const genes = _goTermGenes[termIdx];
+  if (!genes) return;
+  highlightFromGO(genes);
+}
+
+function highlightFromGO(genes) {
+  const el = document.getElementById('scatter-hl');
+  if (!el) return;
+  el.value = genes.join(', ');
+  renderGeneScatter(el.value);
+  document.getElementById('gene-scatter-wrap')?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function exportGOTable() {
+  if (!_goResults) return;
+  const { db, results } = _goResults;
+  const pcut = parseFloat(document.getElementById('go-pval').value)||0.05;
+  const sig = results.filter(r=>(r[6]||1)<=pcut);
+  const rows = [['Term','P-value','Adj.P-value','Genes'],...sig.map(r=>[
+    r[1].replace(/_\d+$/,'').replace(/_/g,' '), r[2], r[6], (r[5]||[]).join(';')
+  ])];
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`go_enrichment_${db}.csv`; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ─── Local FASTA helpers ──────────────────────────────────────────────────────
+function parseFai(text) {
+  const fai = {};
+  text.trim().split('\n').forEach(line => {
+    if (!line.trim()) return;
+    const p = line.split('\t');
+    fai[p[0]] = { length: parseInt(p[1]), offset: parseInt(p[2]), basesPerLine: parseInt(p[3]), bytesPerLine: parseInt(p[4]) };
+  });
+  return fai;
+}
+
+function faiByteRange(fai, chr, start, end) {
+  let e = fai[chr] || fai['chr'+chr] || fai[chr.replace(/^chr/i,'')];
+  if (!e) return null;
+  const pb = pos => e.offset + Math.floor(pos / e.basesPerLine) * e.bytesPerLine + (pos % e.basesPerLine);
+  return { s: pb(start), e: pb(end-1) + 1, entry: e };
+}
+
+async function getSeqFromFasta(faFile, fai, chr, start, end) {
+  if (start < 0) start = 0;
+  const r = faiByteRange(fai, chr, start, end);
+  if (!r) return null;
+  const extra = Math.ceil((end - start) / r.entry.basesPerLine) + 2;
+  const buf = await faFile.slice(r.s, r.e + extra).text();
+  return buf.replace(/\n/g, '').slice(0, end - start).toUpperCase();
+}
+
+function loadFastaFa(input) {
+  const f = input.files[0]; if (!f) return;
+  S._fastaFile = f;
+  document.getElementById('fasta-fa-status').innerHTML = `<span style="color:#065F46">✓ ${escHtml(f.name)} (${(f.size/1e9).toFixed(2)} GB)</span>`;
+  checkFastaReady();
+}
+function loadFastaFai(input) {
+  const f = input.files[0]; if (!f) return;
+  f.text().then(txt => {
+    S._fai = parseFai(txt);
+    document.getElementById('fasta-fai-status').innerHTML = `<span style="color:#065F46">✓ ${escHtml(f.name)} — ${Object.keys(S._fai).length} sequences indexed</span>`;
+    checkFastaReady();
+  });
+}
+function getServerGenome() {
+  const g = document.getElementById('global-genome')?.value || 'hg38';
+  return { hg38: 'hg38', hg19: 'hg19', mm10: 'mm10' }[g] || 'hg38';
+}
+
+async function getSeqFromServer(chr, start, end) {
+  const genome = getServerGenome();
+  const resp = await fetch(`/api/hypertribe/fasta?genome=${genome}&chr=${encodeURIComponent(chr)}&start=${start}&end=${end}`);
+  if (!resp.ok) return null;
+  const data = await resp.json();
+  return data.seq || null;
+}
+
+function checkFastaReady() {
+  const el = document.getElementById('fasta-ready-banner');
+  if (!el) return;
+  const sites = S.bgRemoved || [];
+  const n = sites.length;
+  const btn = document.getElementById('btn-triplet');
+  if (S._fastaFile && S._fai) {
+    el.style.display = '';
+    el.className = 'banner banner-ok';
+    el.textContent = `✓ Local FASTA ready — will analyze all ${n.toLocaleString()} sites instantly.`;
+    if (btn) btn.textContent = `Analyze All ${n.toLocaleString()} Sites (Local FASTA)`;
+  } else {
+    // Server FASTA is always available for known genomes
+    el.style.display = '';
+    el.className = 'banner banner-ok';
+    el.textContent = `✓ Server FASTA ready (${getServerGenome()}) — will analyze all ${n.toLocaleString()} sites via local server. No upload needed.`;
+    if (btn) btn.textContent = `Analyze All ${n.toLocaleString()} Sites (Server FASTA)`;
+  }
+}
+
+// ─── TAB 8: Triplet Analysis ─────────────────────────────────────────────────
+function buildTripletTab() {
+  const c = document.getElementById('triplet-content');
+  if (!S.bgRemoved) { c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>'; return; }
+  const sites = S.bgRemoved;
+  const nSites = sites.length;
+
+  c.innerHTML = `
+    <div class="banner banner-info">
+      Counts 5&#x2032;&#8209;NAN&#8209;3&#x2032; triplets around each edited A and displays a 4&#xD7;4 heatmap.
+      ADAR strongly prefers <strong>UAG</strong> and disfavors <strong>CAG</strong>.
+    </div>
+
+    <div class="vcard" style="background:#F0FDF4;border:1px solid #A7F3D0;padding:14px;margin-bottom:14px;border-radius:6px">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">Server FASTA <span style="font-size:10px;font-weight:400;color:#065F46">— instant, all sites, uses local GENCODE genome (selected above)</span></div>
+      <div id="fasta-ready-banner" class="banner banner-ok" style="margin-bottom:0"></div>
+    </div>
+
+    <details style="margin-bottom:14px">
+      <summary style="font-size:12px;font-weight:700;color:#78716C;cursor:pointer">Override: Upload a different FASTA file</summary>
+      <div style="padding:10px 0 0 0;display:flex;gap:20px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;color:#78716C;margin-bottom:4px">FASTA file (.fa / .fasta)</div>
+          <input type="file" accept=".fa,.fasta" onchange="loadFastaFa(this)" style="font-size:12px">
+          <div id="fasta-fa-status" style="font-size:11px;margin-top:3px"></div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#78716C;margin-bottom:4px">FASTA index (.fai)</div>
+          <input type="file" accept=".fai" onchange="loadFastaFai(this)" style="font-size:12px">
+          <div id="fasta-fai-status" style="font-size:11px;margin-top:3px"></div>
+        </div>
+      </div>
+    </details>
+
+    <div style="font-size:12px;font-weight:700;color:#78716C;margin-bottom:8px">Fallback: Ensembl REST API <span style="font-size:10px;font-weight:400">— requires internet, limited to 2,000 sites, ~3–5 min</span></div>
+    <div class="ctrl-row" style="margin-bottom:12px">
+      <span class="ctrl-lbl">Reference genome</span>
+      <select id="triplet-genome" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-size:12px;color:#1C1917;font-family:IBM Plex Sans,sans-serif">
+        <option value="human/GRCh38">Human hg38</option>
+        <option value="human/GRCh37">Human hg19</option>
+        <option value="mouse/GRCm39">Mouse mm39</option>
+        <option value="mouse/GRCm38">Mouse mm10</option>
+      </select>
+    </div>
+    ${nSites > 2000 ? `<div class="banner banner-warn">${nSites.toLocaleString()} sites detected. Ensembl API path will sample <strong>2,000 random sites</strong>. Use local FASTA (Option A) to analyze all ${nSites.toLocaleString()} sites.</div>` : ''}
+
+    <button class="action-btn" id="btn-triplet" onclick="runTripletAnalysis()"
+      style="margin-bottom:4px">Analyze ${Math.min(nSites, 2000).toLocaleString()} Sites (Ensembl API)</button>
+    <div id="triplet-progress" style="margin-top:12px"></div>
+    <div id="triplet-results" style="margin-top:16px"></div>`;
+
+  // Show server/local FASTA status and restore any prior results
+  checkFastaReady();
+  if (S._tripletCounts) renderTripletResults(S._tripletCounts);
+}
+
+async function runTripletFromFasta(btn, prog) {
+  const sites = S.bgRemoved;
+  const nSites = sites.length;
+  const BASES = ['A','C','G','T'];
+  const counts = {};
+  for (const b1 of BASES) for (const b2 of BASES) counts[b1+'A'+b2] = 0;
+
+  let done = 0, failed = 0;
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Reading local FASTA: 0 / ${nSites.toLocaleString()} sites…</div>`;
+
+  // Process in chunks to keep UI responsive
+  const CHUNK = 500;
+  for (let i = 0; i < sites.length; i += CHUNK) {
+    const batch = sites.slice(i, i + CHUNK);
+    await Promise.all(batch.map(async s => {
+      const seq = await getSeqFromFasta(S._fastaFile, S._fai, s.chr, s.start - 1, s.start + 2);
+      if (seq && seq.length >= 3) {
+        const triplet = seq[0] + 'A' + seq[2];
+        if (triplet[0] in {A:1,C:1,G:1,T:1} && triplet[2] in {A:1,C:1,G:1,T:1}) {
+          counts[triplet]++;
+          done++;
+        } else { failed++; }
+      } else { failed++; }
+    }));
+    if (i % (CHUNK * 5) === 0) {
+      prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Reading local FASTA: ${(i+CHUNK).toLocaleString()} / ${nSites.toLocaleString()} sites… (${Math.round((i+CHUNK)/nSites*100)}%)</div>`;
+      await new Promise(r => setTimeout(r, 0)); // yield to UI
+    }
+  }
+
+  S._tripletCounts = counts;
+  prog.innerHTML = `<div class="banner banner-ok">Done. ${done.toLocaleString()} / ${nSites.toLocaleString()} sites analyzed from local FASTA${failed > 0 ? ` (${failed} unmapped/skipped)` : ''}.</div>`;
+  renderTripletResults(counts);
+  btn.disabled = false;
+}
+
+async function runTripletFromServer(btn, prog) {
+  const sites = S.bgRemoved;
+  const nSites = sites.length;
+  const BASES = ['A','C','G','T'];
+  const counts = {};
+  for (const b1 of BASES) for (const b2 of BASES) counts[b1+'A'+b2] = 0;
+
+  let done = 0, failed = 0;
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching from server FASTA (${getServerGenome()}): 0 / ${nSites.toLocaleString()} sites…</div>`;
+
+  const CHUNK = 50; // parallel requests to server
+  for (let i = 0; i < sites.length; i += CHUNK) {
+    const batch = sites.slice(i, i + CHUNK);
+    await Promise.all(batch.map(async s => {
+      const seq = await getSeqFromServer(s.chr, s.start - 1, s.start + 2);
+      if (seq && seq.length >= 3) {
+        const triplet = seq[0] + 'A' + seq[2];
+        if (triplet[0] in {A:1,C:1,G:1,T:1} && triplet[2] in {A:1,C:1,G:1,T:1}) {
+          counts[triplet]++; done++;
+        } else { failed++; }
+      } else { failed++; }
+    }));
+    if (i % (CHUNK * 5) === 0) {
+      prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Server FASTA: ${Math.min(i+CHUNK,nSites).toLocaleString()} / ${nSites.toLocaleString()} sites… (${Math.round(Math.min(i+CHUNK,nSites)/nSites*100)}%)</div>`;
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+  S._tripletCounts = counts;
+  prog.innerHTML = `<div class="banner banner-ok">Done. ${done.toLocaleString()} / ${nSites.toLocaleString()} sites analyzed via server FASTA${failed > 0 ? ` (${failed} unmapped/skipped)` : ''}.</div>`;
+  renderTripletResults(counts);
+  btn.disabled = false;
+}
+
+async function runTripletAnalysis() {
+  const btn = document.getElementById('btn-triplet');
+  const prog = document.getElementById('triplet-progress');
+  btn.disabled = true;
+
+  // Priority: local FASTA upload > server FASTA > Ensembl API
+  if (S._fastaFile && S._fai) {
+    btn.textContent = 'Running…';
+    await runTripletFromFasta(btn, prog);
+    btn.textContent = `Analyze All ${(S.bgRemoved||[]).length.toLocaleString()} Sites (Local FASTA)`;
+    return;
+  }
+
+  // Server-side FASTA (always available for hg38/hg19/mm10)
+  btn.textContent = 'Running…';
+  await runTripletFromServer(btn, prog);
+  btn.textContent = `Analyze All ${(S.bgRemoved||[]).length.toLocaleString()} Sites (Server FASTA)`;
+  return;
+
+  const allSites = S.bgRemoved;
+  // Sample up to 2000 sites
+  let sites = allSites;
+  if (allSites.length > 2000) {
+    const step = allSites.length / 2000;
+    sites = Array.from({ length: 2000 }, (_, i) => allSites[Math.floor(i * step)]);
+  }
+
+  const genome = document.getElementById('triplet-genome').value;
+  const [species, assembly] = genome.split('/');
+  const BATCH = 50;
+  const counts = {};
+  const BASES = ['A','C','G','T'];
+  for (const b1 of BASES) for (const b2 of BASES) counts[b1 + 'A' + b2] = 0;
+
+  let done = 0, failed = 0;
+
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching sequences 0 / ${sites.length}...</div>`;
+
+  for (let i = 0; i < sites.length; i += BATCH) {
+    const batch = sites.slice(i, i + BATCH);
+    const regions = batch.map(s => {
+      const chrNum = s.chr.replace(/^chr/i, '');
+      // Fetch ±1 bp around site: need the A and its two flanking bases
+      // bedgraph is 0-based half-open, so site A is at s.start..s.end
+      // We want [start-1, end+1] to get the ±1 context
+      return `${chrNum}:${s.start}..${s.end + 1}:1`;
+    });
+
+    try {
+      const resp = await fetch(`https://rest.ensembl.org/sequence/region/${species}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ regions })
+      });
+      if (resp.ok) {
+        const seqs = await resp.json();
+        for (const seq of seqs) {
+          const s = (seq.seq || '').toUpperCase();
+          if (s.length >= 3) {
+            // s[0]=prev base, s[1]=A (edited), s[2]=next base
+            const triplet = s[0] + 'A' + s[2];
+            if (triplet[0] in {A:1,C:1,G:1,T:1} && triplet[2] in {A:1,C:1,G:1,T:1}) {
+              counts[triplet] = (counts[triplet] || 0) + 1;
+            }
+          } else {
+            failed++;
+          }
+        }
+      } else {
+        failed += batch.length;
+      }
+    } catch {
+      failed += batch.length;
+    }
+
+    done += batch.length;
+    prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching sequences ${done} / ${sites.length}... (${Math.round(done / sites.length * 100)}%)</div>`;
+
+    // Rate limit: ~15 req/sec max for Ensembl REST
+    if (i + BATCH < sites.length) await new Promise(r => setTimeout(r, 350));
+  }
+
+  S._tripletCounts = counts;
+  prog.innerHTML = `<div class="banner banner-ok">Done. ${done - failed} / ${done} sites successfully retrieved${failed > 0 ? ` (${failed} failed/unmapped)` : ''}.</div>`;
+  renderTripletResults(counts);
+  btn.disabled = false;
+}
+
+function renderTripletResults(counts) {
+  const el = document.getElementById('triplet-results');
+  if (!el) return;
+  const BASES = ['A','C','G','T'];
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+
+  const pct = {};
+  for (const k of Object.keys(counts)) pct[k] = (counts[k] / total * 100);
+
+  let maxPct = 0;
+  for (const v of Object.values(pct)) if (v > maxPct) maxPct = v;
+
+  // ── Diverging color scale: blue (depleted) ↔ off-white (expected) ↔ crimson (enriched) ──
+  const EXPECTED = 100 / 16; // 6.25% uniform
+  function hexRgb(h) {
+    return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  }
+  function lerp(c1, c2, t) {
+    return c1.map((v,i) => Math.round(v + t * (c2[i] - v)));
+  }
+  const COL_CENTER  = hexRgb('#F5F4F1'); // near-white center (at expected frequency)
+  const COL_DEPLETED = hexRgb('#1D4ED8'); // blue-600 for strong depletion
+  const COL_ENRICHED = hexRgb('#9F1239'); // lab crimson for strong enrichment
+  function cellColor(p) {
+    if (p <= EXPECTED) {
+      const t = (EXPECTED - p) / EXPECTED; // 0 at center, 1 at p=0
+      const [r,g,b] = lerp(COL_CENTER, COL_DEPLETED, Math.min(t, 1));
+      return { fill:`rgb(${r},${g},${b})`, light: t < 0.45 };
+    } else {
+      const t = maxPct > EXPECTED ? (p - EXPECTED) / (maxPct - EXPECTED) : 0;
+      const [r,g,b] = lerp(COL_CENTER, COL_ENRICHED, Math.min(t, 1));
+      return { fill:`rgb(${r},${g},${b})`, light: t < 0.45 };
+    }
+  }
+
+  // ── Heatmap SVG ──────────────────────────────────────────────────────────
+  const cellSize = 90, gap = 4, padL = 48, padT = 44;
+  const legH = 40;
+  const W = padL + 4 * (cellSize + gap) + 24;
+  const H = padT + 4 * (cellSize + gap) + legH + 30;
+
+  let cells = '';
+  BASES.forEach((b1, row) => {
+    BASES.forEach((b2, col) => {
+      const triplet = b1 + 'A' + b2;
+      const p = pct[triplet] || 0;
+      const { fill, light } = cellColor(p);
+      const tf = light ? '#1C1917' : '#fff';
+      const tfMuted = light ? '#78716C' : 'rgba(255,255,255,0.75)';
+      const cx = padL + col * (cellSize + gap);
+      const cy = padT + row * (cellSize + gap);
+      const isUAG = triplet === 'TAG', isCAG = triplet === 'CAG';
+      const stroke = isUAG ? '#B45309' : isCAG ? '#1D4ED8' : 'none';
+      const sw = (isUAG || isCAG) ? 2.5 : 0;
+      cells += `
+        <rect x="${cx}" y="${cy}" width="${cellSize}" height="${cellSize}" fill="${fill}" rx="7" stroke="${stroke}" stroke-width="${sw}"/>
+        <text x="${cx+cellSize/2}" y="${cy+18}" font-size="10.5" font-weight="600" fill="${tfMuted}" text-anchor="middle" font-family="IBM Plex Mono,monospace">5&#x2032;&#8209;${triplet}&#8209;3&#x2032;</text>
+        <text x="${cx+cellSize/2}" y="${cy+52}" font-size="22" font-weight="700" fill="${tf}" text-anchor="middle" font-family="IBM Plex Mono,monospace">${p.toFixed(1)}%</text>
+        <text x="${cx+cellSize/2}" y="${cy+70}" font-size="9" fill="${tfMuted}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">n = ${counts[triplet]||0}</text>`;
+    });
+  });
+
+  // Axis labels
+  let rowLabels = '', colLabels = '';
+  BASES.forEach((b, i) => {
+    const cy = padT + i * (cellSize + gap) + cellSize / 2;
+    rowLabels += `<text x="${padL - 8}" y="${cy + 4}" font-size="11" font-weight="600" fill="#44403C" text-anchor="end" font-family="IBM Plex Sans,sans-serif">&#x2212;1: ${b}</text>`;
+    const cx = padL + i * (cellSize + gap) + cellSize / 2;
+    colLabels += `<text x="${cx}" y="${padT - 12}" font-size="11" font-weight="600" fill="#44403C" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">+1: ${b}</text>`;
+  });
+
+  // Color scale legend
+  const legSteps = 120, legW = 4 * (cellSize + gap) - gap, legY = padT + 4 * (cellSize + gap) + 14;
+  let legRects = '';
+  for (let i = 0; i < legSteps; i++) {
+    const p = (i / legSteps) * maxPct;
+    const { fill } = cellColor(p);
+    const lx = padL + (i / legSteps) * legW;
+    legRects += `<rect x="${lx.toFixed(1)}" y="${legY}" width="${(legW/legSteps+0.5).toFixed(1)}" height="10" fill="${fill}"/>`;
+  }
+  // Legend tick at expected
+  const expX = padL + (EXPECTED / maxPct) * legW;
+  const legend = `${legRects}
+    <rect x="${padL}" y="${legY}" width="${legW}" height="10" fill="none" stroke="#D6D3D1" stroke-width="0.75" rx="2"/>
+    <line x1="${expX.toFixed(1)}" y1="${legY-3}" x2="${expX.toFixed(1)}" y2="${legY+13}" stroke="#44403C" stroke-width="1.2" stroke-dasharray="2,2"/>
+    <text x="${padL}" y="${legY+24}" font-size="9" fill="#78716C" text-anchor="start" font-family="IBM Plex Sans,sans-serif">0%</text>
+    <text x="${expX.toFixed(1)}" y="${legY+24}" font-size="9" fill="#44403C" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">${EXPECTED.toFixed(1)}%</text>
+    <text x="${(padL+legW)}" y="${legY+24}" font-size="9" fill="#78716C" text-anchor="end" font-family="IBM Plex Sans,sans-serif">${maxPct.toFixed(1)}%</text>
+    <text x="${padL}" y="${legY+35}" font-size="9" fill="#1D4ED8" font-weight="600" text-anchor="start" font-family="IBM Plex Sans,sans-serif">depleted</text>
+    <text x="${(padL+legW)}" y="${legY+35}" font-size="9" fill="#9F1239" font-weight="600" text-anchor="end" font-family="IBM Plex Sans,sans-serif">enriched</text>`;
+
+  const heatmapSVG = `<svg id="triplet-heatmap-svg" width="${W}" height="${H}" style="overflow:visible">
+    ${rowLabels}${colLabels}${cells}${legend}
+  </svg>`;
+
+  // ── Ranked list ──────────────────────────────────────────────────────────
+  const ranked = Object.entries(pct)
+    .sort((a, b) => b[1] - a[1])
+    .map(([triplet, p]) => `<tr><td style="font-family:IBM Plex Mono,monospace;font-weight:700">5&#x2032;-${triplet}-3&#x2032;</td><td>${p.toFixed(1)}%</td><td>${counts[triplet]||0}</td></tr>`)
+    .join('');
+
+  el.innerHTML = `
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">Triplet Preference Heatmap</div>
+    <div style="font-size:11px;color:#78716C;margin-bottom:14px">Rows = &#x2212;1 position &bull; Columns = +1 position &bull; Center base = edited A &bull; Color = frequency relative to uniform expectation (6.25%) &bull; <span style="color:#B45309;font-weight:600">UAG</span> &bull; <span style="color:#1D4ED8;font-weight:600">CAG</span> outlined</div>
+    <div style="overflow-x:auto;margin-bottom:20px">${heatmapSVG}</div>
+    <div style="margin-bottom:10px"><button class="sec-btn" onclick="exportScatterSVG('triplet-heatmap-svg','triplet_heatmap.svg')">&#128229; Export SVG</button></div>
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px">Ranked Triplets</div>
+    <div class="table-wrap" style="max-height:260px">
+      <table class="data-table"><thead><tr><th>Triplet</th><th>Frequency</th><th>Sites</th></tr></thead>
+      <tbody>${ranked}</tbody></table>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:#78716C">n=${total.toLocaleString()} sites analyzed &bull; Expected ADAR pattern: UAG > AAG > GAG &asymp; CAG</div>`;
+}
+
+// ─── TAB 9: Metagene Plot ────────────────────────────────────────────────────
+function buildMetageneTab() {
+  const c = document.getElementById('metagene-content');
+  if (!S.bgRemoved) { c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>'; return; }
+  if (!S.annotated) { c.innerHTML = '<div class="banner banner-warn">Complete Step 5 (Annotate) first — metagene analysis requires gene assignments.</div>'; return; }
+
+  // Check if we have pre-loaded metagene results
+  if (S._metagenoData) { renderMetageneResults(c, S._metagenoData); return; }
+
+  const uniqueGenes = [...new Set(S.bgRemoved.map(s => s.gene).filter(Boolean))];
+  const nSites = S.bgRemoved.filter(s => s.gene).length;
+  const genome = document.getElementById('global-genome')?.value || 'hg38';
+  const hasFeatures = S.bgRemoved.some(s => s.feature);
+
+  c.innerHTML = `
+    <div class="banner banner-info">
+      Computes where editing sites fall across the normalized gene body (0% = TSS, 100% = TES), binned into a histogram.
+      Fetches gene boundaries from Ensembl for <strong>${uniqueGenes.length.toLocaleString()} unique genes</strong> in one batch request.
+      ${hasFeatures ? 'Feature annotations (5\'UTR/CDS/3\'UTR) detected in your bedgraph — bars will be color-coded.' : ''}
+    </div>
+    <div class="ctrl-row" style="margin-bottom:12px;flex-wrap:wrap;gap:10px">
+      <span class="ctrl-lbl">Bins</span>
+      <input type="range" id="meta-bins" min="20" max="200" step="10" value="100"
+        oninput="document.getElementById('meta-bins-val').textContent=this.value"
+        style="width:140px">
+      <span class="ctrl-val" id="meta-bins-val">100</span>
+    </div>
+    <button class="action-btn" id="btn-metagene" onclick="runMetageneAnalysis()">
+      Compute Metagene — ${nSites.toLocaleString()} sites in ${uniqueGenes.length.toLocaleString()} genes
+    </button>
+    <div id="metagene-progress" style="margin-top:12px"></div>
+    <div id="metagene-results" style="margin-top:16px"></div>`;
+}
+
+async function runMetageneAnalysis() {
+  const prog = document.getElementById('metagene-progress');
+  const res  = document.getElementById('metagene-results');
+  const btn  = document.getElementById('btn-metagene');
+  btn.disabled = true;
+
+  const sites = S.bgRemoved.filter(s => s.gene);
+  const uniqueGenes = [...new Set(sites.map(s => s.gene))];
+  const genome = document.getElementById('global-genome')?.value || 'hg38';
+  const species = genome.startsWith('mm') ? 'mus_musculus' : 'homo_sapiens';
+
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching gene coordinates for ${uniqueGenes.length.toLocaleString()} genes from Ensembl…</div>`;
+  await new Promise(r => setTimeout(r, 20));
+
+  // Batch Ensembl lookup: POST /lookup/symbol/{species} accepts up to ~1000 at once
+  const geneCoords = {};
+  const BATCH = 900;
+  for (let i = 0; i < uniqueGenes.length; i += BATCH) {
+    const batch = uniqueGenes.slice(i, i + BATCH);
+    try {
+      const resp = await fetch(`https://rest.ensembl.org/lookup/symbol/${species}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ symbols: batch, expand: 0 })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        for (const [name, info] of Object.entries(data)) {
+          if (info && info.start && info.end) {
+            geneCoords[name] = { chr: 'chr' + info.seq_region_name, start: info.start, end: info.end, strand: info.strand };
+          }
+        }
+      }
+    } catch { /* continue with partial results */ }
+    if (i + BATCH < uniqueGenes.length) {
+      prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Fetching gene coordinates… ${Math.min(i + BATCH, uniqueGenes.length).toLocaleString()} / ${uniqueGenes.length.toLocaleString()}</div>`;
+      await new Promise(r => setTimeout(r, 300));
+    }
+  }
+
+  const found = Object.keys(geneCoords).length;
+  prog.innerHTML = `<div class="banner banner-info"><span class="spinner"></span>Found ${found.toLocaleString()} / ${uniqueGenes.length.toLocaleString()} genes. Computing positions…</div>`;
+  await new Promise(r => setTimeout(r, 20));
+
+  // Compute relative positions
+  const nBins = parseInt(document.getElementById('meta-bins')?.value || 100);
+  const bins = new Array(nBins).fill(0);
+  const featureColors = { '5UTR': '#3730A3', 'CDS': '#065F46', '3UTR': '#92400E', 'Intron': '#C2185B', 'Other': '#78716C' };
+  const featureBins = {};
+  for (const k of Object.keys(featureColors)) featureBins[k] = new Array(nBins).fill(0);
+
+  let posCount = 0, noCoords = 0;
+  for (const s of sites) {
+    const gc = geneCoords[s.gene];
+    if (!gc) { noCoords++; continue; }
+    const gLen = gc.end - gc.start;
+    if (gLen <= 0) continue;
+    // Strand-aware relative position
+    const relPos = gc.strand === -1
+      ? (gc.end - s.start) / gLen
+      : (s.start - gc.start) / gLen;
+    if (relPos < 0 || relPos > 1) continue;
+    const binIdx = Math.min(Math.floor(relPos * nBins), nBins - 1);
+    bins[binIdx]++;
+    posCount++;
+    // Feature coloring from bedgraph col 8 (if available)
+    const feat = s.feature || '';
+    const fk = /5.?UTR|five/i.test(feat) ? '5UTR'
+      : /3.?UTR|three/i.test(feat) ? '3UTR'
+      : /CDS|cod/i.test(feat) ? 'CDS'
+      : /intron/i.test(feat) ? 'Intron'
+      : 'Other';
+    featureBins[fk][binIdx]++;
+  }
+
+  const hasFeatures = Object.values(featureBins).some(arr => {
+    let s = 0; for (const v of arr) s += v; return s > 0 && arr !== featureBins['Other'];
+  });
+
+  S._metagenoData = { bins, featureBins, featureColors, nBins, posCount, noCoords, hasFeatures };
+  prog.innerHTML = `<div class="banner banner-ok">Done — ${posCount.toLocaleString()} sites mapped${noCoords > 0 ? ` (${noCoords} skipped: gene not in Ensembl)` : ''}.</div>`;
+  renderMetageneResults(document.getElementById('metagene-results'), S._metagenoData);
+  btn.disabled = false;
+}
+
+function gaussianKDE(data, bw) {
+  const n = data.length, out = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    let s = 0;
+    for (let j = 0; j < n; j++) {
+      const x = (i - j) / bw;
+      s += Math.exp(-0.5 * x * x) * data[j];
+    }
+    out[i] = s;
+  }
+  return out;
+}
+
+function donutArcPath(cx, cy, ro, ri, startDeg, endDeg) {
+  const deg = endDeg - startDeg;
+  if (deg >= 360) endDeg = startDeg + 359.99; // avoid degenerate full circle
+  const toRad = a => (a - 90) * Math.PI / 180;
+  const x1o = cx + ro * Math.cos(toRad(startDeg)), y1o = cy + ro * Math.sin(toRad(startDeg));
+  const x2o = cx + ro * Math.cos(toRad(endDeg)),   y2o = cy + ro * Math.sin(toRad(endDeg));
+  const x1i = cx + ri * Math.cos(toRad(endDeg)),   y1i = cy + ri * Math.sin(toRad(endDeg));
+  const x2i = cx + ri * Math.cos(toRad(startDeg)), y2i = cy + ri * Math.sin(toRad(startDeg));
+  const lg = deg > 180 ? 1 : 0;
+  return `M${x1o.toFixed(1)},${y1o.toFixed(1)} A${ro},${ro} 0 ${lg},1 ${x2o.toFixed(1)},${y2o.toFixed(1)} L${x1i.toFixed(1)},${y1i.toFixed(1)} A${ri},${ri} 0 ${lg},0 ${x2i.toFixed(1)},${y2i.toFixed(1)} Z`;
+}
+
+function renderMetageneResults(container, data) {
+  const { bins, featureBins, featureColors, nBins, posCount, noCoords, hasFeatures } = data;
+  const FEAT_ORDER = ['5UTR', 'CDS', 'Intron', '3UTR', 'Other'];
+
+  // ── Main metagene SVG histogram ─────────────────────────────────────────
+  const W = 620, H = 240, padL = 55, padR = 20, padT = 28, padB = 48;
+  const drawW = W - padL - padR, drawH = H - padT - padB;
+  const barW = drawW / nBins;
+
+  let maxBin = 0;
+  for (const v of bins) { if (v > maxBin) maxBin = v; }
+  maxBin = maxBin || 1;
+
+  // Stacked/plain bars
+  let bars = '';
+  if (!hasFeatures) {
+    for (let i = 0; i < nBins; i++) {
+      const bh = (bins[i] / maxBin) * drawH;
+      const bx = padL + i * barW;
+      if (bh > 0) bars += `<rect x="${bx.toFixed(1)}" y="${(padT + drawH - bh).toFixed(1)}" width="${Math.max(barW - 0.5, 0.5).toFixed(1)}" height="${bh.toFixed(1)}" fill="#C2185B" opacity="0.8"/>`;
+    }
+  } else {
+    for (let i = 0; i < nBins; i++) {
+      if (bins[i] === 0) continue;
+      const bx = padL + i * barW;
+      let stackY = padT + drawH;
+      for (const fk of FEAT_ORDER) {
+        const fH = (featureBins[fk][i] / maxBin) * drawH;
+        if (fH > 0) {
+          stackY -= fH;
+          bars += `<rect x="${bx.toFixed(1)}" y="${stackY.toFixed(1)}" width="${Math.max(barW - 0.5, 0.5).toFixed(1)}" height="${fH.toFixed(1)}" fill="${featureColors[fk]}" opacity="0.82"/>`;
+        }
+      }
+    }
+  }
+
+  // KDE density curve overlay
+  const kdeBw = Math.max(3, Math.round(nBins / 20));
+  const smooth = gaussianKDE(bins, kdeBw);
+  let maxSmooth = 0;
+  for (const v of smooth) if (v > maxSmooth) maxSmooth = v;
+  const kdeScale = maxSmooth > 0 ? maxBin / maxSmooth : 1;
+  let kdePts = '';
+  for (let i = 0; i < nBins; i++) {
+    const kx = (padL + (i + 0.5) * barW).toFixed(1);
+    const ky = (padT + drawH - (smooth[i] * kdeScale / maxBin) * drawH).toFixed(1);
+    kdePts += (i === 0 ? `M${kx},${ky}` : ` L${kx},${ky}`);
+  }
+  const kdePath = `<path d="${kdePts}" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linejoin="round" opacity="0.65"/>`;
+
+  // X-axis ticks
+  let xTks = '';
+  for (let i = 0; i <= 4; i++) {
+    const tx = (padL + (i / 4) * drawW).toFixed(1);
+    xTks += `<line x1="${tx}" y1="${padT + drawH}" x2="${tx}" y2="${padT + drawH + 4}" stroke="#E2DDD8"/>
+      <text x="${tx}" y="${padT + drawH + 15}" font-size="9" fill="#78716C" text-anchor="middle">${i * 25}%</text>`;
+  }
+
+  // Y-axis ticks
+  let yTks = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = Math.round(maxBin * i / 4);
+    const ty = (padT + drawH - (v / maxBin) * drawH).toFixed(1);
+    yTks += `<line x1="${padL - 4}" y1="${ty}" x2="${padL}" y2="${ty}" stroke="#E2DDD8"/>
+      <text x="${padL - 6}" y="${(+ty + 3).toFixed(1)}" font-size="9" fill="#78716C" text-anchor="end">${v}</text>`;
+  }
+
+  // TSS / TES markers
+  const tssX = padL.toFixed(1), tesX = (padL + drawW).toFixed(1);
+  const markers = `
+    <line x1="${tssX}" y1="${padT}" x2="${tssX}" y2="${padT + drawH}" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+    <text x="${tssX}" y="${padT - 8}" font-size="9" fill="#1D4ED8" text-anchor="middle" font-weight="600">TSS</text>
+    <line x1="${tesX}" y1="${padT}" x2="${tesX}" y2="${padT + drawH}" stroke="#9F1239" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.5"/>
+    <text x="${tesX}" y="${padT - 8}" font-size="9" fill="#9F1239" text-anchor="middle" font-weight="600">TES</text>`;
+
+  // Feature legend + KDE legend
+  let legendSVG = '';
+  let lx = padL;
+  if (hasFeatures) {
+    for (const [fk, color] of Object.entries(featureColors)) {
+      if (fk === 'Other') continue;
+      legendSVG += `<rect x="${lx}" y="${H + 4}" width="11" height="11" fill="${color}" opacity="0.82" rx="2"/>
+        <text x="${lx + 14}" y="${H + 13}" font-size="9" fill="#44403C" font-family="IBM Plex Sans,sans-serif">${fk}</text>`;
+      lx += 60;
+    }
+  }
+  legendSVG += `<line x1="${lx}" y1="${H + 9}" x2="${lx + 16}" y2="${H + 9}" stroke="#1D4ED8" stroke-width="2" opacity="0.65"/>
+    <text x="${lx + 19}" y="${H + 13}" font-size="9" fill="#44403C" font-family="IBM Plex Sans,sans-serif">KDE</text>`;
+
+  const svgH = H + 22;
+  const mainSVG = `<svg id="metagene-svg" width="${W}" height="${svgH}" style="overflow:visible;font-family:IBM Plex Mono,monospace;display:block">
+    <rect x="${padL}" y="${padT}" width="${drawW}" height="${drawH}" fill="#FAFAF9" rx="2"/>
+    ${bars}
+    ${kdePath}
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + drawH}" stroke="#D6D3D1"/>
+    <line x1="${padL}" y1="${padT + drawH}" x2="${W - padR}" y2="${padT + drawH}" stroke="#D6D3D1"/>
+    ${xTks}${yTks}${markers}${legendSVG}
+    <text x="${padL + drawW / 2}" y="${H - 2}" font-size="11" fill="#44403C" text-anchor="middle" font-weight="600">Relative Position in Gene Body</text>
+    <text x="13" y="${padT + drawH / 2}" font-size="11" fill="#44403C" text-anchor="middle" font-weight="600" transform="rotate(-90,13,${padT + drawH / 2})">Sites per Bin</text>
+  </svg>`;
+
+  // ── Feature distribution: donut + bar chart ───────────────────────────────
+  let featureSection = '';
+  if (hasFeatures) {
+    const featTotals = {};
+    let grandTotal = 0;
+    for (const fk of FEAT_ORDER) {
+      const arr = featureBins[fk] || [];
+      let sum = 0; for (const v of arr) sum += v;
+      featTotals[fk] = sum; grandTotal += sum;
+    }
+
+    if (grandTotal > 0) {
+      // Donut chart
+      const CX = 85, CY = 85, RO = 68, RI = 36;
+      let angle = 0;
+      let donutPaths = '', donutLabels = '';
+      for (const fk of FEAT_ORDER) {
+        const count = featTotals[fk] || 0;
+        if (count === 0) continue;
+        const sweep = (count / grandTotal) * 360;
+        const midAngle = angle + sweep / 2;
+        const midRad = (midAngle - 90) * Math.PI / 180;
+        donutPaths += `<path d="${donutArcPath(CX, CY, RO, RI, angle, angle + sweep)}" fill="${featureColors[fk]}" opacity="0.87" stroke="#fff" stroke-width="1.5"/>`;
+        if (sweep > 12) {
+          const lx2 = CX + (RO + 16) * Math.cos(midRad);
+          const ly2 = CY + (RO + 16) * Math.sin(midRad);
+          const pct = (count / grandTotal * 100).toFixed(1);
+          donutLabels += `<text x="${lx2.toFixed(1)}" y="${ly2.toFixed(1)}" font-size="8.5" fill="#44403C" text-anchor="middle" dominant-baseline="middle" font-family="IBM Plex Sans,sans-serif">${fk}<tspan x="${lx2.toFixed(1)}" dy="9" font-size="7.5" fill="#78716C">${pct}%</tspan></text>`;
+        }
+        angle += sweep;
+      }
+      donutPaths += `<text x="${CX}" y="${CY - 6}" font-size="11" fill="#1C1917" text-anchor="middle" font-weight="700" font-family="IBM Plex Sans,sans-serif">${grandTotal.toLocaleString()}</text>
+        <text x="${CX}" y="${CY + 9}" font-size="8.5" fill="#78716C" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">total sites</text>`;
+
+      // Horizontal bar chart
+      const bW2 = 200, bH2 = 16, gap2 = 6, padL2 = 50;
+      let fbars = '';
+      FEAT_ORDER.forEach((fk, i) => {
+        const count = featTotals[fk] || 0;
+        const frac = count / grandTotal;
+        const bw = (frac * bW2).toFixed(1);
+        const by = i * (bH2 + gap2);
+        fbars += `<text x="${padL2 - 4}" y="${by + bH2 / 2 + 4}" font-size="9" fill="#44403C" text-anchor="end" font-family="IBM Plex Sans,sans-serif">${fk}</text>
+          <rect x="${padL2}" y="${by}" width="${Math.max(+bw, 1)}" height="${bH2}" fill="${featureColors[fk]}" opacity="0.85" rx="2"/>
+          <text x="${padL2 + +bw + 4}" y="${by + bH2 / 2 + 4}" font-size="9" fill="#78716C" font-family="IBM Plex Mono,monospace">${(frac * 100).toFixed(1)}% (${count.toLocaleString()})</text>`;
+      });
+      const svgW2 = padL2 + bW2 + 160;
+      const svgH2 = FEAT_ORDER.length * (bH2 + gap2) + 2;
+
+      featureSection += `
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E2DDD8">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px">Feature Distribution</div>
+          <div style="display:flex;gap:36px;align-items:center;flex-wrap:wrap">
+            <svg width="${CX * 2}" height="${CY * 2}" style="overflow:visible;flex-shrink:0">
+              ${donutPaths}${donutLabels}
+            </svg>
+            <svg width="${svgW2}" height="${svgH2}" style="overflow:visible">
+              ${fbars}
+            </svg>
+          </div>
+        </div>`;
+
+      // ── Per-feature metagene histograms (2×2 grid) ────────────────────────
+      const PF_SHOW = ['5UTR', 'CDS', '3UTR', 'Intron'];
+      const pW = 260, pH = 130, ppL = 42, ppR = 10, ppT = 20, ppB = 30;
+      const pdW = pW - ppL - ppR, pdH = pH - ppT - ppB;
+      const pBarW = pdW / nBins;
+
+      let pfPanels = '';
+      for (const fk of PF_SHOW) {
+        const arr = featureBins[fk];
+        if (!arr) continue;
+        let pMax = 0;
+        for (const v of arr) if (v > pMax) pMax = v;
+        if (pMax === 0) continue;
+
+        let pBars = '';
+        for (let i = 0; i < nBins; i++) {
+          const bh = (arr[i] / pMax) * pdH;
+          const bx = ppL + i * pBarW;
+          if (bh > 0) pBars += `<rect x="${bx.toFixed(1)}" y="${(ppT + pdH - bh).toFixed(1)}" width="${Math.max(pBarW - 0.3, 0.3).toFixed(1)}" height="${bh.toFixed(1)}" fill="${featureColors[fk]}" opacity="0.85"/>`;
+        }
+
+        // KDE for this feature
+        const pSmooth = gaussianKDE(arr, kdeBw);
+        let pMaxSm = 0; for (const v of pSmooth) if (v > pMaxSm) pMaxSm = v;
+        const pKdeScale = pMaxSm > 0 ? pMax / pMaxSm : 1;
+        let pKdePts = '';
+        for (let i = 0; i < nBins; i++) {
+          const kx = (ppL + (i + 0.5) * pBarW).toFixed(1);
+          const ky = (ppT + pdH - (pSmooth[i] * pKdeScale / pMax) * pdH).toFixed(1);
+          pKdePts += (i === 0 ? `M${kx},${ky}` : ` L${kx},${ky}`);
+        }
+        const pKdePath = `<path d="${pKdePts}" fill="none" stroke="#1D4ED8" stroke-width="1.3" stroke-linejoin="round" opacity="0.6"/>`;
+
+        // Y-axis: 0 and max
+        const pAxes = `
+          <line x1="${ppL}" y1="${ppT}" x2="${ppL}" y2="${ppT + pdH}" stroke="#D6D3D1"/>
+          <line x1="${ppL}" y1="${ppT + pdH}" x2="${pW - ppR}" y2="${ppT + pdH}" stroke="#D6D3D1"/>
+          <text x="${ppL - 3}" y="${(ppT + pdH + 3).toFixed(1)}" font-size="7.5" fill="#78716C" text-anchor="end">0</text>
+          <text x="${ppL - 3}" y="${(ppT + 4).toFixed(1)}" font-size="7.5" fill="#78716C" text-anchor="end">${pMax}</text>
+          <text x="${ppL}" y="${ppT + pdH + 14}" font-size="7.5" fill="#78716C" font-family="IBM Plex Mono,monospace">TSS</text>
+          <text x="${(pW - ppR).toFixed(1)}" y="${ppT + pdH + 14}" font-size="7.5" fill="#78716C" text-anchor="end" font-family="IBM Plex Mono,monospace">TES</text>`;
+
+        pfPanels += `<div style="display:inline-block;margin:0 12px 14px 0;vertical-align:top">
+          <svg width="${pW}" height="${pH}" style="overflow:visible;font-family:IBM Plex Mono,monospace;display:block">
+            <rect x="${ppL}" y="${ppT}" width="${pdW}" height="${pdH}" fill="#FAFAF9" rx="2"/>
+            ${pBars}${pKdePath}${pAxes}
+            <text x="${ppL + pdW / 2}" y="12" font-size="10.5" fill="${featureColors[fk]}" text-anchor="middle" font-weight="700" font-family="IBM Plex Sans,sans-serif">${fk}</text>
+            <text x="${ppL + pdW / 2}" y="23" font-size="7.5" fill="#78716C" text-anchor="middle" font-family="IBM Plex Sans,sans-serif">${featTotals[fk].toLocaleString()} sites</text>
+            <text x="11" y="${ppT + pdH / 2}" font-size="8" fill="#78716C" text-anchor="middle" transform="rotate(-90,11,${ppT + pdH / 2})" font-family="IBM Plex Sans,sans-serif">Sites</text>
+          </svg>
+        </div>`;
+      }
+
+      if (pfPanels) {
+        featureSection += `
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E2DDD8">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">Per-Feature Metagene</div>
+            <div style="font-size:11px;color:#78716C;margin-bottom:12px">Editing site distribution within each annotation feature across the normalized gene body · blue line = KDE</div>
+            <div style="display:flex;flex-wrap:wrap">
+              ${pfPanels}
+            </div>
+          </div>`;
+      }
+    }
+  }
+
+  container.innerHTML = `
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">Metagene Profile</div>
+    <div style="font-size:11px;color:#78716C;margin-bottom:14px">
+      ${posCount.toLocaleString()} editing sites · ${nBins} bins · normalized gene body (TSS → TES)
+      ${noCoords > 0 ? ` · ${noCoords} sites excluded (gene coordinates not in Ensembl)` : ''}
+    </div>
+    <div style="overflow-x:auto;margin-bottom:10px">${mainSVG}</div>
+    <div style="margin-bottom:16px">
+      <button class="sec-btn" onclick="exportScatterSVG('metagene-svg','metagene_profile.svg')">&#128229; Export SVG</button>
+    </div>
+    ${featureSection}`;
+}
+
+// ─── TAB 10: Export ──────────────────────────────────────────────────────────
+function buildExportTab() {
+  const c = document.getElementById('export-content');
+  if (!S.bgRemoved) {
+    c.innerHTML = '<div class="banner banner-warn">Complete Steps 1–4 first.</div>';
+    return;
+  }
+  const hasAnnot = S.bgRemoved[0] && S.bgRemoved[0].gene !== undefined;
+  c.innerHTML = `<div class="export-grid">
+    <button class="export-btn" onclick="exportFile('tribe-bedgraph')">
+      <strong>&#128229; Filtered TRIBE Bedgraph</strong>
+      <span>Thresholded &amp; intersected sites · .bedgraph</span>
+    </button>
+    <button class="export-btn" onclick="exportFile('bg-removed-bed')">
+      <strong>&#128229; Background-Removed Sites</strong>
+      <span>Final RBP targets · BED format</span>
+    </button>
+    <button class="export-btn" onclick="exportFile('gene-list')" ${!hasAnnot ? 'disabled title="Run annotation (Step 5) first"' : ''}>
+      <strong>&#128229; Unique Gene List</strong>
+      <span>One gene per line · .txt${!hasAnnot ? ' (requires Step 5)' : ''}</span>
+    </button>
+    <button class="export-btn" onclick="exportFile('full-csv')">
+      <strong>&#128229; Full Results Table</strong>
+      <span>CSV with all columns</span>
+    </button>
+  </div>`;
+}
+
+function exportFile(type) {
+  let content = '', filename = '', mime = 'text/plain';
+  if (type === 'tribe-bedgraph') {
+    const sites = S.intersected || S.rep1Filt || [];
+    content = sites.map(s => [s.chr, s.start, s.end, s.score].join('\t')).join('\n');
+    filename = 'tribe_filtered.bedgraph';
+  } else if (type === 'bg-removed-bed') {
+    content = S.bgRemoved.map(s => [s.chr, s.start, s.end, '.', s.score, '+'].join('\t')).join('\n');
+    filename = 'tribe_targets.bed';
+  } else if (type === 'gene-list') {
+    const genes = [...new Set(S.bgRemoved.map(s => s.gene).filter(Boolean))].sort();
+    content = genes.join('\n');
+    filename = 'tribe_target_genes.txt';
+  } else if (type === 'full-csv') {
+    const header = ['chr','start','end','editing_pct_rep1','editing_pct_rep2','gene','biotype'].join(',');
+    const rows = S.bgRemoved.map(s =>
+      [s.chr, s.start, s.end, s.score, s.score2 !== null && s.score2 !== undefined ? s.score2 : '', s.gene || '', s.biotype || ''].join(',')
+    );
+    content = header + '\n' + rows.join('\n');
+    filename = 'tribe_results.csv';
+    mime = 'text/csv';
+  }
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+updatePipelineChecks();
+</script>
+<script src="/js/sessions.js"></script>
+<script>
+// ─── Session persistence ───────────────────────────────────────────────────────
+function _bgToBuffer(sites) {
+  if (!sites || !sites.length) return null;
+  const lines = [];
+  for (let i = 0; i < sites.length; i++) {
+    const s = sites[i];
+    lines.push(s.chr + '\t' + s.start + '\t' + s.end + '\t' + s.score);
+  }
+  const txt = lines.join('\n');
+  const buf = new TextEncoder().encode(txt);
+  return buf.buffer;
+}
+
+async function getTribeState() {
+  const ui = {
+    genome:     document.getElementById('global-genome').value,
+    adarMin:    S.adarMin, rep1Min:  S.rep1Min, rep2Min: S.rep2Min,
+    adarThresh: S.adarThresh, rep1Thresh: S.rep1Thresh, rep2Thresh: S.rep2Thresh,
+    overlapFrac: S._overlapFrac, exactMatch: S._exactMatch,
+    annotated:  S.annotated,
+    sortCol:    S.sortCol, sortDir: S.sortDir,
+    intersected: S.intersected,
+    bgRemoved:  S.bgRemoved,
+    tripletCounts: S._tripletCounts,
+    geneCache:  _geneCache,
+    fileNames:  { adar: S.adarName||'adar.bedgraph', rep1: S.rep1Name||'rep1.bedgraph', rep2: S.rep2Name||'rep2.bedgraph' },
+  };
+  const files = [];
+  const keys = ['adar', 'rep1', 'rep2'];
+  for (const key of keys) {
+    const arr = S[key];
+    if (!arr) continue;
+    const buf = _bgToBuffer(arr);
+    if (buf) files.push({ slot: key, fileName: ui.fileNames[key] || (key + '.bedgraph'), data: buf });
+  }
+  return { stateJson: JSON.stringify(ui), files };
+}
+
+function loadTribeState(stateJson, files) {
+  let ui; try { ui = JSON.parse(stateJson); } catch(_) { ui = {}; }
+
+  if (ui.genome) document.getElementById('global-genome').value = ui.genome;
+
+  // Restore raw parsed arrays from stored bedgraph files
+  for (const [slot, f] of Object.entries(files)) {
+    const text  = new TextDecoder().decode(f.data);
+    const sites = parseBedgraph(text);
+    S[slot] = sites;
+    S[slot + 'Name'] = f.fileName;
+    const minScore = sites.length ? sites.reduce((m,s)=>Math.min(m,s.score),Infinity) : 0;
+    S[slot + 'Min'] = minScore;
+    updateFileUI(slot, f.fileName, sites.length, minScore);
+  }
+
+  S.adarThresh  = ui.adarThresh  || 0;
+  S.rep1Thresh  = ui.rep1Thresh  || 0;
+  S.rep2Thresh  = ui.rep2Thresh  || 0;
+  S._overlapFrac = ui.overlapFrac != null ? ui.overlapFrac : 0.5;
+  S._exactMatch  = ui.exactMatch  != null ? ui.exactMatch  : true;
+
+  // Restore filtered arrays
+  if (S.adar) S.adarFilt = S.adar.filter(s => s.score >= S.adarThresh);
+  if (S.rep1) S.rep1Filt = S.rep1.filter(s => s.score >= S.rep1Thresh);
+  if (S.rep2) S.rep2Filt = S.rep2.filter(s => s.score >= S.rep2Thresh);
+
+  S.intersected  = ui.intersected  || null;
+  S.bgRemoved    = ui.bgRemoved    || null;
+  S.annotated    = ui.annotated    || false;
+  S.sortCol      = ui.sortCol      || null;
+  S.sortDir      = ui.sortDir      || 1;
+  S._tripletCounts = ui.tripletCounts || null;
+  if (ui.geneCache) _geneCache = ui.geneCache;
+
+  updateSidebar();
+  updatePipelineChecks();
+
+  if (S.bgRemoved && S.bgRemoved.length) {
+    buildSummaryTab();
+    goTab(5);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  SessionManager.mount('tribe', getTribeState, loadTribeState);
+});
+</script>
+<script src="/js/site.js"></script>
+<div id="scatter-tip" class="scatter-tip"></div>
+</body>
+</html>

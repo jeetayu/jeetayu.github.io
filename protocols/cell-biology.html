@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell Biology Protocols – Jeet Biswas</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Proteomics &bull; Computational Genomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link active" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/publications.html">Publications</a></div>
+  <div class="nav-item"><a class="nav-link" href="/people.html">People</a></div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title"><h2>Cell Biology Protocols</h2></div>
+<div class="container">
+  <div class="breadcrumb"><a href="/protocols/">Protocols</a> / Cell Biology</div>
+
+  <!-- ══ Cell Culture Media ══ -->
+  <div class="card">
+    <h2>Cell Culture Media Reference</h2>
+    <table>
+      <tr><th>Cell Line</th><th>Media</th><th>Notes</th></tr>
+      <tr><td>HEK293T</td><td>DMEM + 10% FBS + P/S</td><td>Standard; use tet-free FBS for inducible lines</td></tr>
+      <tr><td>U2OS</td><td>DMEM + 10% FBS + P/S</td><td>—</td></tr>
+      <tr><td>MEF</td><td>High-glucose DMEM + NCS</td><td>From Yves Bhatt; normal calf serum</td></tr>
+      <tr><td>MCF7</td><td>DMEM/F12 + supplements</td><td>Tetracycline-free FBS for dox-inducible; split 1:2–1:4</td></tr>
+      <tr><td>K562</td><td>IMDM + 10% FBS</td><td>Suspension; split 1:5–1:10</td></tr>
+      <tr><td>MOLM13</td><td>RPMI + 10% FBS + P/S</td><td>BamBanker for freezing; split 1:10; dox inducible</td></tr>
+      <tr><td>MV411</td><td>RPMI + 10% FBS + P/S</td><td>AML cell line</td></tr>
+      <tr><td>THP1</td><td>RPMI + 10% FBS + P/S</td><td>Suspension monocyte line</td></tr>
+      <tr><td>CD34+ HSCs / PDX AML</td><td>StemSpan SFEM + 1× CC100 + 500 nM UM171</td><td>Serum-free; StemCell Technologies</td></tr>
+    </table>
+  </div>
+
+  <!-- ══ Cell Freezing ══ -->
+  <div class="card">
+    <h2>Cell Freezing</h2>
+    <h3>Method 1 — FBS + 10% DMSO (Adherent Cells; Dry Ice)</h3>
+    <ol>
+      <li>Wash cells 2× with 10 mL PBS</li>
+      <li>Trypsinize 3 mL, 1 min at 37°C; quench with 10 mL DMEM + 10% FBS</li>
+      <li>Transfer to 50 mL falcon; count on hemocytometer</li>
+      <li>Spin; remove media</li>
+      <li>Prepare 5 mL FBS + 10% DMSO (while spinning)</li>
+      <li>Resuspend at ~1 million cells/mL; aliquot 1 mL per cryovial</li>
+      <li>Place in Styrofoam box on dry ice: 1h → transfer to -80°C overnight → move to LN₂</li>
+    </ol>
+    <h3>Method 2 — BamBanker (Suspension Cells; Simpler)</h3>
+    <ol>
+      <li>Spin 500 × g, 5 min; remove media</li>
+      <li>Resuspend 2–10 million cells/mL in BamBanker</li>
+      <li>Aliquot 1 mL per cryovial; place directly at -80°C</li>
+    </ol>
+    <div class="info-box">MOLM13 and K562: use BamBanker. MCF7: BamBanker, 1 million cells/mL. PDX: BamBanker, place directly at -80.</div>
+  </div>
+
+  <!-- ══ Cell Thawing ══ -->
+  <div class="card">
+    <h2>Cell Thawing</h2>
+    <h3>Adherent Lines (MEF, HEK, U2OS)</h3>
+    <ol>
+      <li>Pre-warm media at 37°C ≥30 min before thawing</li>
+      <li>Thaw in 37°C water bath until a small amount of ice remains</li>
+      <li>Transfer to TC hood; mix cells with 1.5 mL media; add to 10 mL falcon with pre-warmed media</li>
+      <li>Spin 5 min; remove supernatant (to remove DMSO)</li>
+      <li>Resuspend in fresh media; plate on 10 cm dish</li>
+      <li>Check adherence after 1–2 h</li>
+    </ol>
+    <h3>Suspension Lines (MOLM13, K562, THP1)</h3>
+    <ol>
+      <li>Thaw in water bath; as soon as liquid, transfer to 10 mL pre-warmed media in 15 mL falcon</li>
+      <li>Spin 400–500 × g, 5 min; remove supernatant</li>
+      <li>Resuspend in fresh media; plate in appropriate vessel</li>
+    </ol>
+    <h3>MCF7</h3>
+    <p>Thaw; add immediately to 10 mL warm media; plate on 10 cm dish. Leave 1–2 days before media change.</p>
+  </div>
+
+  <!-- ══ Transfection ══ -->
+  <div class="card">
+    <h2>Transfection — FuGENE HD</h2>
+    <p>Use <a href="/calculators.html">Transfection Calculator</a> for scaling. Ratio 2:1 (reagent:DNA) for standard; 3:1 for large constructs.</p>
+    <h3>10 cm Dish (10 µg DNA)</h3>
+    <ol>
+      <li>10 µg DNA into 1.5 mL tube; add 470 µL PBS + 20 µL FuGENE HD</li>
+      <li>Flick vigorously; rest 10–20 min at RT</li>
+      <li>Add dropwise to cells</li>
+    </ol>
+    <h3>3.5 cm Dish</h3>
+    <p>2 µg DNA + 3 µL FuGENE HD in 100 µL total</p>
+  </div>
+
+  <div class="card">
+    <h2>Transfection — PEI (HEK293T, 10 cm Dish)</h2>
+    <p>PEI stock: 1 mg/mL in H₂O (pH with HCl; filter sterilize). Ratio 4:1 (PEI:DNA by mass).</p>
+    <ol>
+      <li>Tube A: 10 µg DNA in 500 µL Opti-MEM</li>
+      <li>Tube B: 500 µL Opti-MEM + 40 µL PEI (1 mg/mL)</li>
+      <li>Add Tube A into Tube B; mix by pipetting; incubate 10 min at RT</li>
+      <li>Aspirate media from cells; add PEI-DNA complex</li>
+      <li>Incubate 2–4 h; add complete media; assess GFP next day</li>
+    </ol>
+    <div class="info-box">For 6-well optimization: test PEI:DNA ratios 0:1, 1:2, 1:4, 1:6, 1:8 with 2 µg DNA per well.</div>
+  </div>
+
+  <div class="card">
+    <h2>Transfection — Calcium Phosphate (HEK293T)</h2>
+    <h3>Reagents</h3>
+    <ul>
+      <li><strong>2X HBS:</strong> 50 mM HEPES, 280 mM NaCl, 1.5 mM Na₂HPO₄, pH 7.0 (adjust with HCl); sterile filter</li>
+      <li><strong>2 M CaCl₂:</strong> 11.1 g per 50 mL; sterile filter</li>
+      <li><strong>0.1× TE buffer:</strong> sterile filtered</li>
+    </ul>
+    <h3>6-well Dish (2–3 µg DNA per well)</h3>
+    <ol>
+      <li>Switch cells to antibiotic-free media a few hours before transfection</li>
+      <li>Add DNA to 90 µL 0.1× TE; add 10 µL 2M CaCl₂; mix 5 min at RT</li>
+      <li>Add 100 µL 2× HBS dropwise while vortexing</li>
+      <li>Rest 20 min at RT (slightly cloudy = good)</li>
+      <li>Add to cells; incubate overnight</li>
+      <li>Replace with fresh complete DMEM</li>
+    </ol>
+    <p><strong>10 cm dish (5× scale):</strong> 10–20 µg DNA in 450 µL 0.1× TE + 50 µL 2 M CaCl₂ + 500 µL 2× HBS.</p>
+  </div>
+
+  <div class="card">
+    <h2>Transfection — Nucleoporation (MEFs)</h2>
+    <ul>
+      <li>100 µL transfection reagent (Lonza SE buffer or equivalent)</li>
+      <li>10 µg plasmid DNA per reaction</li>
+      <li>Program A024 (for MEFs)</li>
+      <li>Immediately transfer to pre-warmed media; do not centrifuge for first 24 h</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Lentiviral Packaging &amp; K562 Spinfection</h2>
+    <h3>Packaging (3rd Generation, 10 cm dish)</h3>
+    <ul>
+      <li>Co-transfect HEK293T with: transfer vector + GAG/POL + REV + VSV-G using Lipofectamine</li>
+      <li>Collect media at 48h and 72h; filter 0.45 µm; concentrate with Lenti-X precipitation</li>
+    </ul>
+    <h3>K562 Spinfection</h3>
+    <ol>
+      <li>JetOptimus transfection of packaging cells; collect virus 48 h post-transfection</li>
+      <li>Spin K562 cells onto virus: 2300 rpm, 32°C, 90 min</li>
+      <li>Polybrene: 4 µg/mL</li>
+      <li>Recover in fresh media; select with puromycin after 48 h</li>
+    </ol>
+  </div>
+
+  <!-- ══ RNA Isolation ══ -->
+  <div class="card">
+    <h2>RNA Isolation — TRIzol (MatTek Dish or 10 cm Dish)</h2>
+    <ol>
+      <li>Wash dish with 2 mL cold PBS</li>
+      <li>Add 200 µL TRIzol (Tri-Reagent); pipette up and down to dissociate</li>
+      <li>Transfer to Eppendorf; add 40 µL chloroform; shake 15 s; incubate RT 2–3 min</li>
+      <li>Centrifuge 12,000 × g, 15 min, 4°C; remove aqueous phase (top layer) — avoid white DNA layer</li>
+      <li>Add 1 µL glycogen; add 100 µL isopropanol; incubate RT 10 min</li>
+      <li>Spin 12,000 × g, 10 min, 4°C; pellet is clear</li>
+      <li>Wash 200 µL 75% EtOH; spin 7,500 × g, 5 min; remove EtOH; air dry RT 10 min</li>
+      <li>Resuspend in TE buffer (≥40 µL); quantify on Nanodrop</li>
+    </ol>
+    <h3>DNase Digest</h3>
+    <p>1–2 µg RNA + 4 µL 10× Turbo DNase buffer + 1 µL Turbo DNase → 40 µL total; 37°C, 30 min. Add 4 µL inactivation resin; incubate; centrifuge; transfer RNA.</p>
+    <h3>Mouse Hemisphere</h3>
+    <ol>
+      <li>Add 500 µL TRIzol; pipette up/down; pass 5× through 22.5G needle</li>
+      <li>RT 5–15 min; spin 10,000 × g, 5 min; transfer supernatant</li>
+      <li>Add 100 µL chloroform → proceed as above but incubate isopropanol overnight at -20°C</li>
+    </ol>
+    <div class="info-box">Typical yields: U2OS/K562 (10 cm dish) ~260 ng/µL in 40 µL; MBS neurons (MatTek) ~20–30 ng/µL.</div>
+  </div>
+
+  <!-- ══ CD34+ Isolation ══ -->
+  <div class="card">
+    <h2>CD34+ Isolation — MACS (Miltenyi)</h2>
+    <ol>
+      <li>Ficoll enrichment: layer blood over Ficoll in SepMate tube; spin 400 × g, 35 min</li>
+      <li>Collect mononuclear layer; wash 2× PBS; count cells</li>
+      <li>Block FcR: 10 µL FcR blocking reagent per 10⁷ cells; 10 min at 4°C</li>
+      <li>Add CD34 MicroBeads: 100 µL per 10⁸ cells; 30 min at 4°C</li>
+      <li>Wash; resuspend in MACS buffer; load onto LS column in QuadroMACS separator</li>
+      <li>Wash 3× with MACS buffer; remove column from magnet; elute</li>
+      <li>Spin 400 × g, 5 min to collect; count; proceed to culture or flash freeze</li>
+    </ol>
+    <div class="info-box">CD45+ isolation: identical workflow with CD45 MicroBeads. Used for PDX mouse bone marrows and spleens.</div>
+  </div>
+
+  <!-- ══ PDX Work ══ -->
+  <div class="card">
+    <h2>PDX — Bone Marrow Harvest &amp; Engraftment</h2>
+    <h3>Bone Marrow Harvest (mortar/pestle method)</h3>
+    <ol>
+      <li>Sacrifice mouse; collect femurs, tibias, pelvis</li>
+      <li>Crush bones in mortar; strain through 40 µm filter into PBS</li>
+      <li>ACK lysis (1 mL per 10⁷ cells, 2 min RT); quench with PBS; spin 400 × g, 5 min</li>
+      <li>Count; proceed to MACS or culture</li>
+    </ol>
+    <h3>Spleen Processing</h3>
+    <p>Mash through 40 µm filter; ACK lysis; spin 400 × g, 5 min; resuspend in media.</p>
+    <h3>Tail Vein Injection</h3>
+    <ul>
+      <li>1 million cells in 100 µL per NSG mouse</li>
+      <li>Strain through 40 µm before injection; count and confirm viability</li>
+      <li>Pre-warm tail in warm water 1–2 min to dilate veins</li>
+    </ul>
+  </div>
+
+  <!-- ══ Flow Cytometry ══ -->
+  <div class="card">
+    <h2>Flow Cytometry — Surface Staining &amp; Sorting</h2>
+    <h3>Sorting Buffer Recipes</h3>
+    <table>
+      <tr><th>Buffer</th><th>Components</th></tr>
+      <tr><td>Basic FACS buffer</td><td>PBS + 2 mM EDTA + 25 mM HEPES + 2% FCS</td></tr>
+      <tr><td>MEF sorting buffer</td><td>Above + sodium azide + DAPI (1 µg/mL for live/dead)</td></tr>
+    </table>
+    <h3>Cell Surface Staining</h3>
+    <ol>
+      <li>Spin cells; resuspend in 50–100 µL FACS buffer per sample</li>
+      <li>Add antibody (typically 1:200–1:1000 dilution); mix; 30 min on ice in dark</li>
+      <li>Wash 2× with 2 mL FACS buffer; spin 400 × g, 3 min</li>
+      <li>Resuspend in 200–500 µL buffer + live/dead stain; acquire</li>
+    </ol>
+    <h3>Live/Dead Stains</h3>
+    <ul>
+      <li><strong>PI</strong> (propidium iodide): 1 µg/mL, add immediately before acquisition</li>
+      <li><strong>DAPI</strong>: 1 µg/mL in non-fixed cells</li>
+      <li><strong>7-AAD</strong>: 0.25 µg per 10⁶ cells; 10 min RT; wash</li>
+    </ul>
+  </div>
+
+  <!-- ══ Viability Assays ══ -->
+  <div class="card">
+    <h2>Viability Assays</h2>
+    <h3>CellTiter-Glo (384-well)</h3>
+    <ol>
+      <li>Equilibrate reagent and plates to RT 30 min</li>
+      <li>Add 25 µL CellTiter-Glo to 50 µL cells in 384-well white plate</li>
+      <li>Shake 2 min; RT 15 min</li>
+      <li>Read luminescence</li>
+    </ol>
+    <h3>Caspase 3/7 Assay (Flow Cytometry)</h3>
+    <ul>
+      <li>96-well U-bottom plate; 500 × g spins throughout</li>
+      <li>Components A/B per kit instructions; 30 min RT in dark</li>
+      <li>Wash; resuspend in FACS buffer + PI; acquire</li>
+    </ul>
+    <h3>Tecan D300 Drug Printer</h3>
+    <ul>
+      <li>10 mM DMSO compound stocks in T8 cassette</li>
+      <li>Target DMSO: 0.1% final</li>
+      <li>Use D3003 software for dispensing layout</li>
+    </ul>
+  </div>
+
+  <!-- ══ IF Staining ══ -->
+  <div class="card">
+    <h2>Immunofluorescence Staining</h2>
+    <h3>Fixation Methods</h3>
+    <ul>
+      <li><strong>PFA (4%):</strong> 15 min RT; quench overnight in 4°C glycine (0.1 M in PBS)</li>
+      <li><strong>MeOH (ice cold):</strong> 10 min on ice; better for lysosome morphology</li>
+    </ul>
+    <h3>Standard IF Protocol</h3>
+    <ol>
+      <li>Wash 3× PBS; permeabilize 5 min (0.1% Triton X-100 in PBS, PFA-fixed only)</li>
+      <li>Block 30 min: 5% BSA or 5% donkey serum in PBS</li>
+      <li>Primary antibody in block; 1–2h RT or overnight 4°C</li>
+      <li>Wash 3× PBS; secondary antibody in block; 1h RT in dark</li>
+      <li>Wash 3× PBS; DAPI 1:10,000 in PBS, 5 min; wash; mount</li>
+    </ol>
+    <h3>Coverslip Preparation</h3>
+    <ul>
+      <li><strong>Fibronectin:</strong> 10 µg/mL; 0.8 mL per well (12-well); 37°C, 30 min; aspirate; air dry</li>
+      <li><strong>Poly-D-Lysine:</strong> 50 µg/mL; 1 mL per well; 37°C, 1h; wash 2× PBS; air dry</li>
+      <li><strong>Plasma cleaning:</strong> 3 min in plasma cleaner before coating for best adhesion</li>
+    </ul>
+  </div>
+
+  <!-- ══ Dye Labeling ══ -->
+  <div class="card">
+    <h2>Organelle &amp; Fusion-Tag Dye Labeling</h2>
+    <h3>Lysotracker</h3>
+    <ul>
+      <li>Stock: 1 mM in DMSO (Cuervo lab stock)</li>
+      <li>Working: 1:10,000 → 100 nM or 1:20,000 → 50 nM in serum-free media</li>
+      <li>Incubate 20–30 min at 37°C; wash; image live</li>
+    </ul>
+    <h3>MitoTracker</h3>
+    <ul>
+      <li>Stock: 1 mM in DMSO</li>
+      <li>Working: 25 nM (dense cultures) or 5 nM (sparse) in serum-free media</li>
+      <li>30 min at 37°C; wash; proceed to fixation or live imaging</li>
+    </ul>
+    <h3>JF549 Halo Dye Labeling</h3>
+    <ul>
+      <li>Stock: 5 µM; Working: 1:6,000 → ~0.83 nM</li>
+      <li>15 min at 37°C; wash 3× media; image</li>
+    </ul>
+    <h3>Shield Ligand (Proteotuner Degron)</h3>
+    <table>
+      <tr><th>Target Concentration</th><th>Dilution from 0.5 mM Stock</th></tr>
+      <tr><td>250 nM</td><td>1:2,000</td></tr>
+      <tr><td>1 µM</td><td>1:500</td></tr>
+    </table>
+  </div>
+
+  <!-- ══ ABPP ══ -->
+  <div class="card">
+    <h2>ABPP — Activity Based Protein Profiling</h2>
+    <p>See <a href="/protocols.html">Full Protocol Book</a> for complete V1 (short, IP then gel) and V2 (5-day, overexpression) workflows. Key steps below.</p>
+    <h3>General ABPP Workflow</h3>
+    <ol>
+      <li><strong>Lysis:</strong> Sonication in PBS + protease inhibitors (3 min, 1400 × g spin)</li>
+      <li><strong>Normalize:</strong> DC assay → dilute to 1 mg/mL; use 200 µg (200 µL) per sample</li>
+      <li><strong>Scout compound:</strong> 2 µL of 100× stock; 1h RT (e.g. KB05 at 500 µM final)</li>
+      <li><strong>Alkyne probe:</strong> 2 µL of 100× stock; 1h RT (e.g. KB05-yne at 100 µM final)</li>
+      <li><strong>FLAG-IP:</strong> dilute 1:1.5 with 0.1% Triton-X/PBS; add 30 µL anti-FLAG M2 beads; rotate 2h 4°C; wash 2× IP buffer + 3× PBS</li>
+      <li><strong>Click reaction (fresh TCEP each time):</strong> 1 µL CuSO₄ [50 mM] + 3 µL TBTA [1.7 mM] + 1 µL TCEP [50 mM] + 1 µL Rh-azide; incubate 1h RT</li>
+      <li><strong>Gel:</strong> quench 30 µL LDS; boil 95°C 7 min; SDS-PAGE; image on Bio-Rad ChemiDoc (DyLight 550 for Rh-N₃)</li>
+    </ol>
+    <div class="info-box">Compounds stock: KB02, KB05, KB02-yne, KB05-yne in DMSO. TCEP: make fresh each time (50 mM in PBS). TBTA: 1.7 mM in 4:1 tBuOH:DMSO.</div>
+  </div>
+
+</div>
+<footer>Jeet Biswas – Research Site &bull; Hosted on Raspberry Pi &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

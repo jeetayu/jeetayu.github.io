@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HyperTRIBE Pipeline — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.main{flex:1;padding:20px;max-width:1020px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.field input,.field select{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Mono",monospace;font-size:12px;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus{border-color:#C2185B}
+.field .hint{font-size:10px;color:#A8A29E;margin-top:2px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 22px;transition:background .15s}
+.action-btn:hover{background:#A3144E}
+.action-btn:disabled{background:#E2DDD8;color:#A8A29E;cursor:default}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover:not(:disabled){background:#F0EDE9}
+.danger-btn{background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;color:#9F1239;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;padding:4px 10px}
+/* Wizard steps */
+.wizard-steps{display:flex;gap:0;margin-bottom:20px;overflow:hidden}
+.wizard-step{flex:1;padding:10px 6px;font-size:11px;font-weight:600;text-align:center;background:#F5F4F1;border:1px solid #E2DDD8;border-right:none;color:#78716C;cursor:pointer;transition:background .15s;position:relative}
+.wizard-step:first-child{border-radius:6px 0 0 6px}
+.wizard-step:last-child{border-right:1px solid #E2DDD8;border-radius:0 6px 6px 0}
+.wizard-step.active{background:#C2185B;color:#fff;border-color:#C2185B;z-index:1}
+.wizard-step.done{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+.wizard-step .step-num{display:block;font-size:16px;font-weight:700;margin-bottom:2px}
+/* Sample rows */
+.sample-row{display:grid;grid-template-columns:160px 1fr 1fr auto;gap:8px;align-items:center;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:8px 10px;margin-bottom:6px}
+.sample-row input{background:#fff;border:1px solid #E2DDD8;border-radius:4px;padding:5px 8px;font-family:"IBM Plex Mono",monospace;font-size:11px;outline:none;width:100%}
+.sample-row input:focus{border-color:#C2185B}
+.sample-row .rm-btn{background:none;border:none;color:#A8A29E;cursor:pointer;font-size:16px;padding:2px 6px;transition:color .15s;flex-shrink:0}
+.sample-row .rm-btn:hover{color:#9F1239}
+.sample-type-label{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.ctrl-label{background:#E0F2FE;color:#0369A1}
+.treat-label{background:#FEE2E2;color:#9F1239}
+/* Progress steps */
+.progress-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.prog-step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:#F5F4F1;border:1px solid #E2DDD8;font-size:12px}
+.prog-step.done{background:#ECFDF5;border-color:#A7F3D0}
+.prog-step.running{background:#FFF8F0;border-color:#FDE68A;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.prog-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.prog-icon.done{background:#065F46;color:#fff}
+.prog-icon.running{background:#F59E0B;color:#fff}
+.prog-icon.queued{background:#E2DDD8;color:#78716C}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Log viewer */
+.log-viewer{background:#0D1117;color:#E6EDF3;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:12px;border-radius:6px;max-height:300px;overflow-y:auto;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+/* Result files */
+.result-file{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid #E2DDD8;border-radius:5px;margin-bottom:5px;background:#FAFAF9}
+.result-file-name{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#1C1917;font-weight:600}
+.result-file-size{font-size:10px;color:#78716C}
+/* Jobs list */
+.job-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid #E2DDD8;border-radius:5px;margin-bottom:5px;background:#FAFAF9;cursor:pointer;transition:background .1s}
+.job-row:hover{background:#FFF1F5}
+.status-badge{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.status-running{background:#FEF3C7;color:#92400E}
+.status-completed{background:#ECFDF5;color:#065F46}
+.status-failed{background:#FFF1F2;color:#9F1239}
+.status-queued{background:#EEF2FF;color:#3730A3}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+  <div>
+    <div class="topbar-logo"><em>HyperTRIBE</em> Pipeline</div>
+    <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; End-to-end RBP target identification from FASTQ</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="banner banner-info">
+    <strong>Server-side pipeline.</strong> This app submits jobs to the local Mac server (192.168.68.37). FASTQ files must be accessible on that machine. The pipeline runs fastp &rarr; STAR &rarr; samtools &rarr; editing site calling &rarr; gene annotation &rarr; report.
+  </div>
+
+  <!-- Wizard steps indicator -->
+  <div class="wizard-steps" id="wizard-steps">
+    <div class="wizard-step active" onclick="goStep(0)"><span class="step-num">1</span>Project</div>
+    <div class="wizard-step" onclick="goStep(1)"><span class="step-num">2</span>References</div>
+    <div class="wizard-step" onclick="goStep(2)"><span class="step-num">3</span>Samples</div>
+    <div class="wizard-step" onclick="goStep(3)"><span class="step-num">4</span>Parameters</div>
+    <div class="wizard-step" onclick="goStep(4)"><span class="step-num">5</span>Run &amp; Monitor</div>
+  </div>
+
+  <!-- Step 0: Project -->
+  <div class="vcard" id="step-0">
+    <div class="vcard-title">Project Setup</div>
+    <div class="vcard-sub">Give your analysis a name and choose the organism.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Project Name</label>
+        <input type="text" id="proj-name" value="HyperTRIBE_Analysis" placeholder="e.g. SF1_HyperTRIBE_K562">
+      </div>
+      <div class="field">
+        <label>Organism</label>
+        <select id="proj-org" onchange="fillRefPaths()">
+          <option value="Homo sapiens">Human (hg38)</option>
+          <option value="Homo sapiens hg19">Human (hg19)</option>
+          <option value="Mus musculus">Mouse (mm10)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Output Directory (on server)</label>
+      <input type="text" id="proj-outdir" value="/Users/clawdbot/hypertribe_jobs" placeholder="/path/to/output">
+      <div class="hint">Jobs are stored here with a unique ID each run.</div>
+    </div>
+    <div style="margin-top:8px">
+      <button class="action-btn" onclick="goStep(1)">Next: References &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Step 1: References -->
+  <div class="vcard" id="step-1" style="display:none">
+    <div class="vcard-title">Reference Files</div>
+    <div class="vcard-sub">Server-side paths to genome FASTA, STAR index, and GTF annotation. These do not need to be uploaded — they must already exist on 192.168.68.37.</div>
+    <div class="banner banner-warn">
+      <strong>STAR &amp; genome references:</strong> Paths are pre-filled to the standard locations on the server. Genome FASTA and GTF must be downloaded from GENCODE, then the STAR index built with <code>STAR --runMode genomeGenerate</code> (~3 hours). FASTQ alignment will fail until these paths exist.
+    </div>
+    <div class="field">
+      <label>Genome FASTA</label>
+      <input type="text" id="ref-genome">
+      <div class="hint">Pre-filled based on organism selection. Genome FASTA from GENCODE/Ensembl.</div>
+    </div>
+    <div class="field">
+      <label>STAR Index Directory</label>
+      <input type="text" id="ref-star">
+      <div class="hint">Directory built by STAR --runMode genomeGenerate (100bp overhang)</div>
+    </div>
+    <div class="field">
+      <label>GTF Annotation (GENCODE)</label>
+      <input type="text" id="ref-gtf">
+      <div class="hint">GENCODE comprehensive annotation GTF — used for alignment and gene annotation</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="sec-btn" onclick="goStep(0)">&larr; Back</button>
+      <button class="action-btn" onclick="goStep(2)">Next: Samples &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Samples -->
+  <div class="vcard" id="step-2" style="display:none">
+    <div class="vcard-title">Sample Definition</div>
+    <div class="vcard-sub">Add ADARcd control samples and HyperTRIBE treatment samples. Each sample needs a unique name and paired-end FASTQ paths on the server.</div>
+    <div class="banner banner-info">
+      FASTQ files must be <strong>gzip-compressed</strong> (<code>.fastq.gz</code>). Paired-end is required. Paths are on the server (192.168.68.37).
+    </div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:#0369A1;margin-bottom:6px">ADARcd Control Samples</div>
+      <div style="font-size:10px;color:#78716C;display:grid;grid-template-columns:160px 1fr 1fr 28px;gap:8px;padding:0 10px;margin-bottom:4px">
+        <span>Name</span><span>R1 path (.fastq.gz)</span><span>R2 path (.fastq.gz)</span><span></span>
+      </div>
+      <div id="ctrl-rows"></div>
+      <button class="sec-btn" style="margin-top:6px" onclick="addSample('ctrl')">+ Add Control Sample</button>
+    </div>
+
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#9F1239;margin-bottom:6px">HyperTRIBE Treatment Samples</div>
+      <div style="font-size:10px;color:#78716C;display:grid;grid-template-columns:160px 1fr 1fr 28px;gap:8px;padding:0 10px;margin-bottom:4px">
+        <span>Name</span><span>R1 path (.fastq.gz)</span><span>R2 path (.fastq.gz)</span><span></span>
+      </div>
+      <div id="treat-rows"></div>
+      <button class="sec-btn" style="margin-top:6px" onclick="addSample('treat')">+ Add Treatment Sample</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="sec-btn" onclick="goStep(1)">&larr; Back</button>
+      <button class="action-btn" onclick="goStep(3)">Next: Parameters &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Parameters -->
+  <div class="vcard" id="step-3" style="display:none">
+    <div class="vcard-title">Analysis Parameters</div>
+    <div class="vcard-sub">Editing site calling thresholds. Defaults match the published HyperTRIBE v2.0 pipeline.</div>
+
+    <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:#78716C;text-transform:uppercase;letter-spacing:.6px">Editing Site Thresholds</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>Min Coverage (reads)</label>
+        <input type="number" id="p-mincov" value="20" min="5" max="200">
+        <div class="hint">Min read depth at each position</div>
+      </div>
+      <div class="field">
+        <label>Min Edit Frequency (%)</label>
+        <input type="number" id="p-minedit" value="5" min="1" max="50" step="0.5">
+        <div class="hint">Min A→G editing % in treatment</div>
+      </div>
+      <div class="field">
+        <label>Min Fold Change (vs control)</label>
+        <input type="number" id="p-fc" value="2.0" min="1" max="20" step="0.5">
+        <div class="hint">Treatment/control edit ratio</div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="field">
+        <label>P-value Threshold</label>
+        <input type="number" id="p-pval" value="0.05" min="0.001" max="0.1" step="0.001">
+        <div class="hint">Fisher's exact test cutoff</div>
+      </div>
+      <div class="field">
+        <label>Min Replicates</label>
+        <input type="number" id="p-reps" value="2" min="1" max="10">
+        <div class="hint">Sites must appear in ≥N reps</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;margin:14px 0 10px;color:#78716C;text-transform:uppercase;letter-spacing:.6px">Compute Resources</div>
+    <div class="grid-3">
+      <div class="field">
+        <label>STAR Alignment Threads</label>
+        <input type="number" id="p-starthr" value="8" min="1" max="64">
+      </div>
+      <div class="field">
+        <label>Editing Calling Threads</label>
+        <input type="number" id="p-callthr" value="16" min="1" max="64">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="sec-btn" onclick="goStep(2)">&larr; Back</button>
+      <button class="action-btn" onclick="goStep(4)">Review &amp; Submit &rarr;</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Run & Monitor -->
+  <div class="vcard" id="step-4" style="display:none">
+    <div class="vcard-title">Run &amp; Monitor</div>
+    <div class="vcard-sub">Review config and submit to the server pipeline. Monitor progress in real time.</div>
+
+    <div id="submit-area">
+      <div id="config-preview" style="margin-bottom:14px"></div>
+      <button class="action-btn" id="btn-submit" onclick="submitJob()">&#9654; Submit Pipeline Job</button>
+    </div>
+
+    <div id="monitor-area" style="display:none;margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <span id="job-status-badge" class="status-badge status-running">running</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#78716C;margin-left:8px" id="job-id-display"></span>
+        </div>
+        <button class="sec-btn" onclick="stopPolling()">Stop monitoring</button>
+      </div>
+
+      <div class="progress-steps" id="progress-steps"></div>
+
+      <div style="font-size:11px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Pipeline Log</div>
+      <div class="log-viewer" id="log-viewer">Waiting for pipeline output…</div>
+
+      <div id="results-area" style="display:none;margin-top:16px">
+        <div class="banner banner-ok">&#10003; Pipeline completed successfully!</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Result Files</div>
+        <div id="result-files"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Previous Jobs -->
+  <div class="vcard">
+    <div class="vcard-title">Previous Jobs</div>
+    <div id="jobs-list"><div style="font-size:12px;color:#78716C">Loading…</div></div>
+    <button class="sec-btn" style="margin-top:8px" onclick="loadJobs()">&#8635; Refresh</button>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+const API = '/api/hypertribe';
+let pollTimer = null;
+let currentJobId = null;
+let ctrlCount = 0, treatCount = 0;
+
+// ─── Wizard ───────────────────────────────────────────────────────────────────
+// Reference path presets — standard locations on 192.168.68.37
+const REF_PATHS = {
+  'Homo sapiens': {
+    genome:     '/Users/clawdbot/References/hg38/GRCh38.primary_assembly.genome.fa',
+    star_index: '/Users/clawdbot/References/hg38/star_index_100bp/',
+    gtf:        '/Users/clawdbot/References/hg38/gencode.v46.primary_assembly.annotation.gtf'
+  },
+  'Homo sapiens hg19': {
+    genome:     '/Users/clawdbot/References/hg19/GRCh37.primary_assembly.genome.fa',
+    star_index: '/Users/clawdbot/References/hg19/star_index_100bp/',
+    gtf:        '/Users/clawdbot/References/hg19/gencode.v45lift37.annotation.gtf'
+  },
+  'Mus musculus': {
+    genome:     '/Users/clawdbot/References/mm10/GRCm38.primary_assembly.genome.fa',
+    star_index: '/Users/clawdbot/References/mm10/star_index_100bp/',
+    gtf:        '/Users/clawdbot/References/mm10/gencode.vM25.primary_assembly.annotation.gtf'
+  }
+};
+
+function fillRefPaths() {
+  const org = document.getElementById('proj-org').value;
+  const paths = REF_PATHS[org];
+  if (!paths) return;
+  document.getElementById('ref-genome').value = paths.genome;
+  document.getElementById('ref-star').value   = paths.star_index;
+  document.getElementById('ref-gtf').value    = paths.gtf;
+}
+
+// Pre-fill on page load
+document.addEventListener('DOMContentLoaded', fillRefPaths);
+
+function goStep(n) {
+  [0,1,2,3,4].forEach(i => {
+    document.getElementById('step-'+i).style.display = i===n ? '' : 'none';
+    const tab = document.querySelectorAll('.wizard-step')[i];
+    tab.classList.toggle('active', i===n);
+  });
+  if (n===4) buildConfigPreview();
+  if (n===2 && ctrlCount===0) { addSample('ctrl'); addSample('ctrl'); addSample('treat'); addSample('treat'); }
+}
+
+// ─── Sample rows ─────────────────────────────────────────────────────────────
+function addSample(type) {
+  const container = document.getElementById(type==='ctrl'?'ctrl-rows':'treat-rows');
+  const idx = type==='ctrl' ? ++ctrlCount : ++treatCount;
+  const prefix = type==='ctrl' ? 'ctrl_wt' : 'tribe';
+  const row = document.createElement('div');
+  row.className = 'sample-row';
+  row.id = `${type}-row-${idx}`;
+  row.innerHTML = `
+    <input type="text" placeholder="Sample name" id="${type}-name-${idx}" value="${prefix}_rep${idx}">
+    <input type="text" placeholder="/path/to/R1.fastq.gz" id="${type}-r1-${idx}">
+    <input type="text" placeholder="/path/to/R2.fastq.gz" id="${type}-r2-${idx}">
+    <button class="rm-btn" onclick="this.closest('.sample-row').remove()">&#215;</button>
+  `;
+  container.appendChild(row);
+}
+
+function collectSamples(type) {
+  const rows = document.querySelectorAll(`[id^="${type}-row-"]`);
+  const result = [];
+  for (const row of rows) {
+    const id = row.id.split('-').pop();
+    const name = document.getElementById(`${type}-name-${id}`)?.value.trim();
+    const r1   = document.getElementById(`${type}-r1-${id}`)?.value.trim();
+    const r2   = document.getElementById(`${type}-r2-${id}`)?.value.trim();
+    if (name) result.push({name, r1: r1||'', r2: r2||''});
+  }
+  return result;
+}
+
+// ─── Config preview ───────────────────────────────────────────────────────────
+function buildConfigPreview() {
+  const ctrl  = collectSamples('ctrl');
+  const treat = collectSamples('treat');
+  let html = `<div style="background:#F5F4F1;border:1px solid #E2DDD8;border-radius:6px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6">`;
+  html += `<strong>project_name:</strong> ${escH(v('proj-name'))}\n`;
+  html += `<strong>organism:</strong> ${escH(v('proj-org'))}\n`;
+  html += `<strong>genome:</strong> ${escH(v('ref-genome'))}\n`;
+  html += `<strong>star_index:</strong> ${escH(v('ref-star'))}\n`;
+  html += `<strong>annotation:</strong> ${escH(v('ref-gtf'))}\n\n`;
+  html += `<strong>control_samples:</strong> [${ctrl.map(s=>`"${escH(s.name)}"`).join(', ')}]\n`;
+  html += `<strong>treatment_samples:</strong> [${treat.map(s=>`"${escH(s.name)}"`).join(', ')}]\n\n`;
+  html += `<strong>min_coverage:</strong> ${v('p-mincov')} | <strong>min_edit_freq:</strong> ${parseFloat(v('p-minedit'))/100} | <strong>edit_fold_change:</strong> ${v('p-fc')}\n`;
+  html += `<strong>p_value_threshold:</strong> ${v('p-pval')} | <strong>min_replicates:</strong> ${v('p-reps')}\n`;
+  html += `<strong>star_threads:</strong> ${v('p-starthr')} | <strong>calling_threads:</strong> ${v('p-callthr')}\n`;
+  html += '</div>';
+  document.getElementById('config-preview').innerHTML = html;
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+async function submitJob() {
+  const ctrl  = collectSamples('ctrl');
+  const treat = collectSamples('treat');
+
+  if (!ctrl.length || !treat.length) {
+    alert('Add at least one control and one treatment sample.'); return;
+  }
+  if (!v('ref-genome') || !v('ref-star') || !v('ref-gtf')) {
+    alert('Please fill in all reference file paths.'); return;
+  }
+
+  const payload = {
+    project_name:      v('proj-name'),
+    control_samples:   ctrl,
+    treatment_samples: treat,
+    genome:            v('ref-genome'),
+    star_index:        v('ref-star'),
+    annotation:        v('ref-gtf'),
+    min_coverage:      parseInt(v('p-mincov')),
+    min_edit_freq:     parseFloat(v('p-minedit')) / 100,
+    edit_fold_change:  parseFloat(v('p-fc')),
+    p_value_threshold: parseFloat(v('p-pval')),
+    min_replicates:    parseInt(v('p-reps')),
+    star_threads:      parseInt(v('p-starthr')),
+    calling_threads:   parseInt(v('p-callthr')),
+  };
+
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('btn-submit').textContent = 'Submitting…';
+
+  try {
+    const resp = await fetch(`${API}/submit`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Error: ' + (data.error||resp.status)); return; }
+
+    currentJobId = data.job_id;
+    document.getElementById('submit-area').style.display = 'none';
+    document.getElementById('monitor-area').style.display = '';
+    document.getElementById('job-id-display').textContent = 'Job: ' + currentJobId;
+    startPolling(currentJobId);
+    loadJobs();
+  } catch(e) {
+    alert('Network error: ' + e.message);
+  }
+  document.getElementById('btn-submit').disabled = false;
+  document.getElementById('btn-submit').textContent = '▶ Submit Pipeline Job';
+}
+
+// ─── Polling ──────────────────────────────────────────────────────────────────
+function startPolling(jobId) {
+  if (pollTimer) clearInterval(pollTimer);
+  pollStatus(jobId);
+  pollTimer = setInterval(() => pollStatus(jobId), 4000);
+}
+
+function stopPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = null;
+}
+
+async function pollStatus(jobId) {
+  try {
+    const resp = await fetch(`${API}/status/${jobId}`);
+    const data = await resp.json();
+    if (!resp.ok) return;
+    updateMonitor(data);
+    if (data.status === 'completed' || data.status === 'failed') stopPolling();
+  } catch(e) { /* ignore network hiccup */ }
+}
+
+function updateMonitor(data) {
+  // Status badge
+  const badge = document.getElementById('job-status-badge');
+  badge.textContent = data.status;
+  badge.className = 'status-badge status-' + (data.status||'queued');
+
+  // Progress steps
+  const stepsEl = document.getElementById('progress-steps');
+  stepsEl.innerHTML = (data.steps||[]).map(s => {
+    const icon = s.status==='done' ? '✓' : s.status==='running' ? '…' : '○';
+    return `<div class="prog-step ${s.status}">
+      <div class="prog-icon ${s.status}">${icon}</div>
+      <span style="font-weight:600">${escH(s.label)}</span>
+    </div>`;
+  }).join('');
+
+  // Log
+  const logEl = document.getElementById('log-viewer');
+  if (data.log) { logEl.textContent = data.log; logEl.scrollTop = logEl.scrollHeight; }
+
+  // Results
+  if (data.results && data.results.length) {
+    document.getElementById('results-area').style.display = '';
+    const filesEl = document.getElementById('result-files');
+    filesEl.innerHTML = data.results.map(r => `
+      <div class="result-file">
+        <div>
+          <div class="result-file-name">${escH(r.label)}</div>
+          <div class="result-file-size">${escH(r.path)} &bull; ${fmtSize(r.size)}</div>
+        </div>
+        <a href="${escH(r.url)}" download><button class="sec-btn">&#128229; Download</button></a>
+      </div>`).join('');
+  }
+}
+
+// ─── Job history ─────────────────────────────────────────────────────────────
+async function loadJobs() {
+  try {
+    const resp = await fetch(`${API}/jobs`);
+    const jobs = await resp.json();
+    const el = document.getElementById('jobs-list');
+    if (!jobs.length) { el.innerHTML = '<div style="font-size:12px;color:#78716C">No jobs yet.</div>'; return; }
+    el.innerHTML = jobs.map(j => `
+      <div class="job-row" onclick="openJob('${j.job_id}')">
+        <div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700">${escH(j.project||j.job_id)}</span>
+          <span style="font-size:10px;color:#78716C;margin-left:8px">${j.job_id}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:#78716C">${j.created ? new Date(j.created*1000).toLocaleString() : ''}</span>
+          <span class="status-badge status-${j.status}">${j.status}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('jobs-list').innerHTML = '<div style="font-size:12px;color:#9F1239">Server unreachable. Is the API running?</div>';
+  }
+}
+
+function openJob(jobId) {
+  currentJobId = jobId;
+  goStep(4);
+  document.getElementById('submit-area').style.display = 'none';
+  document.getElementById('monitor-area').style.display = '';
+  document.getElementById('job-id-display').textContent = 'Job: ' + jobId;
+  startPolling(jobId);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function v(id) { return document.getElementById(id)?.value || ''; }
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtSize(bytes) {
+  if (bytes > 1e6) return (bytes/1e6).toFixed(1)+' MB';
+  if (bytes > 1e3) return (bytes/1e3).toFixed(1)+' KB';
+  return bytes+' B';
+}
+
+// Init
+loadJobs();
+</script>
+<script src="/js/site.js"></script>
+</body>
+</html>

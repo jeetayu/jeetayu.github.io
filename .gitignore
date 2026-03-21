@@ -1,0 +1,30 @@
+# Per-gene cache (43k files, 2GB) — fetched on demand from Ensembl at runtime
+apps/gene-cache/
+# Keep genome coordinate files used by tribe.html annotation
+!apps/gene-cache/hg38_gene_coords.json
+!apps/gene-cache/mm10_gene_coords.json
+!apps/gene-cache/hg19_gene_coords.json
+
+# Flask API backends — not usable on GitHub Pages
+api/
+
+# Temp / test directories
+_STARtmp/
+api_test_*/
+
+# Python
+*.pyc
+__pycache__/
+apps/generate_*.py
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor
+.vscode/
+*.swp
+# Python tools (not web content)
+tools/
+scripts/
+notebook/

@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCR Repertoire Analysis — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* Body */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:260px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:2px}
+.sb-btn{background:none;border:none;border-radius:5px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:500;padding:7px 10px;text-align:left;transition:all .15s;display:flex;align-items:center;gap:8px}
+.sb-btn:hover{background:#F5F4F1}
+.sb-btn.active{background:#FFF0F5;color:#C2185B;font-weight:700}
+.sb-btn .sb-icon{font-size:14px;width:18px;text-align:center}
+
+/* Sample list */
+.sample-chip{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;background:#FAFAF9;border:1px solid #E2DDD8;font-size:11px;margin-bottom:4px}
+.sample-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Main panel */
+.main{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px}
+.pane{display:none}.pane.active{display:flex;flex-direction:column;gap:16px}
+
+/* Cards */
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* Upload zone */
+.drop-zone{border:2px dashed #E2DDD8;border-radius:8px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;background:#FAFAF9}
+.drop-zone:hover,.drop-zone.drag-over{border-color:#C2185B;background:#FFF0F5}
+.drop-zone .dz-icon{font-size:36px;margin-bottom:10px}
+.drop-zone .dz-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.drop-zone .dz-sub{font-size:12px;color:#78716C}
+
+/* Metadata table */
+.meta-table{width:100%;border-collapse:collapse;font-size:12px}
+.meta-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:2px solid #E2DDD8}
+.meta-table td{padding:6px 8px;border-top:1px solid #F0EDE9}
+.meta-table tr:hover td{background:#FAFAF9}
+.meta-table input,.meta-table select{width:100%;background:#fff;border:1px solid #E2DDD8;border-radius:4px;padding:4px 7px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none}
+.meta-table input:focus,.meta-table select:focus{border-color:#C2185B}
+
+/* Banners */
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+
+/* Buttons */
+.btn-primary{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:600;padding:9px 20px;transition:background .15s}
+.btn-primary:hover{background:#A3144E}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-sec{background:#fff;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:all .15s}
+.btn-sec:hover{background:#F5F4F1}
+
+/* Stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:4px}
+.stat-card{background:#F5F4F1;border-radius:7px;padding:12px 14px}
+.stat-val{font-size:22px;font-weight:700;color:#C2185B;font-family:"IBM Plex Mono",monospace}
+.stat-lbl{font-size:10px;color:#78716C;font-weight:600;letter-spacing:.6px;text-transform:uppercase;margin-top:2px}
+
+/* Plot containers */
+.plot-wrap{width:100%;min-height:420px}
+.plot-wrap-tall{width:100%;min-height:560px}
+.plot-wrap-sm{width:100%;min-height:320px}
+
+/* Spinner */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+.data-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.data-tbl th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:2px solid #E2DDD8;position:sticky;top:0}
+.data-tbl td{padding:6px 10px;border-top:1px solid #EDE9E5;font-family:"IBM Plex Mono",monospace}
+.data-tbl tr:hover td{background:#FAFAF9}
+
+/* Patient selector */
+.pt-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.pt-tab{background:#F5F4F1;border:1px solid #E2DDD8;border-radius:5px;color:#44403C;cursor:pointer;font-size:11px;font-weight:600;padding:5px 12px;transition:all .15s}
+.pt-tab.active{background:#C2185B;color:#fff;border-color:#C2185B}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Topbar -->
+<div class="topbar">
+  <a href="/apps.html" class="topbar-back">← Apps</a>
+  <div class="topbar-logo"><em>TCR</em> Repertoire Analysis</div>
+  <div class="topbar-sub">Adaptive ImmunoSEQ · TCRB</div>
+  <div class="topbar-right">
+    <button class="btn-sec" onclick="resetApp()" id="reset-btn" style="display:none">↺ New Analysis</button>
+    <button class="btn-primary" onclick="runAnalysis()" id="analyze-btn" style="display:none">▶ Analyze</button>
+  </div>
+</div>
+
+<div class="body">
+
+<!-- Sidebar (shown after analysis) -->
+<div class="sidebar" id="sidebar" style="display:none">
+  <div>
+    <div class="sb-section">Analysis</div>
+    <div class="sb-nav">
+      <button class="sb-btn active" onclick="showPane('overview')" id="nav-overview"><span class="sb-icon">📊</span>Overview</button>
+      <button class="sb-btn" onclick="showPane('diversity')" id="nav-diversity"><span class="sb-icon">📈</span>Diversity</button>
+      <button class="sb-btn" onclick="showPane('genes')" id="nav-genes"><span class="sb-icon">🧬</span>Gene Usage</button>
+      <button class="sb-btn" onclick="showPane('clones')" id="nav-clones"><span class="sb-icon">🔍</span>Clone Tracking</button>
+      <button class="sb-btn" onclick="showPane('overlap')" id="nav-overlap"><span class="sb-icon">⭕</span>Overlap</button>
+      <button class="sb-btn" onclick="showPane('tables')" id="nav-tables"><span class="sb-icon">📋</span>Export Tables</button>
+    </div>
+  </div>
+  <div>
+    <div class="sb-section">Samples</div>
+    <div id="sample-list"></div>
+  </div>
+</div>
+
+<!-- Main panel -->
+<div class="main" id="main">
+
+  <!-- Upload pane -->
+  <div class="pane active" id="pane-upload">
+    <div class="vcard">
+      <div class="vcard-title">TCR Repertoire Analysis</div>
+      <div class="vcard-sub">Upload Adaptive ImmunoSEQ TCRB files (TSV format). Accepts the newer Adaptive column format. Optionally upload a sampleOverview.tsv to auto-populate metadata.</div>
+
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="dzOver(event)" ondragleave="dzLeave(event)" ondrop="dzDrop(event)">
+        <div class="dz-icon">🧬</div>
+        <div class="dz-title">Drop Adaptive TSV files here</div>
+        <div class="dz-sub">Or click to browse &nbsp;·&nbsp; Multiple files accepted &nbsp;·&nbsp; Also accepts sampleOverview.tsv</div>
+      </div>
+      <input type="file" id="file-input" accept=".tsv,.txt,.csv" multiple style="display:none" onchange="handleFiles(this.files)">
+
+      <div id="upload-status" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Metadata assignment (shown after files uploaded) -->
+    <div class="vcard" id="meta-card" style="display:none">
+      <div class="vcard-title">Sample Metadata</div>
+      <div class="vcard-sub">Assign Patient ID and Timepoint to each sample. Timepoint format: T1, T2, T2.5, T3, T4, T5, T6</div>
+      <div class="tbl-wrap">
+        <table class="meta-table" id="meta-table">
+          <thead><tr>
+            <th>File</th><th>Sample Name</th><th>Patient ID</th><th>Timepoint</th><th>Rows</th>
+          </tr></thead>
+          <tbody id="meta-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+        <button class="btn-primary" onclick="runAnalysis()">▶ Run Analysis</button>
+        <button class="btn-sec" onclick="document.getElementById('file-input').click()">+ Add More Files</button>
+        <span id="analyze-msg" style="font-size:12px;color:#78716C"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview pane -->
+  <div class="pane" id="pane-overview">
+    <div class="vcard">
+      <div class="vcard-title">Repertoire Overview</div>
+      <div class="vcard-sub" id="overview-sub"></div>
+      <div class="stat-grid" id="stat-grid"></div>
+    </div>
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Total Productive Clones per Patient</div>
+        <div class="vcard-sub">Unique nucleotide sequences across all timepoints</div>
+        <div class="plot-wrap" id="plot-clones-pt"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">Clonality by Sample</div>
+        <div class="vcard-sub">1 − normalized Shannon entropy; higher = more dominant clones</div>
+        <div class="plot-wrap" id="plot-clonality"></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Productive Templates per Sample</div>
+        <div class="vcard-sub">Colored by patient</div>
+        <div class="plot-wrap" id="plot-templates"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">Dominant Clone Frequency</div>
+        <div class="vcard-sub">Max productive template frequency per sample</div>
+        <div class="plot-wrap" id="plot-maxfreq"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diversity pane -->
+  <div class="pane" id="pane-diversity">
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Shannon Diversity Over Time</div>
+        <div class="vcard-sub">Higher = more diverse repertoire</div>
+        <div class="plot-wrap" id="plot-shannon"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">Simpson Clonality Over Time</div>
+        <div class="vcard-sub">1 − normalized Shannon; lower = more diverse</div>
+        <div class="plot-wrap" id="plot-clonality-tp"></div>
+      </div>
+    </div>
+    <div class="vcard">
+      <div class="vcard-title">Clone Frequency: First vs Last Timepoint</div>
+      <div class="vcard-sub">Each point = one clone (amino acid); axes = log₁₀ frequency. Diagonal = stable clones.</div>
+      <div class="pt-tabs" id="fl-pt-tabs"></div>
+      <div class="plot-wrap-tall" id="plot-first-last"></div>
+    </div>
+    <div class="vcard">
+      <div class="vcard-title">Top 10 Clone Frequencies per Patient</div>
+      <div class="vcard-sub">Ranked by maximum frequency across timepoints</div>
+      <div class="pt-tabs" id="top10-pt-tabs"></div>
+      <div class="plot-wrap" id="plot-top10"></div>
+    </div>
+  </div>
+
+  <!-- Gene Usage pane -->
+  <div class="pane" id="pane-genes">
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">V Gene Usage</div>
+        <div class="vcard-sub">Top 20 TRBV genes &middot; frequency across samples</div>
+        <div class="plot-wrap-tall" id="plot-vgene"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">J Gene Usage</div>
+        <div class="vcard-sub">All TRBJ genes &middot; frequency across samples</div>
+        <div class="plot-wrap-tall" id="plot-jgene"></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Top V–J Gene Pairs</div>
+        <div class="vcard-sub">Top 20 most frequent V–J combinations</div>
+        <div class="plot-wrap" id="plot-vj"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">CDR3 Length Distribution</div>
+        <div class="vcard-sub">Amino acid length of CDR3 region by sample</div>
+        <div class="plot-wrap" id="plot-cdr3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clone Tracking pane -->
+  <div class="pane" id="pane-clones">
+    <div class="vcard">
+      <div class="vcard-title">Clone Tracking Over Time</div>
+      <div class="vcard-sub">Top 20 clones per patient tracked by amino acid CDR3 sequence.</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div class="pt-tabs" id="track-pt-tabs" style="margin:0"></div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <span style="font-size:11px;color:#78716C;margin-right:4px">View:</span>
+          <button class="pt-tab active" id="view-line" onclick="setTrackView('line')">Line</button>
+          <button class="pt-tab" id="view-alluvial" onclick="setTrackView('alluvial')">Alluvial</button>
+        </div>
+      </div>
+      <div class="plot-wrap-tall" id="plot-tracking"></div>
+    </div>
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Clone Persistence</div>
+        <div class="vcard-sub">How many timepoints each clone appears in (per patient)</div>
+        <div class="pt-tabs" id="persist-pt-tabs"></div>
+        <div class="plot-wrap" id="plot-persistence"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">Public Clones</div>
+        <div class="vcard-sub">Clones (amino acid) shared between N patients</div>
+        <div class="plot-wrap" id="plot-public"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlap pane -->
+  <div class="pane" id="pane-overlap">
+    <div class="vcard">
+      <div class="vcard-title">Repertoire Overlap (Jaccard Similarity)</div>
+      <div class="vcard-sub">Jaccard index between samples using amino acid CDR3 sequences. Values near 0 = very different repertoires.</div>
+      <div class="plot-wrap-tall" id="plot-jaccard"></div>
+    </div>
+    <div class="grid-2">
+      <div class="vcard">
+        <div class="vcard-title">Within-Patient Overlap Over Time</div>
+        <div class="vcard-sub">Jaccard similarity between T1 and each subsequent timepoint per patient</div>
+        <div class="plot-wrap" id="plot-jaccard-tp"></div>
+      </div>
+      <div class="vcard">
+        <div class="vcard-title">Clone Sharing Between Patients</div>
+        <div class="vcard-sub">Number of shared amino acid sequences between patient pairs</div>
+        <div class="plot-wrap" id="plot-sharing"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables pane -->
+  <div class="pane" id="pane-tables">
+    <div class="vcard">
+      <div class="vcard-title">Sample Summary Table</div>
+      <div class="vcard-sub">Per-sample diversity metrics and sequencing statistics</div>
+      <div style="margin-bottom:10px"><button class="btn-sec" onclick="exportCSV('sample-summary')">⬇ Download CSV</button></div>
+      <div class="tbl-wrap" id="tbl-sample-summary"></div>
+    </div>
+    <div class="vcard">
+      <div class="vcard-title">Clone Persistence Table</div>
+      <div class="vcard-sub">Clones that appear across multiple timepoints within each patient</div>
+      <div style="margin-bottom:10px"><button class="btn-sec" onclick="exportCSV('clone-persistence')">⬇ Download CSV</button></div>
+      <div class="tbl-wrap" id="tbl-clone-persistence"></div>
+    </div>
+    <div class="vcard">
+      <div class="vcard-title">Public Clone Table</div>
+      <div class="vcard-sub">Amino acid sequences shared between 2+ patients</div>
+      <div style="margin-bottom:10px"><button class="btn-sec" onclick="exportCSV('public-clones')">⬇ Download CSV</button></div>
+      <div class="tbl-wrap" id="tbl-public-clones"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /body -->
+</div><!-- /shell -->
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = { files: [], meta: {} }; // meta[fileName] = {sampleName, patientId, timepoint}
+let C = null; // computed analysis results
+
+// Patient color palette
+const PT_COLORS = ["#C2185B","#5E35B1","#00897B","#E65100","#1565C0","#AD1457","#6A1B9A","#00695C","#BF360C","#0D47A1","#558B2F","#F57F17"];
+const TP_ORDER  = ['T1','T2','T2.5','T3','T4','T5','T6'];
+
+function tpNum(tp) {
+  const n = parseFloat(String(tp).replace(/[^0-9.]/g,''));
+  return isNaN(n) ? 99 : n;
+}
+function tpSort(a,b){ return tpNum(a)-tpNum(b); }
+
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setEl(id,html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
+function fmtN(n){ return Number(n||0).toLocaleString(); }
+function fmtPct(n){ return (n*100).toFixed(2)+'%'; }
+
+// ─── Upload / Drag-drop ───────────────────────────────────────────────────────
+function dzOver(e){ e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function dzLeave(e){ document.getElementById('drop-zone').classList.remove('drag-over'); }
+function dzDrop(e){ e.preventDefault(); dzLeave(e); handleFiles(e.dataTransfer.files); }
+
+function handleFiles(files) {
+  const arr = Array.from(files);
+  if (!arr.length) return;
+
+  // Separate sampleOverview from data files
+  const overviewFile = arr.find(f => f.name.toLowerCase().includes('sampleoverview') || f.name.toLowerCase().includes('sample_overview'));
+  const dataFiles    = arr.filter(f => f !== overviewFile);
+
+  // Add to S.files (dedup by name)
+  dataFiles.forEach(f => {
+    if (!S.files.find(e => e.name === f.name)) S.files.push(f);
+  });
+
+  // Parse each new data file
+  const newFiles = dataFiles.filter(f => !S.meta[f.name]);
+  const parsePromises = newFiles.map(f => parseDataFile(f));
+
+  // If overview uploaded, parse it for metadata
+  if (overviewFile) {
+    parsePromises.push(parseSampleOverview(overviewFile));
+  }
+
+  setEl('upload-status', `<div class="banner banner-info"><span class="spinner"></span>Parsing ${newFiles.length + (overviewFile?1:0)} file(s) — large files may take a moment…</div>`);
+  Promise.all(parsePromises).then(() => {
+    buildMetaTable();
+    document.getElementById('analyze-btn').style.display = '';
+    document.getElementById('reset-btn').style.display = '';
+  });
+}
+
+function parseDataFile(file) {
+  return new Promise(resolve => {
+    if (!S.meta[file.name]) {
+      const sname = file.name.replace(/\.(tsv|txt|csv)$/i,'');
+      S.meta[file.name] = { sampleName: sname, patientId: '', timepoint: '', rowCount: 0, agg: null };
+    }
+    const agg = { totalTemplates: 0, cloneMap: {}, vUsage: {}, jUsage: {}, cdr3Hist: {}, vjPairs: {}, aaSet: new Set(), rowCount: 0 };
+
+    // Streaming step-by-step parse — never holds all rows in memory
+    Papa.parse(file, {
+      header: true, delimiter: '\t', skipEmptyLines: true,
+      step: result => {
+        const r = result.data;
+        if ((r.frame_type || '').trim() !== 'In') return;
+
+        const freq      = parseFloat(r.productive_template_frequency || r.template_frequency) || 0;
+        const templates = parseInt(r.templates) || 0;
+        const vgene     = (r.v_gene || r.v_resolved || '').split('*')[0].trim();
+        const jgene     = (r.j_gene || r.j_resolved || '').split('*')[0].trim();
+        const aa        = (r.amino_acid || '').trim();
+        const cdr3aa    = (r.cdr3_amino_acid || '').trim();
+        const nuc       = (r.nucleotide || '').trim();
+        const cdr3len   = parseInt(r.cdr3_length) || 0;
+        const aaKey     = aa || cdr3aa;
+        const cloneKey  = nuc || aaKey;
+        if (!cloneKey) return;
+
+        agg.rowCount++;
+        agg.totalTemplates += templates;
+
+        if (!agg.cloneMap[cloneKey]) agg.cloneMap[cloneKey] = { aa: aaKey, freq: 0, templates: 0, vgene, jgene, cdr3len };
+        agg.cloneMap[cloneKey].freq      += freq;
+        agg.cloneMap[cloneKey].templates += templates;
+
+        if (aaKey) agg.aaSet.add(aaKey);
+        if (vgene) agg.vUsage[vgene] = (agg.vUsage[vgene]||0) + templates;
+        if (jgene) agg.jUsage[jgene] = (agg.jUsage[jgene]||0) + templates;
+        const len = cdr3len || (cdr3aa ? cdr3aa.length : 0);
+        if (len > 0) agg.cdr3Hist[len] = (agg.cdr3Hist[len]||0) + templates;
+        if (vgene && jgene) { const k = vgene+'|'+jgene; agg.vjPairs[k] = (agg.vjPairs[k]||0) + templates; }
+      },
+      complete: () => {
+        // Normalize V/J usage and CDR3 hist to fractions
+        const totT = agg.totalTemplates || 1;
+        Object.keys(agg.vUsage).forEach(g => { agg.vUsage[g] /= totT; });
+        Object.keys(agg.jUsage).forEach(g => { agg.jUsage[g] /= totT; });
+        Object.keys(agg.cdr3Hist).forEach(l => { agg.cdr3Hist[l] /= totT; });
+        S.meta[file.name].agg      = agg;
+        S.meta[file.name].rowCount = agg.rowCount;
+        resolve();
+      },
+      error: () => resolve()
+    });
+  });
+}
+
+function parseSampleOverview(file) {
+  return new Promise(resolve => {
+    Papa.parse(file, {
+      header: true, delimiter: '\t', skipEmptyLines: true,
+      complete: results => {
+        // Map sample_name → subject_id (for patient+timepoint parsing)
+        results.data.forEach(row => {
+          const sn = row.sample_name || row.display_name || '';
+          const subjId = row.subject_id || '';
+          // Find matching data file
+          const matchKey = Object.keys(S.meta).find(k => k.includes(sn) || S.meta[k].sampleName === sn);
+          if (matchKey && subjId) {
+            // Parse "MF1-T4" → patient="MF1", timepoint="T4"
+            const m = subjId.match(/^(.+?)-(T[\d.]+)$/i);
+            if (m) {
+              S.meta[matchKey].patientId  = m[1];
+              S.meta[matchKey].timepoint  = m[2].toUpperCase();
+            }
+          }
+          if (matchKey) S.meta[matchKey].sampleName = sn || S.meta[matchKey].sampleName;
+        });
+        resolve();
+      }
+    });
+  });
+}
+
+function buildMetaTable() {
+  const tbody = document.getElementById('meta-tbody');
+  tbody.innerHTML = '';
+  document.getElementById('meta-card').style.display = '';
+
+  S.files.forEach((f,i) => {
+    const m = S.meta[f.name] || {};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td title="${escH(f.name)}" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(f.name)}</td>
+      <td><input id="mt-sname-${i}" value="${escH(m.sampleName||'')}" placeholder="Sample name"></td>
+      <td><input id="mt-pt-${i}" value="${escH(m.patientId||'')}" placeholder="e.g. MF1"></td>
+      <td><input id="mt-tp-${i}" value="${escH(m.timepoint||'')}" placeholder="T1, T2 …"></td>
+      <td style="font-family:'IBM Plex Mono',monospace;color:#78716C">${fmtN(m.rowCount||0)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  setEl('upload-status', `<div class="banner banner-ok">${S.files.length} file${S.files.length!==1?'s':''} loaded. Fill in Patient ID and Timepoint, then click Run Analysis.</div>`);
+}
+
+// ─── Run Analysis ─────────────────────────────────────────────────────────────
+function runAnalysis() {
+  // Collect metadata from table
+  S.files.forEach((f,i) => {
+    if (!S.meta[f.name]) S.meta[f.name] = {};
+    S.meta[f.name].sampleName = (document.getElementById(`mt-sname-${i}`)?.value || f.name.replace(/\.(tsv|txt|csv)$/i,'')).trim();
+    S.meta[f.name].patientId  = (document.getElementById(`mt-pt-${i}`)?.value || '').trim();
+    S.meta[f.name].timepoint  = (document.getElementById(`mt-tp-${i}`)?.value || '').trim().toUpperCase();
+  });
+
+  // Validate
+  const missing = S.files.filter(f => !S.meta[f.name]?.patientId || !S.meta[f.name]?.timepoint);
+  if (missing.length) {
+    setEl('analyze-msg', `⚠ ${missing.length} sample(s) missing Patient ID or Timepoint`);
+    return;
+  }
+
+  setEl('analyze-msg', '');
+  compute();
+  document.getElementById('sidebar').style.display = '';
+  showPane('overview');
+  document.getElementById('pane-upload').classList.remove('active');
+  buildSampleList();
+}
+
+// ─── Compute ──────────────────────────────────────────────────────────────────
+function compute() {
+  // Build sampleMeta from S.files (maintains file order)
+  const sampleArr = [];
+  const sampleMeta = {}; // sampleName → {patient, timepoint, agg}
+  S.files.forEach(f => {
+    const m = S.meta[f.name];
+    if (!m?.agg) return;
+    sampleArr.push(m.sampleName);
+    sampleMeta[m.sampleName] = { patient: m.patientId, timepoint: m.timepoint, agg: m.agg };
+  });
+
+  const patArr = [...new Set(sampleArr.map(s => sampleMeta[s].patient))].filter(Boolean).sort();
+  const tpArr  = [...new Set(sampleArr.map(s => sampleMeta[s].timepoint))].filter(Boolean).sort(tpSort);
+
+  // Per-sample diversity metrics (derived from cloneMap frequencies)
+  const perSample = {};
+  sampleArr.forEach(sn => {
+    const sm  = sampleMeta[sn];
+    const agg = sm.agg;
+    const freqs = Object.values(agg.cloneMap).map(c => c.freq).filter(f => f > 0);
+    const totalF = freqs.reduce((a,b) => a+b, 0) || 1;
+    const norms  = freqs.map(f => f/totalF);
+    const shannon    = -norms.reduce((s,f) => s + (f>0 ? f*Math.log2(f) : 0), 0);
+    const nUniq      = freqs.length;
+    const maxShannon = nUniq > 1 ? Math.log2(nUniq) : 1;
+    const normShannon = maxShannon > 0 ? shannon/maxShannon : 0;
+    const simpson    = norms.reduce((s,f) => s+f*f, 0);
+    perSample[sn] = {
+      patient: sm.patient, timepoint: sm.timepoint,
+      nTemplates: agg.totalTemplates, nUnique: nUniq,
+      shannon, normShannon, clonality: 1-normShannon, simpson,
+      maxFreq: freqs.length ? Math.max(...freqs) : 0,
+    };
+  });
+
+  // V/J usage: already normalized per-sample in agg
+  const vByS = {}, jByS = {};
+  sampleArr.forEach(sn => { vByS[sn] = sampleMeta[sn].agg.vUsage; jByS[sn] = sampleMeta[sn].agg.jUsage; });
+
+  // Top V/J genes globally
+  const vTotal = {}, jTotal = {};
+  sampleArr.forEach(sn => {
+    Object.entries(vByS[sn]).forEach(([g,f]) => { vTotal[g] = (vTotal[g]||0)+f; });
+    Object.entries(jByS[sn]).forEach(([g,f]) => { jTotal[g] = (jTotal[g]||0)+f; });
+  });
+  const topV = Object.entries(vTotal).sort((a,b)=>b[1]-a[1]).slice(0,20).map(e=>e[0]);
+  const topJ = Object.entries(jTotal).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+
+  // Global VJ pairs
+  const vjPairs = {};
+  sampleArr.forEach(sn => {
+    Object.entries(sampleMeta[sn].agg.vjPairs).forEach(([k,v]) => { vjPairs[k] = (vjPairs[k]||0)+v; });
+  });
+
+  // CDR3 histogram per sample (already normalized)
+  const cdr3BySample = {};
+  sampleArr.forEach(sn => { cdr3BySample[sn] = sampleMeta[sn].agg.cdr3Hist; });
+
+  // Clone tracking per patient (match clones by aa across samples/timepoints)
+  const clonesByPt = {};
+  patArr.forEach(pt => {
+    const ptSamples = sampleArr.filter(s => perSample[s]?.patient === pt);
+    const ptTPs = [...new Set(ptSamples.map(s => perSample[s].timepoint))].sort(tpSort);
+    const cloneMap = {}; // aa → { key, tpData: {tp: freq} }
+    ptSamples.forEach(sn => {
+      const tp = perSample[sn].timepoint;
+      Object.values(sampleMeta[sn].agg.cloneMap).forEach(c => {
+        const key = c.aa;
+        if (!key) return;
+        if (!cloneMap[key]) cloneMap[key] = { key, tpData: {} };
+        cloneMap[key].tpData[tp] = (cloneMap[key].tpData[tp]||0) + c.freq;
+      });
+    });
+    const clones = Object.values(cloneMap).sort((a,b) =>
+      Math.max(...Object.values(b.tpData)) - Math.max(...Object.values(a.tpData)));
+    clonesByPt[pt] = { clones, timepoints: ptTPs };
+  });
+
+  // Clone persistence
+  const persistByPt = {};
+  patArr.forEach(pt => {
+    persistByPt[pt] = {};
+    (clonesByPt[pt]?.clones||[]).forEach(cl => {
+      const n = Object.keys(cl.tpData).length;
+      persistByPt[pt][n] = (persistByPt[pt][n]||0)+1;
+    });
+  });
+
+  // Public clones (aa sequences shared across 2+ patients)
+  const clonePatientMap = {};
+  sampleArr.forEach(sn => {
+    const pt = perSample[sn].patient;
+    Object.values(sampleMeta[sn].agg.cloneMap).forEach(c => {
+      if (!c.aa || c.aa.length < 5) return;
+      if (!clonePatientMap[c.aa]) clonePatientMap[c.aa] = new Set();
+      clonePatientMap[c.aa].add(pt);
+    });
+  });
+  const publicClones = Object.entries(clonePatientMap)
+    .filter(([,pts]) => pts.size >= 2)
+    .sort((a,b) => b[1].size - a[1].size)
+    .map(([seq,pts]) => ({ seq, patients: [...pts].sort(), n: pts.size }));
+
+  // Jaccard similarity between samples (uses pre-built aaSet — O(1) per lookup)
+  const jaccMatrix = {};
+  sampleArr.forEach(sa => {
+    const setA = sampleMeta[sa].agg.aaSet;
+    sampleArr.forEach(sb => {
+      if (sa >= sb) return;
+      const setB = sampleMeta[sb].agg.aaSet;
+      let inter = 0;
+      setA.forEach(s => { if (setB.has(s)) inter++; });
+      const union = setA.size + setB.size - inter;
+      jaccMatrix[sa+'|||'+sb] = union > 0 ? inter/union : 0;
+    });
+  });
+
+  C = { samples: sampleArr, patients: patArr, timepoints: tpArr, perSample, sampleMeta, vByS, jByS, topV, topJ, vjPairs, cdr3BySample, clonesByPt, persistByPt, publicClones, jaccMatrix };
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showPane(id) {
+  ['overview','diversity','genes','clones','overlap','tables'].forEach(p => {
+    document.getElementById('pane-'+p)?.classList.remove('active');
+    document.getElementById('nav-'+p)?.classList.remove('active');
+  });
+  document.getElementById('pane-'+id)?.classList.add('active');
+  document.getElementById('nav-'+id)?.classList.add('active');
+
+  // Lazy render on first visit
+  const rendered = document.getElementById('pane-'+id)?.dataset.rendered;
+  if (!rendered && id !== 'overview') {
+    renderPane(id);
+    document.getElementById('pane-'+id).dataset.rendered = '1';
+  }
+  if (id === 'overview' && !document.getElementById('pane-overview').dataset.rendered) {
+    renderOverview();
+    document.getElementById('pane-overview').dataset.rendered = '1';
+  }
+}
+
+function buildSampleList() {
+  const el = document.getElementById('sample-list');
+  el.innerHTML = '';
+  C.patients.forEach((pt,i) => {
+    const col = PT_COLORS[i % PT_COLORS.length];
+    const ptSamples = C.samples.filter(s => C.perSample[s]?.patient === pt);
+    ptSamples.forEach(s => {
+      const m = C.perSample[s];
+      el.innerHTML += `<div class="sample-chip">
+        <div class="sample-dot" style="background:${col}"></div>
+        <div><div style="font-weight:600">${escH(s)}</div><div style="color:#78716C;font-size:10px">${escH(pt)} · ${escH(m.timepoint)}</div></div>
+      </div>`;
+    });
+  });
+}
+
+// ─── Overview ─────────────────────────────────────────────────────────────────
+function renderOverview() {
+  const { patients, samples, timepoints, perSample } = C;
+  const totalTemplates = Object.values(perSample).reduce((s,m) => s+m.nTemplates, 0);
+  const totalUnique    = Object.values(perSample).reduce((s,m) => s+m.nUnique, 0);
+  const meanClonality  = Object.values(perSample).reduce((s,m) => s+m.clonality, 0) / samples.length;
+
+  setEl('overview-sub', `${samples.length} samples · ${patients.length} patients · ${timepoints.length} timepoints`);
+  setEl('stat-grid', `
+    <div class="stat-card"><div class="stat-val">${patients.length}</div><div class="stat-lbl">Patients</div></div>
+    <div class="stat-card"><div class="stat-val">${samples.length}</div><div class="stat-lbl">Samples</div></div>
+    <div class="stat-card"><div class="stat-val">${fmtN(totalTemplates)}</div><div class="stat-lbl">Total Templates</div></div>
+    <div class="stat-card"><div class="stat-val">${fmtN(totalUnique)}</div><div class="stat-lbl">Total Unique Clones</div></div>
+    <div class="stat-card"><div class="stat-val">${(meanClonality*100).toFixed(1)}%</div><div class="stat-lbl">Mean Clonality</div></div>
+    <div class="stat-card"><div class="stat-val">${C.publicClones.length}</div><div class="stat-lbl">Public Clones</div></div>
+  `);
+
+  // Clones per patient (bar)
+  const ptClones = patients.map(pt => {
+    const all = new Set();
+    C.samples.filter(s => perSample[s]?.patient===pt).forEach(s => C.sampleMeta[s].agg.aaSet.forEach(aa => all.add(aa)));
+    return all.size;
+  });
+  Plotly.react('plot-clones-pt', [{
+    type:'bar', x:patients, y:ptClones,
+    marker:{color:patients.map((_,i)=>PT_COLORS[i%PT_COLORS.length])},
+    text:ptClones.map(fmtN), textposition:'outside'
+  }], plotLayout({ yaxis:{title:'Unique Clones (aa)',type:'log'}, margin:{t:10,b:60,l:70,r:20}, height:360 }), {responsive:true});
+
+  // Clonality scatter
+  const clonSamples = samples.sort((a,b) => tpSort(perSample[a]?.timepoint||'', perSample[b]?.timepoint||''));
+  const ptColors = clonSamples.map(s => PT_COLORS[patients.indexOf(perSample[s]?.patient)%PT_COLORS.length]);
+  Plotly.react('plot-clonality', [{
+    type:'scatter', mode:'markers+text',
+    x:clonSamples, y:clonSamples.map(s=>perSample[s].clonality),
+    marker:{color:ptColors, size:10, line:{color:'#fff',width:1.5}},
+    text:clonSamples.map(s=>perSample[s].timepoint), textposition:'top center', textfont:{size:9},
+    hovertemplate:'%{x}<br>Clonality: %{y:.4f}<extra></extra>'
+  }], plotLayout({ yaxis:{title:'Clonality'}, xaxis:{tickangle:-40,tickfont:{size:9}}, margin:{t:10,b:100,l:70,r:20}, height:360 }), {responsive:true});
+
+  // Templates scatter by patient
+  const traces1 = patients.map((pt,i) => {
+    const ptS = samples.filter(s => perSample[s]?.patient===pt).sort((a,b)=>tpSort(perSample[a].timepoint,perSample[b].timepoint));
+    return {
+      type:'scatter', mode:'markers+lines', name:pt,
+      x:ptS.map(s=>perSample[s].timepoint), y:ptS.map(s=>perSample[s].nTemplates),
+      marker:{color:PT_COLORS[i%PT_COLORS.length],size:9},
+      line:{color:PT_COLORS[i%PT_COLORS.length],width:1.5}
+    };
+  });
+  Plotly.react('plot-templates', traces1, plotLayout({ yaxis:{title:'Productive Templates',type:'log'}, xaxis:{title:'Timepoint'}, margin:{t:10,b:50,l:70,r:20}, height:360, legend:{orientation:'h',y:-0.25} }), {responsive:true});
+
+  // Max clone freq
+  const traces2 = patients.map((pt,i) => {
+    const ptS = samples.filter(s => perSample[s]?.patient===pt).sort((a,b)=>tpSort(perSample[a].timepoint,perSample[b].timepoint));
+    return {
+      type:'scatter', mode:'markers+lines', name:pt,
+      x:ptS.map(s=>perSample[s].timepoint), y:ptS.map(s=>perSample[s].maxFreq),
+      marker:{color:PT_COLORS[i%PT_COLORS.length],size:9},
+      line:{color:PT_COLORS[i%PT_COLORS.length],width:1.5}
+    };
+  });
+  Plotly.react('plot-maxfreq', traces2, plotLayout({ yaxis:{title:'Max Clone Frequency'}, xaxis:{title:'Timepoint'}, margin:{t:10,b:50,l:70,r:20}, height:360, legend:{orientation:'h',y:-0.25} }), {responsive:true});
+}
+
+// ─── Diversity ────────────────────────────────────────────────────────────────
+function renderDiversity() {
+  const { patients, samples, timepoints, perSample } = C;
+
+  // Shannon over time per patient
+  const tShannon = patients.map((pt,i) => {
+    const ptS = samples.filter(s=>perSample[s]?.patient===pt).sort((a,b)=>tpSort(perSample[a].timepoint,perSample[b].timepoint));
+    return {type:'scatter',mode:'markers+lines',name:pt,
+      x:ptS.map(s=>perSample[s].timepoint), y:ptS.map(s=>perSample[s].shannon),
+      marker:{color:PT_COLORS[i%PT_COLORS.length],size:9},line:{color:PT_COLORS[i%PT_COLORS.length],width:1.5}};
+  });
+  Plotly.react('plot-shannon', tShannon, plotLayout({yaxis:{title:'Shannon Diversity'},xaxis:{title:'Timepoint'},margin:{t:10,b:50,l:70,r:20},height:360,legend:{orientation:'h',y:-0.25}}),{responsive:true});
+
+  // Clonality over time
+  const tClon = patients.map((pt,i) => {
+    const ptS = samples.filter(s=>perSample[s]?.patient===pt).sort((a,b)=>tpSort(perSample[a].timepoint,perSample[b].timepoint));
+    return {type:'scatter',mode:'markers+lines',name:pt,
+      x:ptS.map(s=>perSample[s].timepoint), y:ptS.map(s=>perSample[s].clonality),
+      marker:{color:PT_COLORS[i%PT_COLORS.length],size:9},line:{color:PT_COLORS[i%PT_COLORS.length],width:1.5}};
+  });
+  Plotly.react('plot-clonality-tp', tClon, plotLayout({yaxis:{title:'Clonality (1−norm Shannon)'},xaxis:{title:'Timepoint'},margin:{t:10,b:50,l:70,r:20},height:360,legend:{orientation:'h',y:-0.25}}),{responsive:true});
+
+  // First vs Last patient tabs
+  const flTabs = document.getElementById('fl-pt-tabs');
+  patients.forEach((pt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pt-tab'+(i===0?' active':'');
+    btn.textContent = pt;
+    btn.onclick = () => { document.querySelectorAll('#fl-pt-tabs .pt-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderFirstLast(pt); };
+    flTabs.appendChild(btn);
+  });
+  renderFirstLast(patients[0]);
+
+  // Top 10 patient tabs
+  const top10Tabs = document.getElementById('top10-pt-tabs');
+  patients.forEach((pt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pt-tab'+(i===0?' active':'');
+    btn.textContent = pt;
+    btn.onclick = () => { document.querySelectorAll('#top10-pt-tabs .pt-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderTop10(pt); };
+    top10Tabs.appendChild(btn);
+  });
+  renderTop10(patients[0]);
+}
+
+function renderFirstLast(pt) {
+  const { clonesByPt } = C;
+  const { clones, timepoints: ptTPs } = clonesByPt[pt] || { clones:[], timepoints:[] };
+  if (ptTPs.length < 2) { setEl('plot-first-last','<div class="banner banner-warn">Only one timepoint for this patient.</div>'); return; }
+  const t1 = ptTPs[0], tLast = ptTPs[ptTPs.length-1];
+  const pts = clones
+    .filter(cl => cl.tpData[t1] && cl.tpData[tLast])
+    .map(cl => ({ x: Math.log10(cl.tpData[t1]||1e-6), y: Math.log10(cl.tpData[tLast]||1e-6), seq: cl.key.slice(0,20)+'…' }));
+
+  const ptOnly1 = clones.filter(cl => cl.tpData[t1] && !cl.tpData[tLast]).length;
+  const ptOnlyL = clones.filter(cl => !cl.tpData[t1] && cl.tpData[tLast]).length;
+
+  const xRange = [Math.min(-5,...pts.map(p=>p.x))-0.2, Math.max(-1,...pts.map(p=>p.x))+0.2];
+
+  Plotly.react('plot-first-last', [
+    { type:'scatter',mode:'markers',x:pts.map(p=>p.x),y:pts.map(p=>p.y),
+      marker:{color:'#C2185B',opacity:0.5,size:6},
+      hovertemplate:'%{text}<br>'+t1+': 10^%{x:.2f}<br>'+tLast+': 10^%{y:.2f}<extra></extra>',
+      text:pts.map(p=>p.seq), name:'Shared' },
+    { type:'scatter',mode:'lines',x:xRange,y:xRange,
+      line:{color:'#CBD5E1',dash:'dash',width:1},showlegend:false,hoverinfo:'skip' }
+  ], plotLayout({
+    xaxis:{title:`log₁₀ Frequency at ${t1}`,zeroline:false},
+    yaxis:{title:`log₁₀ Frequency at ${tLast}`,zeroline:false},
+    margin:{t:10,b:60,l:70,r:20},height:500,
+    annotations:[{text:`${ptOnly1} lost · ${ptOnlyL} gained`,xref:'paper',yref:'paper',x:0.98,y:0.02,showarrow:false,font:{size:11,color:'#78716C'}}]
+  }),{responsive:true});
+}
+
+function renderTop10(pt) {
+  const { clonesByPt } = C;
+  const { clones, timepoints: ptTPs } = clonesByPt[pt] || { clones:[], timepoints:[] };
+  const top10 = clones.slice(0,10);
+  const traces = top10.map((cl,i) => ({
+    type:'scatter',mode:'markers+lines',name:cl.key.slice(0,18)+'…',
+    x:ptTPs.filter(tp=>cl.tpData[tp]),
+    y:ptTPs.filter(tp=>cl.tpData[tp]).map(tp=>cl.tpData[tp]),
+    marker:{size:8},connectgaps:false
+  }));
+  Plotly.react('plot-top10', traces, plotLayout({
+    yaxis:{title:'Productive Frequency',type:'log'},xaxis:{title:'Timepoint'},
+    margin:{t:10,b:50,l:70,r:20},height:380,legend:{font:{size:9},orientation:'v'}
+  }),{responsive:true});
+}
+
+// ─── Gene Usage ───────────────────────────────────────────────────────────────
+function renderGenes() {
+  const { samples, topV, topJ, vByS, jByS, vjPairs, cdr3BySample, perSample } = C;
+  const samplesSorted = [...samples].sort((a,b) => {
+    const pa=perSample[a]?.patient||'', pb=perSample[b]?.patient||'';
+    if(pa!==pb) return pa.localeCompare(pb);
+    return tpSort(perSample[a]?.timepoint||'', perSample[b]?.timepoint||'');
+  });
+
+  // V gene heatmap
+  const vZ = topV.map(g => samplesSorted.map(s => (vByS[s]?.[g]||0)*100));
+  Plotly.react('plot-vgene',[{type:'heatmap',z:vZ,x:samplesSorted,y:topV,colorscale:'Viridis',
+    hovertemplate:'Sample: %{x}<br>V gene: %{y}<br>Freq: %{z:.3f}%<extra></extra>'}],
+    plotLayout({margin:{t:10,b:120,l:110,r:20},height:520,xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{tickfont:{size:9}}}),{responsive:true});
+
+  // J gene heatmap
+  const jZ = topJ.map(g => samplesSorted.map(s => (jByS[s]?.[g]||0)*100));
+  Plotly.react('plot-jgene',[{type:'heatmap',z:jZ,x:samplesSorted,y:topJ,colorscale:'RdBu',
+    hovertemplate:'Sample: %{x}<br>J gene: %{y}<br>Freq: %{z:.3f}%<extra></extra>'}],
+    plotLayout({margin:{t:10,b:120,l:90,r:20},height:520,xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{tickfont:{size:9}}}),{responsive:true});
+
+  // V-J pairs
+  const topVJ = Object.entries(vjPairs).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  Plotly.react('plot-vj',[{type:'bar',x:topVJ.map(e=>e[0].replace('|','·')),y:topVJ.map(e=>e[1]),
+    marker:{color:'#5E35B1',opacity:.8},
+    hovertemplate:'%{x}<br>Count: %{y:,}<extra></extra>'}],
+    plotLayout({xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{title:'Template Count'},margin:{t:10,b:160,l:70,r:20},height:380}),{responsive:true});
+
+  // CDR3 length (line per sample, or summarize)
+  const allLengths = new Set();
+  samplesSorted.forEach(s => Object.keys(cdr3BySample[s]||{}).forEach(l=>allLengths.add(+l)));
+  const lenArr = [...allLengths].sort((a,b)=>a-b).filter(l=>l>=6&&l<=24);
+  const cdr3Traces = samplesSorted.slice(0,12).map((s,i) => ({
+    type:'scatter',mode:'lines',name:s,
+    x:lenArr, y:lenArr.map(l=>((cdr3BySample[s]||{})[l]||0)*100),
+    line:{width:1.5}
+  }));
+  Plotly.react('plot-cdr3', cdr3Traces, plotLayout({
+    xaxis:{title:'CDR3 Amino Acid Length',dtick:1},yaxis:{title:'% of Templates'},
+    margin:{t:10,b:50,l:70,r:20},height:380,legend:{font:{size:9}}
+  }),{responsive:true});
+}
+
+// ─── Clone Tracking ───────────────────────────────────────────────────────────
+let _trackView = 'line';
+let _trackPt   = null;
+
+function setTrackView(v) {
+  _trackView = v;
+  document.getElementById('view-line').classList.toggle('active', v==='line');
+  document.getElementById('view-alluvial').classList.toggle('active', v==='alluvial');
+  if (_trackPt) {
+    if (v==='line') renderTracking(_trackPt);
+    else renderAlluvial(_trackPt);
+  }
+}
+
+function renderClones() {
+  const { patients, clonesByPt, persistByPt, publicClones } = C;
+  _trackPt = patients[0];
+
+  // Tracking tabs
+  const trackTabs = document.getElementById('track-pt-tabs');
+  const persistTabs = document.getElementById('persist-pt-tabs');
+  patients.forEach((pt,i) => {
+    const b1 = document.createElement('button'); b1.className='pt-tab'+(i===0?' active':''); b1.textContent=pt;
+    b1.onclick=()=>{document.querySelectorAll('#track-pt-tabs .pt-tab').forEach(b=>b.classList.remove('active'));b1.classList.add('active');_trackPt=pt;setTrackView(_trackView);};
+    trackTabs.appendChild(b1);
+    const b2 = document.createElement('button'); b2.className='pt-tab'+(i===0?' active':''); b2.textContent=pt;
+    b2.onclick=()=>{document.querySelectorAll('#persist-pt-tabs .pt-tab').forEach(b=>b.classList.remove('active'));b2.classList.add('active');renderPersistence(pt);};
+    persistTabs.appendChild(b2);
+  });
+  renderTracking(patients[0]);
+  renderPersistence(patients[0]);
+
+  // Public clones bar
+  const pubCounts = {};
+  publicClones.forEach(c => { pubCounts[c.n] = (pubCounts[c.n]||0)+1; });
+  const pubNs = Object.keys(pubCounts).map(Number).sort((a,b)=>a-b);
+  Plotly.react('plot-public',[{
+    type:'bar',x:pubNs.map(n=>`Shared by ${n} patients`),y:pubNs.map(n=>pubCounts[n]),
+    marker:{color:'#00897B',opacity:.8},
+    hovertemplate:'%{x}<br>%{y} clones<extra></extra>'
+  }],plotLayout({yaxis:{title:'Number of Clones'},margin:{t:10,b:80,l:70,r:20},height:340}),{responsive:true});
+}
+
+function renderTracking(pt) {
+  const { clones, timepoints: ptTPs } = C.clonesByPt[pt] || {};
+  if (!clones) return;
+  const top20 = clones.slice(0,20);
+  const traces = top20.map(cl => ({
+    type:'scatter',mode:'markers+lines',
+    name: cl.key.length>22 ? cl.key.slice(0,22)+'…' : cl.key,
+    x: ptTPs.filter(tp=>cl.tpData[tp]),
+    y: ptTPs.filter(tp=>cl.tpData[tp]).map(tp=>cl.tpData[tp]),
+    marker:{size:8},connectgaps:false,
+    hovertemplate:'%{y:.5f}<br>%{x}<extra>'+escH(cl.key.slice(0,30))+'</extra>'
+  }));
+  Plotly.react('plot-tracking',traces,plotLayout({
+    yaxis:{title:'Productive Frequency',type:'log'},xaxis:{title:'Timepoint'},
+    margin:{t:10,b:50,l:80,r:20},height:520,
+    legend:{font:{size:9},orientation:'v',x:1.01}
+  }),{responsive:true});
+}
+
+function renderPersistence(pt) {
+  const pd = C.persistByPt[pt] || {};
+  const ns = Object.keys(pd).map(Number).sort((a,b)=>a-b);
+  Plotly.react('plot-persistence',[{
+    type:'bar',x:ns.map(n=>`${n} timepoint${n>1?'s':''}`),y:ns.map(n=>pd[n]),
+    marker:{color:'#E65100',opacity:.8},
+    hovertemplate:'%{x}<br>%{y:,} clones<extra></extra>'
+  }],plotLayout({yaxis:{title:'Number of Clones',type:'log'},margin:{t:10,b:80,l:70,r:20},height:340}),{responsive:true});
+}
+
+function renderAlluvial(pt) {
+  const { clones, timepoints: ptTPs } = C.clonesByPt[pt] || {};
+  if (!clones || ptTPs.length < 2) {
+    setEl('plot-tracking','<div class="banner banner-warn" style="margin-top:16px">Need at least 2 timepoints for alluvial view.</div>');
+    return;
+  }
+  // Top 15 clones — Plotly Sankey, one node per (clone × timepoint), links = consecutive flow
+  const top15 = clones.slice(0,15);
+  const CLONE_COLORS = ["#C2185B","#5E35B1","#00897B","#E65100","#1565C0","#AD1457","#6A1B9A","#00695C","#BF360C","#0D47A1","#558B2F","#F57F17","#37474F","#4A148C","#B71C1C"];
+
+  const nodes = [], nodeMap = {};
+  // Build nodes in timepoint-column order so Sankey auto-layout creates columns
+  ptTPs.forEach(tp => {
+    top15.forEach((cl, ci) => {
+      if (!cl.tpData[tp]) return;
+      const key = `${ci}|${tp}`;
+      nodeMap[key] = nodes.length;
+      const label = (cl.key.length > 18 ? cl.key.slice(0,18)+'…' : cl.key);
+      nodes.push({ label: `${tp}: ${label}`, color: CLONE_COLORS[ci % CLONE_COLORS.length] });
+    });
+  });
+
+  const linkSrc=[], linkTgt=[], linkVal=[], linkCol=[];
+  for (let ti = 0; ti < ptTPs.length-1; ti++) {
+    const tpA = ptTPs[ti], tpB = ptTPs[ti+1];
+    top15.forEach((cl, ci) => {
+      const fA = cl.tpData[tpA], fB = cl.tpData[tpB];
+      if (!fA || !fB) return;
+      const src = nodeMap[`${ci}|${tpA}`], tgt = nodeMap[`${ci}|${tpB}`];
+      if (src === undefined || tgt === undefined) return;
+      linkSrc.push(src); linkTgt.push(tgt);
+      linkVal.push(Math.max(fA, fB) * 10000); // scale for visibility
+      linkCol.push(CLONE_COLORS[ci % CLONE_COLORS.length] + '66'); // 40% alpha
+    });
+  }
+
+  Plotly.react('plot-tracking', [{
+    type: 'sankey', orientation: 'h',
+    node: { pad:12, thickness:18, line:{color:'#E2DDD8',width:0.5},
+            label: nodes.map(n=>n.label), color: nodes.map(n=>n.color) },
+    link: { source: linkSrc, target: linkTgt, value: linkVal, color: linkCol }
+  }], plotLayout({ margin:{t:20,b:10,l:10,r:10}, height:520 }), {responsive:true});
+}
+
+// ─── Overlap ──────────────────────────────────────────────────────────────────
+function renderOverlap() {
+  const { samples, patients, perSample, jaccMatrix } = C;
+  const samplesSorted = [...samples].sort((a,b) => {
+    const pa=perSample[a]?.patient||'', pb=perSample[b]?.patient||'';
+    if(pa!==pb) return pa.localeCompare(pb);
+    return tpSort(perSample[a]?.timepoint||'', perSample[b]?.timepoint||'');
+  });
+
+  // Jaccard heatmap (all samples × all samples)
+  const n = samplesSorted.length;
+  const jZ = samplesSorted.map(sa => samplesSorted.map(sb => {
+    if (sa===sb) return 1;
+    const k1=sa+'|||'+sb, k2=sb+'|||'+sa;
+    return jaccMatrix[k1]??jaccMatrix[k2]??0;
+  }));
+  Plotly.react('plot-jaccard',[{type:'heatmap',z:jZ,x:samplesSorted,y:samplesSorted,
+    colorscale:'Blues',zmin:0,
+    hovertemplate:'%{x} vs %{y}<br>Jaccard: %{z:.5f}<extra></extra>'}],
+    plotLayout({margin:{t:10,b:120,l:120,r:20},height:520,xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{tickfont:{size:9}}}),{responsive:true});
+
+  // Within-patient Jaccard over time
+  const jTpTraces = patients.map((pt,i) => {
+    const ptS = samplesSorted.filter(s=>perSample[s]?.patient===pt).sort((a,b)=>tpSort(perSample[a].timepoint,perSample[b].timepoint));
+    if (ptS.length < 2) return null;
+    const t1 = ptS[0];
+    const xs = ptS.slice(1).map(s=>perSample[s].timepoint);
+    const ys = ptS.slice(1).map(s => {
+      const k1=t1+'|||'+s, k2=s+'|||'+t1;
+      return jaccMatrix[k1]??jaccMatrix[k2]??0;
+    });
+    return {type:'scatter',mode:'markers+lines',name:pt,x:xs,y:ys,
+      marker:{color:PT_COLORS[i%PT_COLORS.length],size:9},line:{color:PT_COLORS[i%PT_COLORS.length],width:1.5}};
+  }).filter(Boolean);
+  Plotly.react('plot-jaccard-tp',jTpTraces,plotLayout({
+    yaxis:{title:'Jaccard vs T1',rangemode:'tozero'},xaxis:{title:'Timepoint'},
+    margin:{t:10,b:50,l:70,r:20},height:340,legend:{orientation:'h',y:-0.25}
+  }),{responsive:true});
+
+  // Patient-pair sharing matrix
+  const pairZ = patients.map(pa => patients.map(pb => {
+    if (pa===pb) return 0;
+    const setA = new Set(); const setB = new Set();
+    samplesSorted.filter(s=>perSample[s]?.patient===pa).forEach(s=>C.sampleMeta[s].agg.aaSet.forEach(aa=>setA.add(aa)));
+    samplesSorted.filter(s=>perSample[s]?.patient===pb).forEach(s=>C.sampleMeta[s].agg.aaSet.forEach(aa=>setB.add(aa)));
+    let inter=0; setA.forEach(s=>{if(setB.has(s))inter++;});
+    return inter;
+  }));
+  Plotly.react('plot-sharing',[{type:'heatmap',z:pairZ,x:patients,y:patients,
+    colorscale:'Reds',
+    hovertemplate:'%{y} vs %{x}<br>Shared: %{z:,} clones<extra></extra>',
+    text:pairZ.map(row=>row.map(v=>v>0?fmtN(v):'')),texttemplate:'%{text}'}],
+    plotLayout({margin:{t:10,b:60,l:60,r:20},height:340,xaxis:{tickfont:{size:10}},yaxis:{tickfont:{size:10}}}),{responsive:true});
+}
+
+// ─── Tables ───────────────────────────────────────────────────────────────────
+const _csvData = {};
+
+function renderTables() {
+  const { samples, perSample, publicClones, patients, clonesByPt } = C;
+  const samplesSorted = [...samples].sort((a,b)=>{
+    const pa=perSample[a]?.patient||'',pb=perSample[b]?.patient||'';
+    if(pa!==pb) return pa.localeCompare(pb);
+    return tpSort(perSample[a]?.timepoint||'',perSample[b]?.timepoint||'');
+  });
+
+  // Sample summary
+  const sRows = samplesSorted.map(s => {
+    const m = perSample[s];
+    return {Sample:s,Patient:m.patient,Timepoint:m.timepoint,Templates:m.nTemplates,UniqueClones:m.nUnique,Shannon:m.shannon.toFixed(4),NormShannon:m.normShannon.toFixed(4),Clonality:m.clonality.toFixed(4),MaxFreq:m.maxFreq.toFixed(6)};
+  });
+  _csvData['sample-summary'] = sRows;
+  renderTableEl('tbl-sample-summary', sRows);
+
+  // Clone persistence
+  const persRows = [];
+  patients.forEach(pt => {
+    const { clones, timepoints: ptTPs } = C.clonesByPt[pt] || {};
+    if (!clones) return;
+    clones.filter(cl=>Object.keys(cl.tpData).length>=2).slice(0,200).forEach(cl => {
+      persRows.push({Patient:pt,Sequence:cl.key.slice(0,50),Timepoints:Object.keys(cl.tpData).sort(tpSort).join(','),NumTimepoints:Object.keys(cl.tpData).length,MaxFreq:Math.max(...Object.values(cl.tpData)).toFixed(6)});
+    });
+  });
+  _csvData['clone-persistence'] = persRows;
+  renderTableEl('tbl-clone-persistence', persRows.slice(0,100));
+
+  // Public clones
+  const pubRows = publicClones.slice(0,200).map(c => ({Sequence:c.seq,NumPatients:c.n,Patients:c.patients.join(',')}));
+  _csvData['public-clones'] = pubRows;
+  renderTableEl('tbl-public-clones', pubRows.slice(0,100));
+}
+
+function renderTableEl(elId, rows) {
+  if (!rows.length) { setEl(elId,'<div class="banner banner-info">No data.</div>'); return; }
+  const cols = Object.keys(rows[0]);
+  let html = `<table class="data-tbl"><thead><tr>${cols.map(c=>`<th>${escH(c)}</th>`).join('')}</tr></thead><tbody>`;
+  rows.forEach(r => { html += `<tr>${cols.map(c=>`<td>${escH(String(r[c]??''))}</td>`).join('')}</tr>`; });
+  html += '</tbody></table>';
+  setEl(elId, html);
+}
+
+function exportCSV(key) {
+  const rows = _csvData[key];
+  if (!rows?.length) return;
+  const cols = Object.keys(rows[0]);
+  const csv  = [cols.join(','), ...rows.map(r=>cols.map(c=>JSON.stringify(String(r[c]??''))).join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = key+'.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ─── Pane router ─────────────────────────────────────────────────────────────
+function renderPane(id) {
+  if (id==='diversity') renderDiversity();
+  else if (id==='genes')   renderGenes();
+  else if (id==='clones')  renderClones();
+  else if (id==='overlap') renderOverlap();
+  else if (id==='tables')  renderTables();
+}
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+function resetApp() {
+  S.files=[]; S.meta={}; C=null;
+  document.getElementById('sidebar').style.display='none';
+  document.getElementById('analyze-btn').style.display='none';
+  document.getElementById('reset-btn').style.display='none';
+  ['overview','diversity','genes','clones','overlap','tables'].forEach(p=>{
+    const el=document.getElementById('pane-'+p); if(el){el.classList.remove('active');el.dataset.rendered='';}
+  });
+  document.getElementById('pane-upload').classList.add('active');
+  setEl('upload-status',''); setEl('meta-tbody','');
+  document.getElementById('meta-card').style.display='none';
+}
+
+// ─── Plotly layout helper ─────────────────────────────────────────────────────
+function plotLayout(overrides={}) {
+  return Object.assign({
+    paper_bgcolor:'#fff', plot_bgcolor:'#fff',
+    font:{family:"IBM Plex Sans,sans-serif",size:11,color:'#1C1917'},
+    legend:{orientation:'h',y:-0.2},
+    margin:{l:60,r:20,t:20,b:60}
+  }, overrides);
+}
+</script>
+</body>
+</html>

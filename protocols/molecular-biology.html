@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molecular Biology Protocols – Jeet Biswas</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Proteomics &bull; Computational Genomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link active" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/publications.html">Publications</a></div>
+  <div class="nav-item"><a class="nav-link" href="/people.html">People</a></div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title"><h2>Molecular Biology Protocols</h2></div>
+<div class="container">
+  <div class="breadcrumb"><a href="/protocols/">Protocols</a> / Molecular Biology</div>
+
+  <!-- ══ Cloning Buffers ══ -->
+  <div class="card">
+    <h2>Cloning Buffers &amp; Stocks</h2>
+    <h3>Primer Stocks (100 µM)</h3>
+    <p>Multiply nmol × 10 µL of ultrapure water. Example: 15 nmol → add 150 µL water.</p>
+    <h3>TES Buffer — 2X (50 mL)</h3>
+    <table>
+      <tr><th>Component</th><th>Volume</th><th>Stock</th></tr>
+      <tr><td>Tris-HCl pH 8.0</td><td>1 mL</td><td>1 M</td></tr>
+      <tr><td>EDTA pH 8.0</td><td>200 µL</td><td>0.5 M</td></tr>
+      <tr><td>NaCl</td><td>2 mL</td><td>5 M</td></tr>
+    </table>
+    <h3>TES Buffer — 1X (50 mL)</h3>
+    <table>
+      <tr><th>Component</th><th>Volume</th><th>Stock</th></tr>
+      <tr><td>Tris-HCl pH 8.0</td><td>500 µL</td><td>1 M</td></tr>
+      <tr><td>EDTA pH 8.0</td><td>100 µL</td><td>0.5 M</td></tr>
+      <tr><td>NaCl</td><td>1 mL</td><td>5 M</td></tr>
+    </table>
+    <h3>Synthetic Duplexes (for guide RNA annealing)</h3>
+    <ol>
+      <li>Mix 2 µL each oligo (100 µM) + 4 µL 2X TES → final 25 µM each</li>
+      <li>Heat 95°C 1 min on PCR machine, then ramp down slowly to 4°C</li>
+      <li>Dilute 10x into 100 mM NaCl; use 1.25 µL per ligation reaction</li>
+    </ol>
+  </div>
+
+  <!-- ══ Colony PCR ══ -->
+  <div class="card">
+    <h2>Colony PCR — Platinum Taq (Standard)</h2>
+    <p>15 µL master mix + 5 µL template = 20 µL total per reaction.</p>
+    <table>
+      <tr><th>Component</th><th>Per Rxn</th><th>×12 (MM)</th></tr>
+      <tr><td>10X PCR Buffer (Mg-free)</td><td>2 µL</td><td>24 µL</td></tr>
+      <tr><td>10 mM dNTPs</td><td>0.4 µL</td><td>4.8 µL</td></tr>
+      <tr><td>50 mM MgCl₂</td><td>0.65 µL</td><td>7.8 µL</td></tr>
+      <tr><td>Forward primer (10 µM)</td><td>0.8 µL</td><td>9.6 µL</td></tr>
+      <tr><td>Reverse primer (10 µM)</td><td>0.8 µL</td><td>9.6 µL</td></tr>
+      <tr><td>Platinum Taq</td><td>0.08 µL</td><td>0.96 µL</td></tr>
+      <tr><td>H₂O</td><td>10.27 µL</td><td>to MM</td></tr>
+    </table>
+    <p>Template: pick colony onto heating block (95°C, 10 min); use 5 µL suspension.</p>
+    <h3>Thermocycler — "Jeet Program"</h3>
+    <ol>
+      <li>94°C — 2 min</li>
+      <li>94°C — 30 s → 55°C — 30 s → 72°C — 2 min (1 min/kb) <em>× 35 cycles</em></li>
+      <li>72°C — 7 min</li>
+      <li>4°C — hold</li>
+    </ol>
+    <div class="info-box">High GC content: use 55°C annealing instead of 50°C.</div>
+
+    <h3>Colony PCR — Premade 2X Master Mix (faster)</h3>
+    <table>
+      <tr><th>Component</th><th>Per Rxn</th><th>×5.5</th></tr>
+      <tr><td>2X Platinum Green Hot Start MM</td><td>10 µL</td><td>55 µL</td></tr>
+      <tr><td>Forward primer (10 µM)</td><td>0.5 µL</td><td>2.75 µL</td></tr>
+      <tr><td>Reverse primer (10 µM)</td><td>0.5 µL</td><td>2.75 µL</td></tr>
+      <tr><td>H₂O</td><td>4 µL</td><td>22 µL</td></tr>
+      <tr><td>Template (colony)</td><td>5 µL</td><td>add separately</td></tr>
+    </table>
+    <p>Aliquot 15 µL master mix into tubes already containing 5 µL template. Load 5 µL directly onto gel after cycling.</p>
+  </div>
+
+  <!-- ══ PCR HiFi ══ -->
+  <div class="card">
+    <h2>PCR — Platinum Taq High Fidelity (Cloning)</h2>
+    <table>
+      <tr><th>Component</th><th>50 µL Rxn</th></tr>
+      <tr><td>10X HiFi PCR Buffer</td><td>5 µL</td></tr>
+      <tr><td>10 mM dNTPs</td><td>1 µL</td></tr>
+      <tr><td>50 mM MgSO₄</td><td>2 µL</td></tr>
+      <tr><td>Forward primer (10 µM)</td><td>2 µL</td></tr>
+      <tr><td>Reverse primer (10 µM)</td><td>2 µL</td></tr>
+      <tr><td>Template DNA (~10 ng)</td><td>1 µL</td></tr>
+      <tr><td>Platinum Taq HiFi</td><td>0.2 µL</td></tr>
+      <tr><td>H₂O</td><td>36.8 µL</td></tr>
+    </table>
+    <h3>Thermocycler — "Jeet HiFi Program"</h3>
+    <ol>
+      <li>94°C — 2 min</li>
+      <li>94°C — 30 s → 55°C — 30 s → 68°C — 30 s (1 min/kb) <em>× 35 cycles</em></li>
+      <li>68°C — 7 min</li>
+      <li>4°C — hold</li>
+    </ol>
+    <div class="info-box">Use 3-min extension for MS2 stem-loop constructs and other hairpin-containing inserts.</div>
+  </div>
+
+  <!-- ══ Agarose Gel ══ -->
+  <div class="card">
+    <h2>Agarose Gel Electrophoresis</h2>
+    <ul>
+      <li>% = g/100 mL (1% = 1 g per 100 mL TAE or TBE); each gel ≈ 50 mL</li>
+      <li>Add 5 µL ethidium bromide per 50 mL after cooling to ~60°C</li>
+      <li>Run: 100V in 1× TAE/TBE; check at 20–30 min</li>
+      <li>1.5% gel for colony PCR (fast); 1% for larger fragments</li>
+    </ul>
+  </div>
+
+  <!-- ══ Restriction Digest ══ -->
+  <div class="card">
+    <h2>Restriction Digest</h2>
+    <ul>
+      <li>Use 3 µg DNA per digest for sufficient material downstream</li>
+      <li>CutSmart buffer (NEB) is compatible with most enzymes — check NEB website for exceptions</li>
+      <li>Incubate 37°C (or enzyme-specific temperature); maximum 1 hour</li>
+      <li>Heat inactivate 20 min at 65°C</li>
+      <li>Add 2 µL 0.5 M EDTA pH 8.0 before gel extraction to completely inactivate</li>
+    </ul>
+    <h3>CIP Dephosphorylation (blunt-end backbones)</h3>
+    <ul>
+      <li>1 µL CIP in CutSmart buffer; total 100 µL</li>
+      <li>Maximum 1 hour at 37°C then heat inactivate</li>
+    </ul>
+  </div>
+
+  <!-- ══ T4 Ligation ══ -->
+  <div class="card">
+    <h2>T4 Ligation</h2>
+    <p>Standard 20 µL reaction. Molar ratio: 1:3 (vector:insert) for cohesive ends; 1:1 for blunt ends. Use the <a href="/calculators.html">Ligation Calculator</a> for exact masses.</p>
+    <table>
+      <tr><th>Component</th><th>Amount</th></tr>
+      <tr><td>Vector DNA (5.5 kb backbone)</td><td>110 ng (~0.025 pmol)</td></tr>
+      <tr><td>Insert DNA (1:3 molar ratio)</td><td>~5–15 ng depending on insert size</td></tr>
+      <tr><td>10X T4 DNA Ligase Buffer</td><td>2 µL</td></tr>
+      <tr><td>T4 DNA Ligase</td><td>1 µL</td></tr>
+      <tr><td>Nuclease-free H₂O</td><td>to 20 µL</td></tr>
+    </table>
+    <ul>
+      <li>Cohesive (sticky) ends: 16°C overnight OR RT 10 min</li>
+      <li>Blunt ends: 16°C overnight OR RT 2 hours</li>
+      <li>Chill on ice; transform 1–5 µL into 50 µL competent cells</li>
+    </ul>
+    <div class="info-box">Thaw T4 Ligase Buffer at RT — it precipitates at 4°C. Mix by gentle pipetting; brief centrifuge.</div>
+  </div>
+
+  <!-- ══ Heat Shock Transformation ══ -->
+  <div class="card">
+    <h2>Heat Shock Transformation</h2>
+    <ol>
+      <li>Thaw competent cells on ice; add 1–5 µL ligation or plasmid DNA</li>
+      <li>Ice: 20 min</li>
+      <li>42°C water bath: exactly 45 seconds</li>
+      <li>Ice: 2 min to recover</li>
+      <li>Add 500 µL SOC; shake 37°C at 300 rpm for 45–60 min</li>
+      <li>Plate 100 µL (and remainder if needed) onto selective plates</li>
+      <li>Incubate overnight at 37°C</li>
+    </ol>
+    <div class="info-box">DH5α: 50 µL cells (can split each tube into 2 plates). Rosetta: 25 µL cells (pRare requires Chl + Amp plates).</div>
+  </div>
+
+  <!-- ══ Reconstitute from Filter Paper ══ -->
+  <div class="card">
+    <h2>Reconstitute Plasmid from Filter Paper</h2>
+    <ol>
+      <li>Cut paper with fresh razor blade</li>
+      <li>Place in Eppendorf with 50 µL sterile dH₂O</li>
+      <li>Soak 5 min at RT</li>
+      <li>Use 10 µL for transformation; store remainder at -20°C</li>
+    </ol>
+  </div>
+
+  <!-- ══ In Vitro Transcription ══ -->
+  <div class="card">
+    <h2>In Vitro Transcription (Ambion T7 MegaShortScript)</h2>
+    <table>
+      <tr><th>Component</th><th>50 µL Rxn</th></tr>
+      <tr><td>T7 PCR product template</td><td>20 µL</td></tr>
+      <tr><td>ATP, GTP, UTP, CTP</td><td>5 µL each</td></tr>
+      <tr><td>10X Transcription Buffer</td><td>5 µL</td></tr>
+      <tr><td>T7 Enzyme Mix</td><td>5 µL</td></tr>
+    </table>
+    <ol>
+      <li>37°C, 4 hours</li>
+      <li>Add 5 µL DNase I → 37°C, 20 min</li>
+      <li>Transfer to 1.5 mL tube; rinse with 50 µL water (100 µL total)</li>
+    </ol>
+  </div>
+
+  <!-- ══ Reverse Transcription ══ -->
+  <div class="card">
+    <h2>Reverse Transcription</h2>
+    <h3>SuperScript IV (for 15 reactions)</h3>
+    <p><strong>Step 1 — Primer annealing MM:</strong></p>
+    <ul>
+      <li>15 µL 50 µM oligo-dT or random hexamer primer</li>
+      <li>15 µL 10 mM dNTP mix</li>
+      <li>Add 2 µL of this MM to each tube containing 11 µL RNA</li>
+      <li>Anneal: 65°C 5 min → ice 1 min</li>
+    </ul>
+    <p><strong>Step 2 — RT MM:</strong></p>
+    <ul>
+      <li>60 µL 4X SSIV Buffer + 15 µL 100 mM DTT + 15 µL RNaseOUT + 15 µL SSIV enzyme</li>
+      <li>Add 7 µL per tube</li>
+      <li>55°C 10 min → 80°C 10 min (inactivation)</li>
+      <li>Dilute 1:5 by adding 80 µL nuclease-free water; store at -20°C</li>
+    </ul>
+    <h3>LunaScript RT MM (simplified)</h3>
+    <ul>
+      <li>4 µL master mix + 16 µL RNA sample</li>
+      <li>25°C 2 min → 55°C 10 min → 95°C 1 min</li>
+    </ul>
+  </div>
+
+  <!-- ══ Western Blot ══ -->
+  <div class="card">
+    <h2>Western Blot from 10 cm Dish</h2>
+    <h3>RIPA Lysis Buffer</h3>
+    <table>
+      <tr><th>Component</th><th>Final Concentration</th></tr>
+      <tr><td>Tris-HCl pH 8.0</td><td>10 mM</td></tr>
+      <tr><td>EDTA</td><td>1 mM</td></tr>
+      <tr><td>EGTA</td><td>0.5 mM</td></tr>
+      <tr><td>Triton X-100</td><td>1%</td></tr>
+      <tr><td>Sodium deoxycholate</td><td>0.1%</td></tr>
+      <tr><td>SDS</td><td>0.1%</td></tr>
+      <tr><td>NaCl</td><td>140 mM</td></tr>
+      <tr><td>PMSF (add fresh)</td><td>1 mM</td></tr>
+    </table>
+    <h3>Protocol</h3>
+    <ol>
+      <li>Prepare 300 µL RIPA + 30 µL 10X protease inhibitor + 3 µL 1 M PMSF</li>
+      <li>Wash cells 2× with ice-cold PBS; scrape into RIPA buffer</li>
+      <li>Lyse by passing through 20G needle several times</li>
+      <li>Spin 14,000 × g, 15 min, 4°C; transfer supernatant</li>
+    </ol>
+    <h3>Gel Loading &amp; Transfer</h3>
+    <ul>
+      <li>Load 25 µL total per well: 18 µL sample + 6 µL 4X LDS buffer + 1 µL DTT</li>
+      <li>Run MOPS gel: 200V, 50 min</li>
+      <li>Transfer: iBLOT system</li>
+      <li>Block: 4% milk in TBST overnight (cold room)</li>
+    </ul>
+    <h3>TBS Recipe (10X, 1L)</h3>
+    <table>
+      <tr><th>Component</th><th>Amount</th></tr>
+      <tr><td>Tris-HCl (FW 157.6)</td><td>24 g</td></tr>
+      <tr><td>Tris base (FW 121.1)</td><td>5.6 g</td></tr>
+      <tr><td>NaCl (FW 58.4)</td><td>88 g</td></tr>
+    </table>
+    <p>Dissolve in 900 mL water. TBST: add 1 mL Tween 20 per 1L 1X TBS.</p>
+    <div class="info-box">For 6-well dish: use 150 µL RIPA per well; 900 µL RIPA + 100 µL 10X protease inhibitor total.</div>
+  </div>
+
+  <!-- ══ Protein Purification ══ -->
+  <div class="card">
+    <h2>Protein Purification — Rosetta Cell Expression</h2>
+    <h3>Transformation &amp; Induction</h3>
+    <ol>
+      <li>Transform 50 µL Rosetta cells; plate on Amp + Chl plates (pRare has Chl resistance)</li>
+      <li>Pick single colony → 50 mL LB starter culture overnight</li>
+      <li>Inoculate 10 mL into 1L LB in Fernbach flask</li>
+      <li>Grow at 37°C; check OD₆₀₀ after 2–3 h. When OD &gt;0.2, thaw IPTG</li>
+      <li>At OD 0.6: add IPTG to 1 mM; induce 4h at 37°C (or 16°C overnight)</li>
+      <li>Spin 15 min at 6,000 × g; store pellet at -80°C</li>
+    </ol>
+    <h3>Bacterial Lysis (xTractor Buffer)</h3>
+    <ol>
+      <li>Add 20 mL xTractor buffer per 1 g pellet; resuspend</li>
+      <li>Add 40 µL DNase I (1 U/µL) + 200 µL 100× lysozyme (optional)</li>
+      <li>Gentle mixing; incubate 10 min at RT with shaking</li>
+      <li>Centrifuge 10,000–12,000 × g, 20 min, 4°C; save supernatant</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>TALON Spin Column Purification (His-tag)</h2>
+    <p>All centrifuge steps: 700 × g, 2 min.</p>
+    <ol>
+      <li>Remove storage buffer from column (snap seal; centrifuge into 2 mL collection tube)</li>
+      <li>Equilibrate: add 1 mL equilibration buffer 3×, centrifuge each time</li>
+      <li>Load 0.6–1 mL clarified lysate; agitate gently 5 min</li>
+      <li>Centrifuge; save flowthrough (check on gel)</li>
+      <li>Wash 3×: add 1 mL equilibration buffer; agitate 5 min; centrifuge</li>
+      <li>Elute 2–3×: add 400–600 µL elution buffer; agitate; centrifuge; collect in fresh tube</li>
+    </ol>
+    <p><strong>Run gel:</strong> Crude lysate — Flowthrough — Wash 1–3 — Elutions 1–3</p>
+  </div>
+
+  <div class="card">
+    <h2>Amylose Column Purification (MBP-tag, Large-Scale Gravity)</h2>
+    <h3>Buffers</h3>
+    <table>
+      <tr><th>Buffer</th><th>Key Components (per 100 mL)</th></tr>
+      <tr><td>Lysis Buffer</td><td>25 mM Tris pH 7.2 + 1.5 M NaCl + 1 mM EDTA + 1 mM DTT (if Cys) + 1 protease inhibitor tablet + 1 µL lysozyme at time of lysis</td></tr>
+      <tr><td>Wash Buffer (1L)</td><td>25 mM Tris pH 7.2 + 300 mM NaCl + 1 mM EDTA + 1 mM DTT (if Cys)</td></tr>
+      <tr><td>Elution Buffer (200 mL)</td><td>25 mM Tris pH 7.2 + 300 mM NaCl + 1 mM EDTA + 1 mM DTT + 10 mM Maltose (0.72 g)</td></tr>
+    </table>
+    <h3>Protocol</h3>
+    <ol>
+      <li>Resuspend pellet in 40 mL cold lysis buffer; rock in cold room 20 min</li>
+      <li>Equilibrate amylose column (pump 150–200 mL wash buffer at 2 mL/min)</li>
+      <li>Sonicate: 30 s ON / 2:30 OFF × 10 min total; power 3.5; on ice</li>
+      <li>Centrifuge 15,000 × g, 20 min, 4°C; load supernatant onto column at 0.5 mL/min</li>
+      <li>Wash 4 hours at 2 mL/min</li>
+      <li>Elute: 10 × 12 mL + 1 × 40 mL final elution at 2 mL/min</li>
+    </ol>
+    <h3>TEV Cleavage (to remove MBP tag)</h3>
+    <ul>
+      <li>Add MBP-TEV to elutions in TEV dialysis buffer; incubate overnight</li>
+      <li>Confirm cleavage by gel (PRE vs POST-TEV)</li>
+      <li>Run on amylose gravity column to capture free MBP-TEV; cleaved protein flows through</li>
+      <li>Dialyze flowthrough into crystallization/storage buffer</li>
+    </ul>
+    <div class="info-box">TALON His-tag column run (for dual MBP/His constructs) follows same wash protocol but uses PBS + imidazole buffers. Do not let column run dry during final elution. Store in 20% ethanol.</div>
+  </div>
+
+</div>
+<footer>Jeet Biswas – Research Site &bull; Hosted on Raspberry Pi &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>

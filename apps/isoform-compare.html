@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isoform Comparison &amp; CRISPR Design — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.main{flex:1;padding:20px;max-width:1060px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:640px){.input-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.field input,.field select,.field textarea{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Mono",monospace;font-size:12px;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#C2185B}
+.field textarea{resize:vertical;min-height:90px;line-height:1.4}
+.field .hint{font-size:10px;color:#A8A29E}
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 22px;transition:background .15s}
+.action-btn:hover{background:#A3144E}
+.action-btn:disabled{background:#E2DDD8;color:#A8A29E;cursor:default}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover:not(:disabled){background:#F0EDE9}
+.sec-btn:disabled{opacity:.4;cursor:default}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 16px;text-align:center;min-width:90px}
+.pill-num{font-size:22px;font-weight:700;display:block;line-height:1.1;color:#C2185B}
+.pill-lbl{font-size:9px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:7px 8px;text-align:left;border-bottom:2px solid #E2DDD8;white-space:nowrap}
+.data-table td{padding:6px 8px;border-top:1px solid #EDE9E5;font-family:"IBM Plex Mono",monospace;font-size:11px;vertical-align:middle}
+.data-table tr:nth-child(even) td{background:#FAFAF9}
+.table-wrap{overflow-x:auto;border:1px solid #E2DDD8;border-radius:6px}
+.svg-wrap{overflow-x:auto;margin-bottom:12px}
+.gene-results{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;border:1px solid #E2DDD8;border-radius:5px;background:#FAFAF9;padding:4px}
+.gene-item{padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-family:"IBM Plex Mono",monospace;transition:background .1s}
+.gene-item:hover{background:#FFF1F5;color:#C2185B}
+.gene-item.canonical{font-weight:700}
+.tag{display:inline-block;background:#F5F4F1;border:1px solid #E2DDD8;border-radius:3px;color:#78716C;font-size:10px;font-weight:600;padding:2px 6px;margin-left:4px}
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* Mode tabs */
+.mode-tabs{display:flex;gap:0;margin-bottom:16px;border:1px solid #E2DDD8;border-radius:7px;overflow:hidden;background:#FAFAF9}
+.mode-tab{flex:1;padding:8px 12px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;border:none;background:none;color:#78716C;transition:background .15s,color .15s;border-right:1px solid #E2DDD8}
+.mode-tab:last-child{border-right:none}
+.mode-tab.active{background:#C2185B;color:#fff}
+/* Cas9 verdicts */
+.cas9-yes{color:#065F46;font-weight:700}
+.cas9-partial{color:#92400E}
+.cas9-no{color:#78716C}
+.cas9-unk{color:#A8A29E}
+/* Gene browser */
+.gene-browser{border:1px solid #E2DDD8;border-radius:6px;overflow:hidden;margin-bottom:14px}
+.gene-browser-header{background:#F5F4F1;padding:8px 12px;font-size:11px;color:#78716C;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.tx-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid #F0EDE9;transition:background .1s;cursor:default}
+.tx-row:hover{background:#FFF8F9}
+.tx-info{display:flex;flex-direction:column;gap:2px}
+.tx-id{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:#1C1917}
+.tx-meta{font-size:10px;color:#78716C;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-block;border-radius:3px;padding:1px 5px;font-size:10px;font-weight:700}
+.badge-canon{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.badge-protein{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.badge-bio{background:#F5F4F1;border:1px solid #E2DDD8;color:#78716C}
+.badge-nc{background:#FFF7ED;border:1px solid #FED7AA;color:#92400E}
+.slot-btn{font-size:11px;font-weight:700;padding:4px 10px;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.slot-btn:hover{opacity:.8}
+.slot1-btn{background:#FFF1F5;color:#C2185B;border:1px solid #FECDD3}
+.slot2-btn{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.iso-slots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.iso-slot{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:10px 12px;min-height:54px}
+.iso-slot-label{font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.iso-slot-val{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:700;color:#1C1917;min-height:18px}
+.iso-slot-sub{font-size:10px;color:#78716C;margin-top:2px}
+.iso-slot.filled-1{border-color:#FECDD3;background:#FFF8F9}
+.iso-slot.filled-2{border-color:#BFDBFE;background:#F0F7FF}
+.dot-1{width:9px;height:9px;border-radius:50%;background:#E84855;flex-shrink:0}
+.dot-2{width:9px;height:9px;border-radius:50%;background:#3A86FF;flex-shrink:0}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+.exon-tip{display:none;position:fixed;background:#1C1917;color:#fff;border-radius:7px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:300;line-height:1.6;font-family:"IBM Plex Mono",monospace;max-width:260px;word-break:break-word;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.exon-tip .tip-title{font-weight:700;font-size:12px;margin-bottom:3px}
+.exon-tip .tip-uniq{color:#F59E0B;font-size:10px;margin-top:4px}
+.exon-export-panel{background:#fff;border:2px solid #C2185B;border-radius:8px;padding:16px;margin-top:12px;display:none}
+.exon-export-panel h4{margin:0 0 8px;font-size:13px;color:#1C1917}
+.exon-export-panel .exon-coords{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#78716C;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+    <div>
+      <div class="topbar-logo"><em>Isoform</em> Comparison &amp; CRISPR Design</div>
+      <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; Exon structure &middot; Unique regions &middot; CRISPR / TIGER export</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Step 1: Gene search (always visible) -->
+    <div class="vcard">
+      <div class="vcard-title">Step 1 — Find Isoforms by Gene Symbol</div>
+      <div class="vcard-sub">Search any gene to browse all Ensembl transcripts. The canonical isoform is marked with &#9733;. Click <strong>&rarr; Iso 1</strong> / <strong>&rarr; Iso 2</strong> to select two transcripts to compare.</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input type="text" id="gene-search" placeholder="Gene symbol — e.g. SF1, U2AF1, PCBP2, CSNK1A1" style="flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:8px 12px;font-family:IBM Plex Mono,monospace;font-size:13px;outline:none;transition:border-color .15s" onfocus="this.style.borderColor='#C2185B'" onblur="this.style.borderColor='#E2DDD8'">
+        <select id="species-select" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:8px 10px;font-size:12px;color:#1C1917;outline:none">
+          <option value="homo_sapiens">Human (hg38)</option>
+          <option value="mus_musculus">Mouse (mm10)</option>
+          <option value="rattus_norvegicus">Rat</option>
+          <option value="danio_rerio">Zebrafish</option>
+          <option value="drosophila_melanogaster">Drosophila</option>
+        </select>
+        <button class="action-btn" onclick="searchGene()" id="btn-search">Search</button>
+      </div>
+
+      <!-- Transcript browser — shown after search -->
+      <div id="gene-browser" style="display:none">
+        <div class="gene-browser">
+          <div class="gene-browser-header">
+            <span id="browser-title">Transcripts</span>
+            <span id="browser-locus" style="font-size:10px;font-weight:400;color:#A8A29E"></span>
+          </div>
+          <div id="browser-rows" style="max-height:320px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- Selected isoform slots -->
+      <div class="iso-slots">
+        <div class="iso-slot" id="slot-1">
+          <div class="iso-slot-label"><span class="dot-1"></span>Isoform 1</div>
+          <div class="iso-slot-val" id="slot1-val" style="color:#A8A29E;font-weight:400;font-size:11px">Not selected</div>
+          <div class="iso-slot-sub" id="slot1-sub"></div>
+        </div>
+        <div class="iso-slot" id="slot-2">
+          <div class="iso-slot-label"><span class="dot-2"></span>Isoform 2</div>
+          <div class="iso-slot-val" id="slot2-val" style="color:#A8A29E;font-weight:400;font-size:11px">Not selected</div>
+          <div class="iso-slot-sub" id="slot2-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Input card -->
+    <div class="vcard">
+      <div class="vcard-title">Step 2 — Configure Comparison</div>
+      <div class="vcard-sub">ENST IDs are auto-filled from the gene browser above. You can also type them directly, use UniProt accessions, or paste a custom nucleotide sequence.</div>
+
+      <!-- Mode selector -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode(0)">ENST IDs</button>
+        <button class="mode-tab" onclick="setMode(1)">UniProt ID</button>
+        <button class="mode-tab" onclick="setMode(2)">Sequence Paste (JCAST/PG2)</button>
+      </div>
+
+      <!-- Mode 0: Standard -->
+      <div id="mode-0">
+        <div class="input-grid">
+          <div class="field">
+            <label>Isoform 1 (ENST ID)</label>
+            <input type="text" id="enst1" placeholder="ENST00000261798" oninput="onENSTInput(1)">
+            <div class="hint" id="hint1"></div>
+          </div>
+          <div class="field">
+            <label>Isoform 2 (ENST ID)</label>
+            <input type="text" id="enst2" placeholder="ENST00000399463" oninput="onENSTInput(2)">
+            <div class="hint" id="hint2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 1: UniProt -->
+      <div id="mode-1" style="display:none">
+        <div class="banner banner-info">Enter UniProt accessions (e.g. <strong>P29558</strong> or <strong>P48729-2</strong>). Resolves to Ensembl transcripts — use the gene browser above for a faster workflow.</div>
+        <div class="input-grid">
+          <div class="field">
+            <label>UniProt Accession — Isoform 1</label>
+            <input type="text" id="uniprot1" placeholder="e.g. P29558 or P48729-2" oninput="clearResults()">
+            <div class="hint" id="uphint1"></div>
+          </div>
+          <div class="field">
+            <label>UniProt Accession — Isoform 2</label>
+            <input type="text" id="uniprot2" placeholder="e.g. P29558-2" oninput="clearResults()">
+            <div class="hint" id="uphint2"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <button class="sec-btn" onclick="resolveUniProt()">Resolve UniProt IDs &#8594; Transcripts</button>
+        </div>
+        <div id="up-resolve-area"></div>
+      </div>
+
+      <!-- Mode 2: Sequence paste -->
+      <div id="mode-2" style="display:none">
+        <div class="banner banner-info">Paste a nucleotide sequence from JCAST, PG2, or any custom source as Isoform 1. Select a reference transcript (Isoform 2) from the gene browser above or enter an ENST ID directly.</div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Custom sequence — Isoform 1 (FASTA or plain nucleotide)</label>
+          <textarea id="seq-paste" placeholder=">MyIsoform&#10;ATGCGTAAACG..." oninput="clearResults()"></textarea>
+          <div class="hint">Accepts FASTA or plain sequence. Min 50 nt. Characters: ACGTNRYSWKMBDHV</div>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Reference transcript — Isoform 2 (ENST ID)</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="ref-enst" placeholder="ENST00000261798 (auto-filled from browser)" style="flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:IBM Plex Mono,monospace;font-size:12px;outline:none" oninput="clearResults()">
+            <select id="species-select-2" style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:7px 10px;font-size:12px;color:#1C1917;outline:none">
+              <option value="homo_sapiens">Human</option>
+              <option value="mus_musculus">Mouse</option>
+            </select>
+          </div>
+          <div class="hint" id="ref-hint"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="action-btn" onclick="runComparison()" id="btn-compare">Compare Isoforms</button>
+        <button class="sec-btn" onclick="clearAll()">Clear All</button>
+      </div>
+      <div id="status" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-area" style="display:none">
+
+      <!-- SVG diagram -->
+      <div class="vcard">
+        <div class="vcard-title">Exon Structure Comparison</div>
+        <div class="vcard-sub" id="diagram-sub">Full-height = CDS &bull; Half-height = UTR &bull; <span style="color:#FF9F1C;font-weight:700">&#9733; amber</span> = unique &bull; <span style="color:#9B5DE5;font-weight:700">&#215; purple</span> = absent from custom isoform</div>
+        <div class="vcard-sub" style="font-size:11px;color:#78716C;margin-top:4px">&#9432; Hover over any exon for details &bull; Click a <span style="color:#FF9F1C;font-weight:700">&#9733; unique</span> exon to export its sequence</div>
+        <div class="svg-wrap" id="diagram-wrap"></div>
+        <div id="exon-export-panel" class="exon-export-panel">
+          <h4 id="exon-export-title">Unique Exon Export</h4>
+          <div class="exon-coords" id="exon-export-coords"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="action-btn" id="exon-btn-crispor" onclick="exportSingleExonCRISPOR()">&#128229; FASTA for CRISPOR (±200 bp genomic)</button>
+            <button class="sec-btn" id="exon-btn-tiger" onclick="exportSingleExonTIGER()">&#128229; FASTA for TIGER (spliced cDNA)</button>
+            <button class="sec-btn" onclick="document.getElementById('exon-export-panel').style.display='none'">&#10005; Close</button>
+          </div>
+          <div id="exon-export-status" style="margin-top:8px;font-size:11px"></div>
+        </div>
+        <div class="export-row">
+          <button class="sec-btn" onclick="exportSVG()">&#128229; Export SVG</button>
+        </div>
+      </div>
+
+      <!-- Stats + unique regions table -->
+      <div class="vcard">
+        <div class="vcard-title">Unique / Variable Regions (CRISPR Targets)</div>
+        <div class="vcard-sub">Exons present in one isoform but absent from the other (&ge;80% overlap). Cas9 suitability indicates whether the target region encodes protein in the source isoform.</div>
+        <div class="pills" id="stats-pills"></div>
+        <div id="unique-table"></div>
+        <div class="export-row">
+          <button class="sec-btn" onclick="exportBED()">&#128229; BED (±200 bp CRISPR windows)</button>
+          <button class="sec-btn" onclick="exportTSV()">&#128229; TSV (annotated targets)</button>
+          <button class="sec-btn" onclick="exportFASTA()">&#128229; CRISPOR FASTA</button>
+          <button class="sec-btn" onclick="exportTIGER()">&#128229; TIGER FASTA (full cDNA)</button>
+          <button class="sec-btn" onclick="exportSessionLog()">&#128229; Session log</button>
+        </div>
+      </div>
+
+      <!-- Transcript details -->
+      <div class="vcard">
+        <div class="vcard-title">Transcript Details</div>
+        <div id="transcript-details"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const ENSEMBL   = 'https://rest.ensembl.org';
+const UNIPROT   = 'https://rest.uniprot.org/uniprotkb';
+const CRISPOR   = 'http://crispor.tefor.net/crispor.py';
+const C = {
+  iso1:'#E84855', iso2:'#3A86FF',
+  unique:'#FF9F1C', absent:'#9B5DE5',
+  intron:'#8B949E', bg:'#FAFAF9', border:'#E2DDD8',
+  text:'#1C1917', muted:'#78716C'
+};
+
+const S = {
+  mode: 0,           // 0=standard, 1=uniprot, 2=seqpaste
+  t1: null, t2: null,
+  unique1: [], unique2: [],
+  absent1: [], absent2: [],   // absent in seq-paste mode
+  transcripts: [],
+  upTranscripts1: [], upTranscripts2: [],
+  seqAlignStats: null,
+  geneName: '',
+  runTime: null
+};
+
+// ─── Mode switching ───────────────────────────────────────────────────────────
+function setMode(m) {
+  S.mode = m;
+  [0,1,2].forEach(i => {
+    document.getElementById('mode-'+i).style.display = i===m ? '' : 'none';
+    document.querySelectorAll('.mode-tab')[i].classList.toggle('active', i===m);
+  });
+  clearResults();
+}
+
+// ─── API helpers ──────────────────────────────────────────────────────────────
+async function ensemblGet(path, retries=3) {
+  for (let i=0; i<retries; i++) {
+    try {
+      const r = await fetch(ENSEMBL+path, {headers:{'Content-Type':'application/json','Accept':'application/json'}});
+      if (r.ok) return r.json();
+      if (r.status===429) await sleep(2000*(i+1));
+      else if (r.status===400||r.status===404) return null;
+      else throw new Error('HTTP '+r.status);
+    } catch(e) {
+      if (i===retries-1) throw e;
+      await sleep(1000);
+    }
+  }
+}
+
+async function ensemblSeq(path) {
+  const r = await fetch(ENSEMBL+path, {headers:{'Content-Type':'text/plain','Accept':'text/plain'}});
+  if (!r.ok) return null;
+  return r.text();
+}
+
+async function uniprotGet(acc) {
+  const r = await fetch(`${UNIPROT}/${acc}.json`, {headers:{'Accept':'application/json'}});
+  if (!r.ok) return null;
+  return r.json();
+}
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// ─── Gene search ──────────────────────────────────────────────────────────────
+async function searchGene() {
+  const sym = document.getElementById('gene-search').value.trim();
+  const sp  = document.getElementById('species-select').value;
+  if (!sym) return;
+  const btn = document.getElementById('btn-search');
+  btn.textContent = '…'; btn.disabled = true;
+  setStatus('<span class="spinner"></span>Searching Ensembl for <strong>'+escH(sym)+'</strong>…');
+  try {
+    const data = await ensemblGet(`/lookup/symbol/${sp}/${encodeURIComponent(sym)}?expand=1`);
+    if (!data || !data.Transcript) {
+      setStatus('<div class="banner banner-err">Gene <strong>'+escH(sym)+'</strong> not found in Ensembl ('+escH(sp)+').</div>');
+      return;
+    }
+    S.transcripts = data.Transcript
+      .filter(t => t.id && t.id.startsWith('ENST'))
+      .sort((a, b) => {
+        // Canonical first, then protein-coding, then by start position
+        if ((b.is_canonical||0) !== (a.is_canonical||0)) return (b.is_canonical||0)-(a.is_canonical||0);
+        const aPC = (a.biotype==='protein_coding')?1:0;
+        const bPC = (b.biotype==='protein_coding')?1:0;
+        if (bPC !== aPC) return bPC - aPC;
+        return (a.start||0) - (b.start||0);
+      });
+    S.geneName = data.display_name || sym.toUpperCase();
+    S._geneData = data;
+    renderGeneBrowser(data, sym, sp);
+    setStatus('');
+  } catch(e) {
+    setStatus('<div class="banner banner-err">Ensembl error: '+escH(e.message)+'</div>');
+  }
+  btn.textContent = 'Search'; btn.disabled = false;
+}
+
+function renderGeneBrowser(geneData, sym, sp) {
+  const browser = document.getElementById('gene-browser');
+  const titleEl = document.getElementById('browser-title');
+  const locusEl = document.getElementById('browser-locus');
+  const rowsEl  = document.getElementById('browser-rows');
+
+  const n = S.transcripts.length;
+  const nPC = S.transcripts.filter(t=>t.biotype==='protein_coding').length;
+  titleEl.innerHTML = `<strong>${escH(S.geneName)}</strong> &mdash; ${n} transcripts (${nPC} protein-coding)`;
+  locusEl.textContent = `chr${geneData.seq_region_name} : ${(geneData.start||0).toLocaleString()}–${(geneData.end||0).toLocaleString()} ${geneData.strand===1?'(+)':'(-)'}  ·  ${escH(sp.replace('_',' '))}`;
+
+  let html = '';
+  for (const t of S.transcripts) {
+    const isCanon = t.is_canonical;
+    const isPC    = t.biotype === 'protein_coding';
+    const ensp    = t.Translation ? t.Translation.id : null;
+    const span    = (t.end && t.start) ? ((t.end - t.start)/1000).toFixed(1)+' kb' : '';
+    const nExons  = t.Exon ? t.Exon.length : (t.exon_count || '?');
+    const splLen  = t.Exon ? t.Exon.reduce((s,e)=>s+(e.end-e.start),0) : null;
+
+    let badges = '';
+    if (isCanon) badges += '<span class="badge badge-canon">&#9733; canonical</span>';
+    if (isPC)    badges += '<span class="badge badge-protein">protein-coding</span>';
+    else         badges += `<span class="badge badge-nc">${escH(t.biotype||'unknown')}</span>`;
+
+    let meta = '';
+    if (ensp)   meta += `<span title="Ensembl protein ID">ENSP: ${escH(ensp)}</span>`;
+    if (nExons) meta += `<span>${nExons} exons</span>`;
+    if (splLen) meta += `<span>${splLen.toLocaleString()} nt spliced</span>`;
+    else if (span) meta += `<span>${span} genomic</span>`;
+
+    html += `<div class="tx-row">
+      <div class="tx-info">
+        <div class="tx-id">${escH(t.id)} ${badges}</div>
+        <div class="tx-meta">${meta}</div>
+      </div>
+      <button class="slot-btn slot1-btn" onclick="pickSlot('${t.id}',1,'${escH(t.biotype||'')}','${escH(ensp||'')}','${nExons}')">→ Iso 1</button>
+      <button class="slot-btn slot2-btn" onclick="pickSlot('${t.id}',2,'${escH(t.biotype||'')}','${escH(ensp||'')}','${nExons}')">→ Iso 2</button>
+    </div>`;
+  }
+
+  rowsEl.innerHTML = html;
+  browser.style.display = 'block';
+}
+
+function pickSlot(enst, slot, biotype, ensp, nExons) {
+  // Fill the visual slot
+  const slotEl  = document.getElementById('slot-'+slot);
+  const valEl   = document.getElementById('slot'+slot+'-val');
+  const subEl   = document.getElementById('slot'+slot+'-sub');
+  valEl.textContent = enst;
+  valEl.style.color = slot===1 ? '#C2185B' : '#1D4ED8';
+  valEl.style.fontWeight = '700';
+  const sub = [biotype, ensp?'ENSP:'+ensp:'', nExons?nExons+' exons':''].filter(Boolean).join(' · ');
+  subEl.textContent = sub;
+  slotEl.className = 'iso-slot filled-'+slot;
+
+  // Auto-fill the ENST input fields in all relevant modes
+  if (slot===1) {
+    document.getElementById('enst1').value = enst;
+    document.getElementById('hint1').textContent = [biotype, nExons+' exons'].filter(Boolean).join(' · ');
+    // For seq-paste mode, don't overwrite seq-paste slot 1
+  } else {
+    document.getElementById('enst2').value = enst;
+    document.getElementById('hint2').textContent = [biotype, nExons+' exons'].filter(Boolean).join(' · ');
+    // Also fill ref-enst for sequence paste mode
+    const refEl = document.getElementById('ref-enst');
+    if (refEl) refEl.value = enst;
+  }
+  clearResults();
+}
+
+function onENSTInput(slot) {
+  // Sync manual ENST input back to slot display
+  const val = document.getElementById('enst'+slot).value.trim();
+  const valEl = document.getElementById('slot'+slot+'-val');
+  const slotEl = document.getElementById('slot-'+slot);
+  if (val) {
+    valEl.textContent = val;
+    valEl.style.color = slot===1 ? '#C2185B' : '#1D4ED8';
+    valEl.style.fontWeight = '700';
+    slotEl.className = 'iso-slot filled-'+slot;
+  } else {
+    valEl.textContent = 'Not selected';
+    valEl.style.color = '#A8A29E';
+    valEl.style.fontWeight = '400';
+    slotEl.className = 'iso-slot';
+    document.getElementById('slot'+slot+'-sub').textContent = '';
+  }
+  clearResults();
+}
+
+// ─── UniProt resolution ───────────────────────────────────────────────────────
+async function resolveUniProt() {
+  const acc1 = document.getElementById('uniprot1').value.trim();
+  const acc2 = document.getElementById('uniprot2').value.trim();
+  if (!acc1) { setStatus('<div class="banner banner-warn">Enter at least one UniProt accession.</div>'); return; }
+  setStatus('<span class="spinner"></span>Querying UniProt…');
+  const area = document.getElementById('up-resolve-area');
+  area.innerHTML = '';
+
+  try {
+    const [txs1, txs2] = await Promise.all([
+      resolveOneUniProt(acc1),
+      acc2 ? resolveOneUniProt(acc2) : Promise.resolve([])
+    ]);
+    S.upTranscripts1 = txs1;
+    S.upTranscripts2 = txs2;
+
+    let html = '';
+    html += renderUPPicker(acc1, txs1, '1');
+    if (acc2) html += renderUPPicker(acc2, txs2, '2');
+    area.innerHTML = html || '<div class="banner banner-warn">No Ensembl transcripts found. Try entering ENST IDs directly.</div>';
+    setStatus('');
+  } catch(e) {
+    setStatus('<div class="banner banner-err">UniProt error: '+escH(e.message)+'</div>');
+  }
+}
+
+async function resolveOneUniProt(rawAcc) {
+  // Parse isoform suffix  e.g. P48729-2 → acc=P48729, isoNum=2
+  const m = rawAcc.match(/^([A-Z0-9]+)(?:-(\d+))?$/i);
+  if (!m) throw new Error('Invalid UniProt accession: '+rawAcc);
+  const acc = m[1].toUpperCase();
+  const isoNum = m[2] ? parseInt(m[2]) : null;
+
+  const data = await uniprotGet(acc);
+  if (!data) return [];
+
+  // Extract Ensembl xrefs
+  const xrefs = (data.uniProtKBCrossReferences||[]).filter(x=>x.database==='Ensembl');
+  let transcripts = [];
+  for (const x of xrefs) {
+    // x.properties may have GeneName, isoformId, etc.
+    const enst = x.id; // usually ENST...
+    if (!enst||!enst.startsWith('ENST')) continue;
+    const isoId = (x.properties||[]).find(p=>p.key==='IsoformId')?.value;
+    const isoN  = isoId ? parseInt(isoId.split('-')[1]||'1') : 1;
+    if (isoNum !== null && isoN !== isoNum) continue;
+    transcripts.push({enst, isoId, isoN});
+  }
+
+  // Deduplicate by ENST
+  const seen = new Set();
+  transcripts = transcripts.filter(t=>!seen.has(t.enst)&&seen.add(t.enst));
+
+  // Fallback: try gene name search on Ensembl
+  if (!transcripts.length) {
+    const gene = (data.genes||[])[0]?.geneName?.value;
+    if (gene) {
+      const sp = acc.startsWith('P')||acc.startsWith('Q') ? 'homo_sapiens' : 'homo_sapiens';
+      const gd = await ensemblGet(`/lookup/symbol/${sp}/${encodeURIComponent(gene)}?expand=1`);
+      if (gd&&gd.Transcript) {
+        transcripts = gd.Transcript.filter(t=>t.id&&t.id.startsWith('ENST'))
+          .sort((a,b)=>(b.is_canonical||0)-(a.is_canonical||0))
+          .map(t=>({enst:t.id, isoId:null, isoN:null, biotype:t.biotype, isCanon:t.is_canonical}));
+      }
+    }
+  }
+  return transcripts;
+}
+
+function renderUPPicker(acc, txs, slot) {
+  if (!txs.length) return `<div class="banner banner-warn">No Ensembl transcripts found for <strong>${escH(acc)}</strong>.</div>`;
+  let html = `<div style="font-size:11px;color:#78716C;margin:10px 0 4px"><strong>${escH(acc)}</strong> → ${txs.length} transcript(s) — click to use as Isoform ${slot}:</div><div class="gene-results">`;
+  for (const t of txs) {
+    const sub = t.isoId ? `UniProt isoform ${t.isoId}` : (t.biotype||'');
+    html += `<div class="gene-item" onclick="setENSTFromUP('${t.enst}','${slot}')">
+      <strong>${t.enst}</strong><span class="tag">${escH(sub)}</span>
+      ${t.isCanon?'<span class="tag" style="color:#065F46;border-color:#A7F3D0;background:#ECFDF5">canonical</span>':''}
+    </div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function setENSTFromUP(enst, slot) {
+  if (slot==='1') document.getElementById('enst1').value=enst;
+  else document.getElementById('enst2').value=enst;
+  // Switch to standard mode to see the IDs
+  setMode(0);
+  setStatus(`<div class="banner banner-ok">Set Isoform ${slot} = ${escH(enst)}. Now click Compare.</div>`);
+}
+
+// ─── Transcript parsing ───────────────────────────────────────────────────────
+async function fetchAndParseTranscript(enst) {
+  const id = enst.split('.')[0];
+  const data = await ensemblGet(`/lookup/id/${id}?expand=1`);
+  if (!data||!data.Exon) throw new Error('No exon data for '+id);
+
+  const strand = data.strand||1;
+  const exons = (data.Exon||[]).map(e=>({
+    id:e.id, start:e.start, end:e.end, strand:e.strand, chr:e.seq_region_name
+  })).sort((a,b)=>a.start-b.start);
+  if (strand===-1) exons.reverse();
+  exons.forEach((e,i)=>{ e.rank=i+1; e.len=e.end-e.start; });
+
+  const tr = data.Translation||null;
+  const cds_start = tr ? Math.min(tr.start,tr.end) : null;
+  const cds_end   = tr ? Math.max(tr.start,tr.end) : null;
+
+  return {
+    id: data.id,
+    gene_name: data.display_name||data.Parent||data.id,
+    chr: data.seq_region_name,
+    strand, exons, cds_start, cds_end,
+    biotype: data.biotype||'',
+    total_exons: exons.length,
+    total_len: exons.reduce((s,e)=>s+e.len, 0)
+  };
+}
+
+// Fetch spliced cDNA for TIGER export
+async function fetchCDNA(enst) {
+  const id = enst.split('.')[0];
+  try {
+    const seq = await ensemblSeq(`/sequence/id/${id}?type=cdna`);
+    return seq ? seq.trim() : null;
+  } catch { return null; }
+}
+
+// ─── mRNA ↔ genomic coordinate mapping ───────────────────────────────────────
+function buildMRNAMap(exons, strand) {
+  const sorted = strand===1
+    ? [...exons].sort((a,b)=>a.start-b.start)
+    : [...exons].sort((a,b)=>b.start-a.start);
+  const blocks = [];
+  let mPos = 0;
+  for (const e of sorted) {
+    const len = e.end - e.start;
+    blocks.push({mStart:mPos, mEnd:mPos+len, gStart:e.start, gEnd:e.end, strand});
+    mPos += len;
+  }
+  return {blocks, totalLen:mPos};
+}
+
+function mrnaRangeToGenomic(mStart, mEnd, map) {
+  // Find first and last block touched
+  let gStart=null, gEnd=null;
+  for (const b of map.blocks) {
+    if (mEnd<=b.mStart||mStart>=b.mEnd) continue;
+    const lo = Math.max(mStart,b.mStart)-b.mStart;
+    const hi = Math.min(mEnd,b.mEnd)-b.mStart;
+    let gs, ge;
+    if (b.strand===1) { gs=b.gStart+lo; ge=b.gStart+hi; }
+    else               { gs=b.gEnd-hi;   ge=b.gEnd-lo;   }
+    if (gStart===null||gs<gStart) gStart=gs;
+    if (gEnd===null  ||ge>gEnd)   gEnd=ge;
+  }
+  return gStart!==null ? {start:gStart,end:gEnd} : null;
+}
+
+// ─── Sequence alignment (k-mer based) ────────────────────────────────────────
+function parseRawSeq(input) {
+  // Accept FASTA or plain text
+  let seq = '';
+  const lines = input.trim().split(/\r?\n/);
+  for (const l of lines) {
+    if (l.startsWith('>')) continue;
+    seq += l.trim().toUpperCase().replace(/[^ACGTNRYSWKMBDHV]/g,'');
+  }
+  return seq;
+}
+
+function alignKmer(query, ref, k=14, minBlock=10) {
+  if (ref.length<k||query.length<k) return [];
+  // Build k-mer index of ref
+  const idx = new Map();
+  for (let i=0; i<=ref.length-k; i++) {
+    const km=ref.slice(i,i+k);
+    if (!idx.has(km)) idx.set(km,[]);
+    idx.get(km).push(i);
+  }
+  const usedQ = new Uint8Array(query.length);
+  const blocks = [];
+
+  for (let qi=0; qi<=query.length-k; qi++) {
+    if (usedQ[qi]) continue;
+    const km = query.slice(qi,qi+k);
+    const hits = idx.get(km);
+    if (!hits) continue;
+    for (const ri of hits) {
+      // Extend forward
+      let len=k;
+      while (qi+len<query.length && ri+len<ref.length && query[qi+len]===ref[ri+len]) len++;
+      // Extend backward
+      let back=0;
+      while (back<qi && back<ri && query[qi-back-1]===ref[ri-back-1]) back++;
+      const qStart=qi-back, rStart=ri-back, bLen=len+back;
+      if (bLen<minBlock) continue;
+      // Check not already covered
+      if (usedQ[qStart]) continue;
+      blocks.push({qStart,rStart,length:bLen});
+      for (let x=0;x<bLen;x++) usedQ[qStart+x]=1;
+      break;
+    }
+  }
+  // Sort by qStart
+  blocks.sort((a,b)=>a.qStart-b.qStart);
+  return blocks;
+}
+
+function findVariableRegions(querySeq, refSeq, map, minLen=12) {
+  const blocks = alignKmer(querySeq, refSeq);
+
+  // Build covered sets
+  const refCov  = new Uint8Array(refSeq.length);
+  for (const b of blocks) {
+    for (let i=0;i<b.length;i++) refCov[b.rStart+i]=1;
+  }
+
+  // Ref positions NOT covered = absent from query → map to genomic
+  const absent=[];
+  let rs=-1;
+  for (let i=0; i<=refSeq.length; i++) {
+    if (i<refSeq.length && !refCov[i]) { if (rs===-1) rs=i; }
+    else if (rs!==-1) {
+      if (i-rs>=minLen) {
+        const gc = mrnaRangeToGenomic(rs, i, map);
+        if (gc) absent.push({mStart:rs,mEnd:i,...gc,len:gc.end-gc.start,type:'absent'});
+      }
+      rs=-1;
+    }
+  }
+
+  // Matched nt count for identity
+  const matchedRef = refCov.reduce((s,v)=>s+v,0);
+  const identity = refSeq.length ? matchedRef/refSeq.length : 0;
+
+  return {absent, blocks, identity, matchedRef};
+}
+
+// ─── Exon comparison (standard mode) ─────────────────────────────────────────
+function exonOverlaps(e1,e2,thresh=0.8){
+  const ov=Math.max(0,Math.min(e1.end,e2.end)-Math.max(e1.start,e2.start));
+  const len=e1.end-e1.start;
+  return len>0 && ov/len>=thresh;
+}
+
+function findUniqueExons(t1,t2){
+  const unique1=t1.exons.filter(e1=>!t2.exons.some(e2=>exonOverlaps(e1,e2)));
+  const unique2=t2.exons.filter(e2=>!t1.exons.some(e1=>exonOverlaps(e2,e1)));
+  return {unique1,unique2};
+}
+
+// ─── CDS classification ───────────────────────────────────────────────────────
+function classifyExonCDS(exon, cds_start, cds_end) {
+  if (!cds_start) return {type:'unknown'};
+  const ov_s=Math.max(exon.start,cds_start);
+  const ov_e=Math.min(exon.end,cds_end);
+  if (ov_s>=ov_e) return {type: exon.end<=cds_start?'5utr':'3utr'};
+  return {
+    type:'mixed',
+    utr5: exon.start<ov_s ? {start:exon.start,end:ov_s} : null,
+    cds:  {start:ov_s,end:ov_e},
+    utr3: ov_e<exon.end   ? {start:ov_e,  end:exon.end}  : null
+  };
+}
+
+function cdsLabel(type) {
+  if (type==='mixed') return 'mixed_CDS_UTR';
+  if (type==='5utr'||type==='3utr') return 'UTR';
+  return type==='unknown' ? 'unknown' : 'CDS';
+}
+
+// Does exon genomic range overlap [cds_start,cds_end] of the OTHER isoform?
+function overlapsOtherCDS(exon, t_other) {
+  if (!t_other.cds_start) return 'unknown';
+  const ov=Math.max(0,Math.min(exon.end,t_other.cds_end)-Math.max(exon.start,t_other.cds_start));
+  return ov>0 ? 'overlaps' : 'no_overlap';
+}
+
+function cas9Call(cds_own_type, cds_other_ov) {
+  if (cds_own_type==='unknown') return 'UNKNOWN';
+  const isUTR = cds_own_type==='5utr'||cds_own_type==='3utr';
+  if (isUTR) return cds_other_ov==='overlaps'
+    ? 'PARTIAL — UTR in own; overlaps other CDS'
+    : 'NO — UTR only';
+  // CDS or mixed
+  return cds_other_ov==='overlaps'
+    ? 'YES — CDS in both isoforms'
+    : 'YES — CDS in own isoform only';
+}
+
+// Annotate unique exons with CDS status + cas9 call
+function annotateTargets(regions, t_own, t_other) {
+  return regions.map(e => {
+    const cls     = classifyExonCDS(e, t_own.cds_start, t_own.cds_end);
+    const cds_own = cls.type;
+    const cds_oth = overlapsOtherCDS(e, t_other);
+    const cas9    = cas9Call(cds_own, cds_oth);
+    const label   = cdsLabel(cds_own);
+    const winS    = Math.max(0, e.start-200);
+    const winE    = e.end+200;
+    return {...e, cds_own, cds_oth, cas9, label, winS, winE,
+            strand: t_own.strand===1?'+':'-',
+            chr: t_own.chr, gene: t_own.gene_name};
+  });
+}
+
+// ─── SVG drawing ──────────────────────────────────────────────────────────────
+function drawComparison(t1, t2, ann1, ann2, mode2Label) {
+  const allExons = [...t1.exons, ...t2.exons,
+    ...ann1.map(a=>({start:a.winS,end:a.winE})),
+    ...ann2.map(a=>({start:a.winS,end:a.winE}))];
+  let gmin=Infinity, gmax=-Infinity;
+  for (const e of allExons){ if(e.start<gmin)gmin=e.start; if(e.end>gmax)gmax=e.end; }
+  const grange=gmax-gmin||1;
+
+  const wrap = document.getElementById('diagram-wrap');
+  const W = Math.max((wrap ? wrap.clientWidth : 920) - 4, 600);
+  const padL=140, padR=30, padT=16, padB=50;
+  const cdsBarH=10, cdsBarGap=4;
+  const trackH=60, trackGap=50;
+  const diffH=28;
+  const H=padT + (cdsBarH+cdsBarGap+trackH)*2 + trackGap + diffH + padB;
+  const drawW=W-padL-padR;
+
+  // Compressed coordinate system: introns at fixed 24px, exons proportional
+  const allBounds = [];
+  for (const t of [t1, t2]) {
+    for (const e of t.exons) { allBounds.push(e.start, e.end); }
+  }
+  allBounds.sort((a,b)=>a-b);
+
+  function isExonic(s, e) {
+    for (const t of [t1, t2])
+      for (const ex of t.exons)
+        if (ex.start < e && ex.end > s) return true;
+    return false;
+  }
+
+  const pts = [...new Set(allBounds)].sort((a,b)=>a-b);
+  const breakPts = [gmin, ...pts.filter(p=>p>gmin&&p<gmax), gmax];
+  const segs = [];
+  for (let i=0; i<breakPts.length-1; i++) {
+    const s=breakPts[i], e=breakPts[i+1];
+    segs.push({start:s, end:e, exon: isExonic(s,e)});
+  }
+
+  const INTRON_PX = 24;
+  const exonBp = segs.filter(s=>s.exon).reduce((a,s)=>a+(s.end-s.start),0);
+  const intronPxTotal = segs.filter(s=>!s.exon).length * INTRON_PX;
+  const exonPxTotal = Math.max(drawW - intronPxTotal, 100);
+
+  let cumPx = 0;
+  for (const seg of segs) {
+    seg.dispStart = cumPx;
+    seg.dispW = seg.exon ? (seg.end-seg.start)/Math.max(exonBp,1)*exonPxTotal : INTRON_PX;
+    cumPx += seg.dispW;
+  }
+  const totalDispW = cumPx;
+
+  function px(g) {
+    for (const seg of segs) {
+      if (g >= seg.start && g <= seg.end) {
+        const frac = seg.end > seg.start ? (g - seg.start)/(seg.end - seg.start) : 0;
+        return padL + (seg.dispStart + frac * seg.dispW) / totalDispW * drawW;
+      }
+    }
+    return padL;
+  }
+
+  const u1set=new Set(ann1.map(e=>e.start));
+  const u2set=new Set(ann2.map(e=>e.start));
+
+  function drawCDSBar(t, yTop, color) {
+    if (!t.cds_start) {
+      return `<text x="${padL}" y="${yTop+8}" font-size="9" fill="${C.muted}" font-style="italic">non-coding</text>`;
+    }
+    const cx1=px(t.cds_start), cx2=px(t.cds_end);
+    return `<rect x="${cx1.toFixed(1)}" y="${yTop.toFixed(1)}" width="${Math.max(cx2-cx1,2).toFixed(1)}" height="${cdsBarH}" fill="${color}" opacity="0.25" rx="2"/>
+    <rect x="${cx1.toFixed(1)}" y="${yTop.toFixed(1)}" width="${Math.max(cx2-cx1,2).toFixed(1)}" height="${cdsBarH}" fill="none" stroke="${color}" stroke-width="1.2" rx="2"/>
+    <text x="${(cx1+cx2)/2}" y="${yTop+8}" font-size="8" fill="${color}" text-anchor="middle" font-weight="700">CDS</text>`;
+  }
+
+  function drawTrack(t, cdsBarY, yTop, color, uniqueSet, label2, isoNum) {
+    const cy = yTop+trackH/2;
+    let s='';
+
+    // Labels
+    s+=`<text x="${padL-8}" y="${cdsBarY+8}" font-size="9" fill="${C.muted}" text-anchor="end">CDS</text>`;
+    s+=drawCDSBar(t, cdsBarY, color);
+    s+=`<text x="${padL-8}" y="${cy-6}" font-size="12" fill="${color}" font-weight="700" text-anchor="end" font-family="IBM Plex Mono,monospace">${escH(t.id)}</text>`;
+    const sub = label2||t.gene_name;
+    s+=`<text x="${padL-8}" y="${cy+9}" font-size="10" fill="${C.muted}" text-anchor="end">${escH(sub)}</text>`;
+
+    // Backbone
+    s+=`<line x1="${padL}" y1="${cy}" x2="${W-padR}" y2="${cy}" stroke="${C.intron}" stroke-width="1.5"/>`;
+
+    // Direction ticks — one per exonic segment, at its midpoint
+    for (const seg of segs.filter(sg=>sg.exon)) {
+      const mid = (seg.start+seg.end)/2;
+      const xp = px(mid);
+      const dx = t.strand===1 ? 5 : -5;
+      s += `<line x1="${xp}" y1="${cy-4}" x2="${xp+dx}" y2="${cy}" stroke="${C.intron}" stroke-width="1" opacity="0.4"/>
+            <line x1="${xp}" y1="${cy+4}" x2="${xp+dx}" y2="${cy}" stroke="${C.intron}" stroke-width="1" opacity="0.4"/>`;
+    }
+
+    // Exons
+    for (const exon of t.exons) {
+      const isUniq=uniqueSet.has(exon.start);
+      const fill=isUniq ? C.unique : color;
+      const stroke=isUniq ? '#92400E' : 'none';
+      const ex1=px(exon.start), ew=Math.max(px(exon.end)-ex1,3);
+      const cls=classifyExonCDS(exon,t.cds_start,t.cds_end);
+
+      const box=(gs,ge,hFrac,alpha,partLabel='')=>{
+        const bx=px(gs),bw=Math.max(px(ge)-px(gs),2);
+        const bh=trackH*hFrac, by=cy-bh/2;
+        const clsName = cls.type==='cds' ? 'CDS' : cls.type==='5utr' ? "5'UTR" : cls.type==='3utr' ? "3'UTR" : 'CDS';
+        const tipParts = [
+          `${t.id}  Exon ${exon.rank}${partLabel}`,
+          `${isUniq ? '★ UNIQUE' : 'shared'} · ${clsName}`,
+          `chr${t.chr}:${gs.toLocaleString()}–${ge.toLocaleString()}`,
+          `Length: ${(ge-gs).toLocaleString()} bp`,
+          isUniq ? '↓ Click to export this exon sequence' : ''
+        ].filter(Boolean).join('\n');
+        const tip = encodeURIComponent(tipParts);
+        const clickAttr = isUniq
+          ? `onclick="handleExonClick(${isoNum},${exon.rank},${exon.start},${exon.end})" style="cursor:pointer"`
+          : `style="cursor:crosshair"`;
+        return `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${fill}" opacity="${alpha}" stroke="${stroke}" stroke-width="${isUniq?2:0}" data-tip="${tip}" ${clickAttr}/>`;
+      };
+
+      if (cls.type==='5utr'||cls.type==='3utr') {
+        s+=box(exon.start,exon.end,0.38,0.55," (UTR)");
+      } else if (cls.type==='mixed') {
+        if (cls.utr5) s+=box(cls.utr5.start,cls.utr5.end,0.38,0.55," (5'UTR)");
+        if (cls.cds)  s+=box(cls.cds.start,cls.cds.end,0.88,0.82," (CDS)");
+        if (cls.utr3) s+=box(cls.utr3.start,cls.utr3.end,0.38,0.55," (3'UTR)");
+      } else {
+        s+=box(exon.start,exon.end,0.88,0.82);
+      }
+
+      if (ew>14) s+=`<text x="${(px(exon.start)+px(exon.end))/2}" y="${cy}" font-size="9" fill="white" text-anchor="middle" dominant-baseline="middle" font-weight="700" font-family="IBM Plex Mono,monospace">${exon.rank}</text>`;
+      if (isUniq) {
+        const mx=(px(exon.start)+px(exon.end))/2;
+        s+=`<text x="${mx}" y="${yTop-2}" font-size="9" fill="${C.unique}" text-anchor="middle" font-weight="700">&#9733; unique</text>`;
+      }
+    }
+
+    // Absent regions (seq-paste mode) — purple
+    for (const a of S.absent2||[]) {
+      const ax=px(a.start), aw=Math.max(px(a.end)-ax,3);
+      const bh=trackH*0.88, by=cy-bh/2;
+      s+=`<rect x="${ax.toFixed(1)}" y="${by.toFixed(1)}" width="${aw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${C.absent}" opacity="0.7"/>`;
+      const mx=(ax+ax+aw)/2;
+      s+=`<text x="${mx}" y="${yTop-2}" font-size="9" fill="${C.absent}" text-anchor="middle" font-weight="700">&#215; absent</text>`;
+    }
+
+    return s;
+  }
+
+  // Difference panel
+  function drawDiffPanel(yTop) {
+    let s=`<text x="${padL-8}" y="${yTop+18}" font-size="9" fill="${C.muted}" text-anchor="end" font-style="italic">diff</text>`;
+    s+=`<line x1="${padL}" y1="${yTop}" x2="${W-padR}" y2="${yTop}" stroke="${C.border}" stroke-width="0.5"/>`;
+    // Unique to iso1
+    for (const a of ann1) {
+      const ax=px(a.start),aw=Math.max(px(a.end)-ax,2);
+      s+=`<rect x="${ax.toFixed(1)}" y="${yTop.toFixed(1)}" width="${aw.toFixed(1)}" height="${diffH}" fill="${C.iso1}" opacity="0.25"/>`;
+    }
+    // Unique to iso2 or absent
+    for (const a of [...ann2,...(S.absent2||[])]) {
+      const ax=px(a.start),aw=Math.max(px(a.end)-ax,2);
+      const col=a.type==='absent'?C.absent:C.iso2;
+      s+=`<rect x="${ax.toFixed(1)}" y="${yTop.toFixed(1)}" width="${aw.toFixed(1)}" height="${diffH}" fill="${col}" opacity="0.25"/>`;
+    }
+    s+=`<text x="${padL+drawW/2}" y="${yTop+18}" font-size="9" fill="${C.muted}" text-anchor="middle">Differentially included regions</text>`;
+    return s;
+  }
+
+  const cdsBar1Y  = padT;
+  const track1Y   = padT + cdsBarH + cdsBarGap;
+  const cdsBar2Y  = track1Y + trackH + trackGap;
+  const track2Y   = cdsBar2Y + cdsBarH + cdsBarGap;
+  const diffY     = track2Y + trackH + 12;
+  const axisY     = diffY + diffH + 6;
+
+  let axis=`<line x1="${padL}" y1="${axisY}" x2="${W-padR}" y2="${axisY}" stroke="${C.border}"/>`;
+  for (let i=0;i<=6;i++){
+    const g=gmin+(grange*i/6), x=padL+(i/6)*drawW;
+    const lbl=g>=1e6?(g/1e6).toFixed(3)+'M':g>=1e3?(g/1e3).toFixed(1)+'K':String(Math.round(g));
+    axis+=`<line x1="${x}" y1="${axisY}" x2="${x}" y2="${axisY+5}" stroke="${C.muted}"/>
+           <text x="${x}" y="${axisY+16}" font-size="9" fill="${C.muted}" text-anchor="middle" font-family="IBM Plex Mono,monospace">${escH(lbl)}</text>`;
+  }
+  axis+=`<text x="${padL+drawW/2}" y="${axisY+30}" font-size="11" fill="${C.text}" text-anchor="middle">chr${escH(String(t1.chr))} genomic position</text>`;
+  const strandTxt=t1.strand===1?'+ strand →':'← − strand';
+  axis+=`<text x="${padL}" y="${axisY+30}" font-size="10" fill="${C.muted}">${strandTxt}</text>`;
+
+  // Legend — placed at top of SVG
+  const legY=8;
+  let legend=`
+    <circle cx="${padL}" cy="${legY}" r="5" fill="${C.iso1}"/>
+    <text x="${padL+9}" y="${legY+4}" font-size="10" fill="${C.text}" font-family="IBM Plex Mono,monospace">${escH(t1.id)}</text>
+    <circle cx="${padL+200}" cy="${legY}" r="5" fill="${C.iso2}"/>
+    <text x="${padL+209}" y="${legY+4}" font-size="10" fill="${C.text}" font-family="IBM Plex Mono,monospace">${escH(mode2Label||t2.id)}</text>
+    <rect x="${padL+410}" y="${legY-5}" width="10" height="10" rx="1" fill="${C.unique}"/>
+    <text x="${padL+424}" y="${legY+4}" font-size="10" fill="${C.text}">Unique &#9733;</text>
+    <rect x="${padL+520}" y="${legY-5}" width="10" height="10" rx="1" fill="${C.absent}"/>
+    <text x="${padL+534}" y="${legY+4}" font-size="10" fill="${C.text}">Absent &#215;</text>
+    <rect x="${padL+640}" y="${legY-2}" width="16" height="2" rx="1" fill="${C.intron}" opacity="0.7"/>
+    <text x="${padL+660}" y="${legY+4}" font-size="10" fill="${C.muted}">Intron</text>`;
+
+  const track1svg = drawTrack(t1, cdsBar1Y, track1Y, C.iso1, u1set, null, 1);
+  const track2svg = drawTrack(t2, cdsBar2Y, track2Y, C.iso2, u2set, mode2Label, 2);
+  const diffSVG   = drawDiffPanel(diffY);
+
+  return `<svg id="compare-svg" width="${W}" height="${H}" style="overflow:visible;font-family:IBM Plex Sans,sans-serif"
+    onmousemove="exonTip(event,this)" onmouseleave="exonTipHide()">
+    <rect width="${W}" height="${H}" fill="${C.bg}" rx="6"/>
+    ${track1svg}${track2svg}${diffSVG}${axis}${legend}
+  </svg>`;
+}
+
+// ─── Main comparison flow ─────────────────────────────────────────────────────
+async function runComparison() {
+  const btn=document.getElementById('btn-compare');
+  btn.disabled=true;
+  document.getElementById('results-area').style.display='none';
+  S.runTime=new Date();
+  S.absent1=[]; S.absent2=[];
+
+  try {
+    if (S.mode===2) {
+      await runSeqPasteMode();
+    } else {
+      await runStandardMode();
+    }
+  } catch(e) {
+    setStatus('<div class="banner banner-err">Error: '+escH(e.message)+'. Check your IDs and try again.</div>');
+    console.error(e);
+  }
+  btn.disabled=false;
+}
+
+async function runStandardMode() {
+  const e1v=document.getElementById('enst1').value.trim();
+  const e2v=document.getElementById('enst2').value.trim();
+  if (!e1v||!e2v){setStatus('<div class="banner banner-warn">Enter both ENST IDs.</div>');return;}
+  if (e1v===e2v){setStatus('<div class="banner banner-warn">Both IDs are the same transcript.</div>');return;}
+
+  setStatus('<span class="spinner"></span>Fetching Isoform 1 ('+escH(e1v.split('.')[0])+')…');
+  const t1=await fetchAndParseTranscript(e1v);
+  document.getElementById('hint1').textContent=t1.gene_name+' · '+t1.biotype+' · '+t1.total_exons+' exons';
+
+  setStatus('<span class="spinner"></span>Fetching Isoform 2 ('+escH(e2v.split('.')[0])+')…');
+  const t2=await fetchAndParseTranscript(e2v);
+  document.getElementById('hint2').textContent=t2.gene_name+' · '+t2.biotype+' · '+t2.total_exons+' exons';
+
+  if (t1.chr!==t2.chr) setStatus('<div class="banner banner-warn">Warning: different chromosomes ('+escH(t1.chr)+' vs '+escH(t2.chr)+').</div>');
+  else setStatus('');
+
+  S.geneName=t1.gene_name||t2.gene_name;
+  const {unique1,unique2}=findUniqueExons(t1,t2);
+  const ann1=annotateTargets(unique1,t1,t2);
+  const ann2=annotateTargets(unique2,t2,t1);
+  S.t1=t1; S.t2=t2; S.unique1=ann1; S.unique2=ann2;
+
+  renderResults(t1,t2,ann1,ann2,null);
+}
+
+async function runSeqPasteMode() {
+  const rawSeq=document.getElementById('seq-paste').value;
+  const refId =document.getElementById('ref-enst').value.trim();
+  if (!rawSeq.trim()){setStatus('<div class="banner banner-warn">Paste a nucleotide sequence.</div>');return;}
+  if (!refId){setStatus('<div class="banner banner-warn">Enter a reference ENST ID.</div>');return;}
+
+  const querySeq=parseRawSeq(rawSeq);
+  if (querySeq.length<50){setStatus('<div class="banner banner-warn">Sequence too short (min 50 nt).</div>');return;}
+
+  setStatus('<span class="spinner"></span>Fetching reference transcript…');
+  const t2=await fetchAndParseTranscript(refId);
+  document.getElementById('ref-hint').textContent=t2.gene_name+' · '+t2.biotype+' · '+t2.total_exons+' exons';
+  S.geneName=t2.gene_name;
+
+  setStatus('<span class="spinner"></span>Fetching reference cDNA…');
+  const refCDNA=await fetchCDNA(refId);
+  if (!refCDNA){setStatus('<div class="banner banner-err">Could not fetch cDNA for '+escH(refId)+'</div>');return;}
+
+  setStatus('<span class="spinner"></span>Aligning sequences…');
+  const map=buildMRNAMap(t2.exons, t2.strand);
+  const {absent, identity, matchedRef}=findVariableRegions(querySeq, refCDNA.toUpperCase(), map);
+
+  S.seqAlignStats={queryLen:querySeq.length, refLen:refCDNA.length, identity, matchedRef, absentN:absent.length};
+
+  // Create synthetic t1 from query label
+  const t1={
+    id:'CustomSeq', gene_name:'[custom]', chr:t2.chr, strand:t2.strand,
+    exons:[], cds_start:null, cds_end:null, biotype:'custom',
+    total_exons:0, total_len:querySeq.length
+  };
+
+  // Absent = regions in ref not in query → annotate against t2 CDS
+  const ann2=annotateTargets(absent.map((a,i)=>({...a,rank:i+1,len:a.end-a.start})), t2, t1);
+  S.absent2=ann2;
+  S.t1=t1; S.t2=t2; S.unique1=[]; S.unique2=ann2;
+
+  setStatus(`<div class="banner banner-ok">Alignment complete. Identity: ${(identity*100).toFixed(1)}% | Query: ${querySeq.length} nt | Ref cDNA: ${refCDNA.length} nt | Absent regions: ${absent.length}</div>`);
+  renderResults(t1, t2, [], ann2, `[custom sequence]`);
+}
+
+function renderResults(t1, t2, ann1, ann2, mode2Label) {
+  document.getElementById('diagram-wrap').innerHTML=drawComparison(t1,t2,ann1,ann2,mode2Label);
+  document.getElementById('diagram-sub').innerHTML=
+    'Full-height = CDS &bull; Half-height = UTR &bull; '+
+    '<span style="color:#FF9F1C;font-weight:700">&#9733; amber</span> = unique &bull; '+
+    '<span style="color:#9B5DE5;font-weight:700">&#215; purple</span> = absent from custom isoform';
+
+  // Stats pills
+  const shared=t1.exons.length+t2.exons.length-ann1.length-ann2.length;
+  document.getElementById('stats-pills').innerHTML=`
+    <div class="pill"><span class="pill-num" style="color:${C.iso1}">${ann1.length}</span><span class="pill-lbl">Unique to Iso 1</span></div>
+    <div class="pill"><span class="pill-num" style="color:${C.iso2}">${ann2.length}</span><span class="pill-lbl">Unique to Iso 2</span></div>
+    <div class="pill"><span class="pill-num">${Math.max(0,shared)}</span><span class="pill-lbl">Shared Exons</span></div>
+    <div class="pill"><span class="pill-num">${ann1.length+ann2.length}</span><span class="pill-lbl">CRISPR Targets</span></div>
+    ${S.seqAlignStats?`<div class="pill"><span class="pill-num" style="font-size:16px">${(S.seqAlignStats.identity*100).toFixed(0)}%</span><span class="pill-lbl">Seq Identity</span></div>`:''}`;
+
+  renderUniqueTable(ann1,ann2);
+
+  document.getElementById('transcript-details').innerHTML=buildTxTable(t1,t2);
+  document.getElementById('results-area').style.display='block';
+  document.getElementById('results-area').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderUniqueTable(ann1, ann2) {
+  const all=[...ann1.map(a=>({...a,which:'1',color:C.iso1})),
+             ...ann2.map(a=>({...a,which:'2',color:C.iso2}))].sort((a,b)=>a.start-b.start);
+  if (!all.length){
+    document.getElementById('unique-table').innerHTML='<div class="banner banner-ok">No unique exons found — both isoforms share all exons at &ge;80% overlap.</div>';
+    return;
+  }
+  let html=`<div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>Isoform</th><th>Exon</th><th>Chr</th><th>Start</th><th>End</th>
+      <th>Strand</th><th>Length</th><th>CDS (own)</th><th>CDS (other)</th><th>Cas9 Suitability</th>
+    </tr></thead><tbody>`;
+  for (const r of all) {
+    const cas9cls=r.cas9.startsWith('YES')?'cas9-yes':r.cas9.startsWith('PARTIAL')?'cas9-partial':r.cas9==='UNKNOWN'?'cas9-unk':'cas9-no';
+    html+=`<tr>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};margin-right:5px"></span>${escH(r.which==='1'?S.t1.id:S.t2.id)}</td>
+      <td>Exon ${r.rank}</td>
+      <td>chr${escH(String(r.chr))}</td>
+      <td>${r.start.toLocaleString()}</td>
+      <td>${r.end.toLocaleString()}</td>
+      <td>${r.strand}</td>
+      <td>${r.len.toLocaleString()} bp</td>
+      <td><span class="tag">${escH(r.label)}</span></td>
+      <td><span class="tag">${escH(r.cds_oth)}</span></td>
+      <td class="${cas9cls}" style="font-size:10px">${escH(r.cas9)}</td>
+    </tr>`;
+  }
+  html+='</tbody></table></div>';
+  document.getElementById('unique-table').innerHTML=html;
+}
+
+function buildTxTable(t1,t2) {
+  const row=(t,c)=>`<tr>
+    <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c}"></span></td>
+    <td>${escH(t.id)}</td><td>${escH(t.gene_name)}</td><td>${escH(t.biotype)}</td>
+    <td>${t.total_exons}</td><td>${t.total_len.toLocaleString()} bp</td>
+    <td>${t.cds_start?t.cds_start.toLocaleString()+'–'+t.cds_end.toLocaleString():'non-coding'}</td>
+    <td>chr${escH(String(t.chr))}</td>
+  </tr>`;
+  return `<div class="table-wrap"><table class="data-table">
+    <thead><tr><th></th><th>Transcript</th><th>Gene</th><th>Biotype</th><th>Exons</th><th>Spliced Len</th><th>CDS</th><th>Chr</th></tr></thead>
+    <tbody>${row(t1,C.iso1)}${row(t2,C.iso2)}</tbody>
+  </table></div>`;
+}
+
+// ─── Export functions ─────────────────────────────────────────────────────────
+function genePrefix() {
+  return (S.geneName||'isoform').replace(/[^A-Za-z0-9_-]/g,'_');
+}
+
+// ─── Exon hover tooltip ───────────────────────────────────────────────────────
+function exonTip(e, svg) {
+  const tip = document.getElementById('exon-tip');
+  if (!tip) return;
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const sp = pt.matrixTransform(svg.getScreenCTM().inverse());
+  let nearest = null, minDist = 16;
+  for (const r of svg.querySelectorAll('rect[data-tip]')) {
+    const x = parseFloat(r.getAttribute('x')), w = parseFloat(r.getAttribute('width'));
+    const y = parseFloat(r.getAttribute('y')), h = parseFloat(r.getAttribute('height'));
+    if (sp.x >= x && sp.x <= x+w && sp.y >= y && sp.y <= y+h) { nearest = r; break; }
+  }
+  if (nearest) {
+    const lines = decodeURIComponent(nearest.getAttribute('data-tip')).split('\n');
+    const isUniq = lines.some(l => l.includes('UNIQUE'));
+    tip.innerHTML = `<div class="tip-title">${lines[0]}</div>${lines.slice(1).map((l,i) =>
+      (isUniq && i === lines.length-2) ? `<div class="tip-uniq">${l}</div>` : `<div>${l}</div>`
+    ).join('')}`;
+    tip.style.display = 'block';
+    tip.style.left = (e.clientX + 16) + 'px';
+    tip.style.top  = (e.clientY - 10) + 'px';
+  } else {
+    tip.style.display = 'none';
+  }
+}
+function exonTipHide() {
+  const tip = document.getElementById('exon-tip');
+  if (tip) tip.style.display = 'none';
+}
+
+// ─── Unique exon click → export panel ────────────────────────────────────────
+let _clickedExon = null;
+
+function handleExonClick(isoNum, rank, start, end) {
+  exonTipHide();
+  const t = isoNum === 1 ? S.t1 : S.t2;
+  const sp = S.species || 'human';
+  const exon = t.exons.find(e => e.rank === rank) || { rank, start, end, len: end-start };
+  _clickedExon = { t, exon, isoNum, sp };
+
+  const panel = document.getElementById('exon-export-panel');
+  document.getElementById('exon-export-title').textContent =
+    `★ Unique Exon ${rank} — ${t.id}`;
+  document.getElementById('exon-export-coords').textContent =
+    `chr${t.chr}:${start.toLocaleString()}–${end.toLocaleString()} · ${(end-start).toLocaleString()} bp · ${t.strand===1?'+':'-'} strand`;
+  document.getElementById('exon-export-status').textContent = '';
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function exportSingleExonCRISPOR() {
+  if (!_clickedExon) return;
+  const { t, exon, sp } = _clickedExon;
+  const strand = t.strand === 1 ? 1 : -1;
+  const winS = Math.max(0, exon.start - 200);
+  const winE = exon.end + 200;
+  const status = document.getElementById('exon-export-status');
+  status.innerHTML = '<span class="spinner"></span> Fetching sequence…';
+  try {
+    const d = await ensemblGet(`/sequence/region/${sp}/chr${t.chr}:${winS+1}..${winE}:${strand}?content-type=application/json`);
+    const seq = d && d.seq ? d.seq.toUpperCase() : 'N'.repeat(winE - winS);
+    const hdr = `>${genePrefix()}_${t.id}_exon${exon.rank}_chr${t.chr}:${winS}-${winE}_crispor_window`;
+    const fasta = hdr + '\n' + seq;
+    const blob = new Blob([fasta], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${genePrefix()}_exon${exon.rank}_crispor.fa`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    status.textContent = '✓ Downloaded. Paste into CRISPOR at crispor.tefor.net';
+  } catch(e) {
+    status.textContent = '✗ Error: ' + e.message;
+  }
+}
+
+async function exportSingleExonTIGER() {
+  if (!_clickedExon) return;
+  const { t, exon } = _clickedExon;
+  const status = document.getElementById('exon-export-status');
+  status.innerHTML = '<span class="spinner"></span> Fetching spliced cDNA…';
+  try {
+    const cdna = await fetchCDNA(t.id);
+    const hdr = `>${genePrefix()}_${t.id}_exon${exon.rank}_spliced_cDNA_for_TIGER`;
+    const fasta = hdr + '\n' + cdna;
+    const blob = new Blob([fasta], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${genePrefix()}_exon${exon.rank}_tiger.fa`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    status.textContent = '✓ Downloaded. Use this spliced cDNA as TIGER input for Cas13 guide design.';
+  } catch(e) {
+    status.textContent = '✗ Error: ' + e.message;
+  }
+}
+
+// ─── BED / TSV / FASTA exports ───────────────────────────────────────────────
+function exportBED() {
+  const {t1,t2,unique1,unique2}=S;
+  if (!t1) return;
+  const lines=['track name="CRISPR_isoform_targets" description="Unique exons ±200bp for isoform-specific CRISPR (Biswas Lab)"'];
+  for (const r of unique1) {
+    const name=`${genePrefix()}_unique_to_iso1_exon${r.rank}_${r.label}`;
+    lines.push(`chr${r.chr}\t${r.winS}\t${r.winE}\t${name}\t0\t${r.strand}`);
+  }
+  for (const r of unique2) {
+    const name=`${genePrefix()}_unique_to_iso2_exon${r.rank}_${r.label}`;
+    lines.push(`chr${r.chr}\t${r.winS}\t${r.winE}\t${name}\t0\t${r.strand}`);
+  }
+  downloadText(lines.join('\n'), genePrefix()+'_crispr_targets.bed', 'text/plain');
+}
+
+function exportTSV() {
+  const {t1,t2,unique1,unique2}=S;
+  if (!t1) return;
+  const cols=['gene','isoform','label','exon_rank','chrom','exon_start','exon_end',
+              'crispr_window_start','crispr_window_end','strand','exon_size_bp',
+              'cds_in_own_isoform','cds_in_other_isoform','cas9_suitable'];
+  const rows=[cols.join('\t')];
+  const addRows=(recs,iso)=>{
+    for (const r of recs) {
+      rows.push([S.geneName||'.',iso,r.label,r.rank,
+        'chr'+r.chr,r.start,r.end,r.winS,r.winE,r.strand,r.len,
+        r.cds_own,r.cds_oth,r.cas9].join('\t'));
+    }
+  };
+  addRows(unique1,t1.id);
+  addRows(unique2,t2.id);
+  downloadText(rows.join('\n'), genePrefix()+'_crispr_targets.tsv', 'text/tab-separated-values');
+}
+
+async function exportFASTA() {
+  const {t1,t2,unique1,unique2}=S;
+  if (!t1) return;
+  setStatus('<span class="spinner"></span>Fetching sequences from Ensembl…');
+  const lines=[];
+  const fetchSeq=async(r,isoLabel)=>{
+    const strand=r.strand==='+'?'1':'-1';
+    try {
+      const sp=document.getElementById('species-select')?.value||'homo_sapiens';
+      const d=await ensemblGet(`/sequence/region/${sp}/chr${r.chr}:${r.winS}..${r.winE}:${strand}?content-type=application/json`);
+      const seq=d&&d.seq?d.seq.toUpperCase():'N'.repeat(r.winE-r.winS);
+      const hdr=`>${genePrefix()}_${isoLabel}_exon${r.rank}_chr${r.chr}:${r.winS}-${r.winE}_${r.label}`;
+      lines.push(hdr);
+      for (let i=0;i<seq.length;i+=60) lines.push(seq.slice(i,i+60));
+    } catch {
+      lines.push(`>${isoLabel}_exon${r.rank}_chr${r.chr}:${r.winS}-${r.winE}_${r.label}`);
+      lines.push('N'.repeat(r.winE-r.winS));
+    }
+  };
+  for (const r of unique1) await fetchSeq(r,'iso1_unique');
+  for (const r of unique2) await fetchSeq(r,'iso2_unique');
+  setStatus('');
+  downloadText(lines.join('\n'), genePrefix()+'_crispor_input.fa', 'text/plain');
+}
+
+async function exportTIGER() {
+  const {t1,t2}=S;
+  if (!t1||!t2) return;
+  setStatus('<span class="spinner"></span>Fetching spliced cDNA for TIGER…');
+  const lines=[];
+  const write=async(t,label)=>{
+    if (!t.id||t.id==='CustomSeq') {
+      lines.push(`>${S.geneName||'Gene'} ${t.id} | label=${label} | biotype=custom | length=${t.total_len}nt`);
+      lines.push('N'.repeat(t.total_len||100));
+      return;
+    }
+    const cdna=await fetchCDNA(t.id);
+    const seq=cdna||('N'.repeat(t.total_len));
+    const canon=t.biotype==='protein_coding'?' [canonical]':'';
+    const hdr=`>${S.geneName||'Gene'} ${t.id} | label=${label} | biotype=${t.biotype}${canon} | length=${seq.length}nt`;
+    lines.push(hdr);
+    for (let i=0;i<seq.length;i+=60) lines.push(seq.slice(i,i+60));
+  };
+  await write(t1,'isoform_1');
+  await write(t2,'isoform_2');
+  setStatus('');
+  downloadText(lines.join('\n'), genePrefix()+'_tiger_input.fa', 'text/plain');
+}
+
+function exportSessionLog() {
+  const {t1,t2,unique1,unique2}=S;
+  if (!t1||!t2) return;
+  const now=S.runTime||new Date();
+  const ts=now.toISOString().replace('T',' ').slice(0,19);
+  const mode=['Standard (ENST vs ENST)','UniProt','Sequence Paste'][S.mode];
+
+  let log=`=== Isoform Comparison Session Log ===
+Timestamp  : ${ts}
+Mode       : ${mode}
+Gene       : ${S.geneName||'unknown'}
+
+--- Locus ---
+Chromosome : chr${t1.chr}
+Strand     : ${t1.strand===1?'+':'-'}
+
+--- Isoform 1 ---
+ID         : ${t1.id}
+Biotype    : ${t1.biotype}
+Exons      : ${t1.total_exons}
+Spliced len: ${t1.total_len} bp
+CDS        : ${t1.cds_start?t1.cds_start+'–'+t1.cds_end:'non-coding'}
+`;
+  if (S.seqAlignStats) {
+    log+=`Custom seq : ${S.seqAlignStats.queryLen} nt
+Ref cDNA   : ${S.seqAlignStats.refLen} nt
+Identity   : ${(S.seqAlignStats.identity*100).toFixed(1)}%
+Absent rgns: ${S.seqAlignStats.absentN}
+`;
+  }
+  log+=`
+--- Isoform 2 ---
+ID         : ${t2.id}
+Biotype    : ${t2.biotype}
+Exons      : ${t2.total_exons}
+Spliced len: ${t2.total_len} bp
+CDS        : ${t2.cds_start?t2.cds_start+'–'+t2.cds_end:'non-coding'}
+
+--- CRISPR Targets (${unique1.length+unique2.length} total) ---
+`;
+  const allT=[...unique1.map(r=>({...r,isoform:t1.id})),...unique2.map(r=>({...r,isoform:t2.id}))];
+  for (const r of allT) {
+    log+=`  chr${r.chr}:${r.start}-${r.end} | exon ${r.rank} | ${r.label} | ${r.cas9}\n`;
+  }
+  log+=`
+--- TIGER guidance ---
+Use ${genePrefix()}_tiger_input.fa with cas13_isoform_guide_filter.py for Cas13 guide design.
+Ensure both isoform cDNA sequences are included in that file.
+
+--- Output files ---
+${genePrefix()}_crispr_targets.bed    — CRISPR windows ±200bp
+${genePrefix()}_crispr_targets.tsv    — Annotated target table
+${genePrefix()}_crispor_input.fa      — CRISPOR genomic sequences
+${genePrefix()}_tiger_input.fa        — Spliced cDNA for TIGER (Cas13)
+${genePrefix()}_comparison.svg        — Exon structure diagram
+
+Generated by Biswas Lab Isoform Comparison App (lab-website)
+`;
+  downloadText(log, genePrefix()+'_session_log.txt', 'text/plain');
+}
+
+function exportSVG() {
+  const svg=document.getElementById('compare-svg');
+  if (!svg) return;
+  downloadText('<?xml version="1.0"?>\n'+svg.outerHTML, genePrefix()+'_comparison.svg', 'image/svg+xml');
+}
+
+function downloadText(content,filename,mime) {
+  const blob=new Blob([content],{type:mime});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+function setStatus(html){document.getElementById('status').innerHTML=html;}
+function clearResults(){document.getElementById('results-area').style.display='none';}
+function clearAll(){
+  ['enst1','enst2','gene-search','uniprot1','uniprot2','ref-enst','seq-paste'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['hint1','hint2','uphint1','uphint2','ref-hint'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent='';
+  });
+  // Reset slots
+  [1,2].forEach(slot=>{
+    const valEl=document.getElementById('slot'+slot+'-val');
+    const subEl=document.getElementById('slot'+slot+'-sub');
+    const slotEl=document.getElementById('slot-'+slot);
+    if(valEl){valEl.textContent='Not selected';valEl.style.color='#A8A29E';valEl.style.fontWeight='400';}
+    if(subEl) subEl.textContent='';
+    if(slotEl) slotEl.className='iso-slot';
+  });
+  // Reset browser
+  document.getElementById('gene-browser').style.display='none';
+  document.getElementById('up-resolve-area').innerHTML='';
+  clearResults(); setStatus('');
+  S.t1=S.t2=null; S.unique1=[]; S.unique2=[]; S.absent1=[]; S.absent2=[]; S.seqAlignStats=null;
+  S.transcripts=[]; S._geneData=null;
+}
+function escH(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Enter key shortcuts
+document.addEventListener('keydown', e=>{
+  if (e.key!=='Enter') return;
+  const id = document.activeElement?.id;
+  if (id==='gene-search') searchGene();
+  else if (['enst1','enst2','ref-enst','uniprot1','uniprot2'].includes(id)) runComparison();
+});
+
+// Redraw SVG on resize so it fills the container width
+window.addEventListener('resize', () => {
+  if (S.t1 && S.t2) drawComparison(S.t1, S.t2, S.unique1, S.unique2, null);
+});
+</script>
+<div id="exon-tip" class="exon-tip"></div>
+<script src="/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venn Diagram Studio — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+
+/* Shell */
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+
+/* Body split */
+.body-split{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:288px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;display:flex;flex-direction:column}
+.sb-group{border-bottom:1px solid #EDE9E5;padding:14px 16px}
+.sb-group:last-child{border-bottom:none}
+.sb-heading{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:12px}
+
+/* List cards */
+.lcard{border:1px solid #E2DDD8;border-left:3px solid #E2DDD8;border-radius:6px;margin-bottom:8px;overflow:hidden;background:#FAFAF9;transition:opacity .15s}
+.lcard:last-child{margin-bottom:0}
+.lcard.is-on{border-left-color:var(--card-color)}
+.lcard.is-off{opacity:.38}
+.lcard-head{display:flex;align-items:center;gap:6px;padding:8px 10px 6px}
+.lcard-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--card-color)}
+.lcard-name{flex:1;min-width:0;background:transparent;border:none;border-bottom:1px solid transparent;color:#1C1917;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:1px 0;outline:none;transition:border-color .15s;width:100%}
+.lcard-name:focus{border-bottom-color:#C2185B}
+.lcard-badge{font-size:10px;font-weight:600;color:#78716C;background:#fff;border:1px solid #E2DDD8;border-radius:10px;padding:1px 7px;white-space:nowrap;flex-shrink:0}
+.ns-pill{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:3px;padding:1px 5px;flex-shrink:0;display:none}
+.ns-pill.visible{display:inline-block}
+.ns-symbol{background:#EEF2FF;color:#3730A3}
+.ns-ensg{background:#ECFDF5;color:#065F46}
+.ns-enst{background:#F0FDF4;color:#14532D}
+.ns-refseq{background:#FFFBEB;color:#92400E}
+.ns-entrez{background:#F5F3FF;color:#4C1D95}
+
+/* Toggle */
+.tgl{position:relative;display:inline-block;width:30px;height:17px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-track{position:absolute;inset:0;background:#CBD5E1;border-radius:17px;cursor:pointer;transition:.2s}
+.tgl-track::before{content:"";position:absolute;width:11px;height:11px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.tgl input:checked~.tgl-track{background:#C2185B}
+.tgl input:checked~.tgl-track::before{transform:translateX(13px)}
+
+/* Gene textarea */
+.gene-area textarea{width:100%;background:#fff;border:none;border-top:1px solid #EDE9E5;color:#1C1917;font-family:"IBM Plex Mono",monospace;font-size:10.5px;line-height:1.7;padding:7px 10px;min-height:72px;resize:vertical;outline:none;display:block}
+.gene-area textarea::placeholder{color:#C4BCB7}
+
+/* Token strip */
+.token-strip{background:#F0FDF4;border-top:1px solid #BBF7D0;padding:4px 10px;font-size:10px;color:#065F46;font-family:"IBM Plex Mono",monospace;max-height:48px;overflow:hidden;display:none}
+.token-strip.visible{display:block}
+
+/* Controls */
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ctrl-lbl{font-size:11px;font-weight:600;color:#78716C;min-width:86px}
+.ctrl-row select,.ctrl-row input[type=number],.ctrl-row input[type=text]{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:5px 8px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.ctrl-row select:focus,.ctrl-row input:focus{border-color:#C2185B}
+.ckbox{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:#44403C;cursor:pointer}
+.ckbox input{accent-color:#C2185B;width:14px;height:14px}
+
+/* Export row */
+.dl-row{display:flex;gap:7px;margin-top:6px}
+.dl-btn{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;font-family:"IBM Plex Sans",sans-serif;font-size:11px;font-weight:600;padding:7px 0;cursor:pointer;transition:background .15s;text-align:center}
+.dl-btn:hover:not(:disabled){background:#F0EDE9}
+.dl-btn:disabled{opacity:.4;cursor:default}
+
+/* Generate button */
+.gen-btn{width:100%;background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:11px 0;letter-spacing:.3px;transition:background .15s,transform .1s}
+.gen-btn:hover{background:#A3144E}
+.gen-btn:active{transform:scale(.98)}
+
+/* Main panel */
+.main-panel{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* Tabs */
+.vtabs{display:flex;gap:2px;background:#fff;border:1px solid #E2DDD8;border-radius:7px;padding:3px;width:fit-content}
+.vtab-btn{background:none;border:none;border-radius:5px;color:#78716C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:6px 16px;transition:all .15s;white-space:nowrap}
+.vtab-btn.active{background:#C2185B;color:#fff}
+.vtab-btn:hover:not(.active){background:#F5F4F1;color:#1C1917}
+.vpane{display:none}.vpane.active{display:block}
+
+/* Cards */
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+
+/* Stat pills */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;padding:8px 14px;text-align:center;min-width:72px}
+.pill-num{font-size:20px;font-weight:700;display:block;line-height:1.1}
+.pill-lbl{font-size:9px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+
+/* Banners */
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+
+/* Venn SVG container */
+#venn-container{width:100%;min-height:460px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#venn-placeholder{color:#78716C;font-size:13px;text-align:center;padding:60px 20px;line-height:2}
+#venn-placeholder strong{display:block;font-size:15px;font-weight:600;color:#44403C;margin-bottom:8px}
+.venn-title{font-size:16px;font-weight:700;color:#1C1917;margin-bottom:8px;text-align:center}
+
+/* Stats table */
+#stats-table{width:100%;border-collapse:collapse;font-size:12px}
+#stats-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:2px solid #E2DDD8}
+#stats-table td{padding:8px 10px;border-top:1px solid #EDE9E5;color:#1C1917}
+#stats-table tr:nth-child(even) td{background:#FAFAF9}
+.sig-check{color:#065F46;font-weight:700}
+.pval-sig{background:rgba(6,95,70,.12) !important}
+.pval-trend{background:rgba(6,95,70,.06) !important}
+
+/* Gene sets table */
+#genes-table{width:100%;border-collapse:collapse;font-size:12px}
+#genes-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:2px solid #E2DDD8}
+#genes-table td{padding:8px 10px;border-top:1px solid #EDE9E5;color:#1C1917;word-break:break-word}
+#genes-table tr:nth-child(even) td{background:#FAFAF9}
+.count-cell{color:#C2185B;font-weight:700}
+
+/* Gene search */
+.gene-search{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.gene-search input{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:6px 10px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;transition:border-color .15s}
+.gene-search input:focus{border-color:#C2185B}
+
+/* Loading spinner */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ID report */
+.id-entry{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #EDE9E5}
+.id-entry:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.id-entry-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.id-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.id-entry-body{font-size:12px;color:#44403C;line-height:1.8}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+    <div>
+      <div class="topbar-logo"><em>Venn</em> Diagram Studio</div>
+      <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; up to 5 sets &middot; pure JS</div>
+    </div>
+  </div>
+
+  <div class="body-split">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <!-- Gene Lists -->
+      <div class="sb-group">
+        <div class="sb-heading">Gene Lists</div>
+        <div id="list-cards"></div>
+      </div>
+
+      <!-- ID Conversion -->
+      <div class="sb-group">
+        <div class="sb-heading">ID Conversion</div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Species</span>
+          <select id="species">
+            <option value="human">Human</option>
+            <option value="mouse">Mouse</option>
+            <option value="rat">Rat</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Convert to</span>
+          <select id="target-ns">
+            <option value="symbol">Gene Symbol</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+        <label class="ckbox"><input type="checkbox" id="auto-convert" checked> Auto-convert when namespaces differ</label>
+      </div>
+
+      <!-- Hypergeometric Test -->
+      <div class="sb-group">
+        <div class="sb-heading">Hypergeometric Test</div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Universe</span>
+          <input type="number" id="universe-size" value="12000" min="100" step="100">
+        </div>
+        <label class="ckbox"><input type="checkbox" id="run-hyper" checked> Run test after generating</label>
+      </div>
+
+      <!-- Export -->
+      <div class="sb-group">
+        <div class="sb-heading">Export</div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Width</span>
+          <input type="number" id="svg-width" value="600" min="200" max="2000" step="50">
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Height</span>
+          <input type="number" id="svg-height" value="500" min="200" max="2000" step="50">
+        </div>
+        <div class="ctrl-row">
+          <span class="ctrl-lbl">Title</span>
+          <input type="text" id="plot-title" placeholder="Optional title…">
+        </div>
+        <div class="dl-row">
+          <button class="dl-btn" id="dl-svg" disabled onclick="downloadSVG()">SVG</button>
+          <button class="dl-btn" id="dl-csv" disabled onclick="downloadCSV()">CSV</button>
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <div class="sb-group">
+        <button class="gen-btn" id="gen-btn" onclick="generate()">&#9654;&#xfe0e;&nbsp; Generate Diagram</button>
+      </div>
+
+    </div><!-- /sidebar -->
+
+    <!-- Main Panel -->
+    <div class="main-panel">
+
+      <!-- Tabs -->
+      <div class="vtabs">
+        <button class="vtab-btn active" onclick="showPane('venn')">Venn Diagram</button>
+        <button class="vtab-btn" onclick="showPane('stats')">Statistics</button>
+        <button class="vtab-btn" onclick="showPane('genes')">Gene Sets</button>
+        <button class="vtab-btn" onclick="showPane('idconv')">ID Conversion</button>
+      </div>
+
+      <!-- Venn pane -->
+      <div class="vpane active" id="vpane-venn">
+        <div class="vcard">
+          <div class="vcard-title">Venn Diagram</div>
+          <div class="vcard-sub">Counts in each region &middot; duplicates removed per list &middot; radius scaled by gene count</div>
+          <div id="stat-pills"></div>
+          <div id="banners">
+            <div class="banner banner-ok">&#10003;&nbsp; Paste gene names into the lists on the left, then click Generate Diagram.</div>
+          </div>
+          <div id="venn-container">
+            <div id="venn-placeholder"><strong>No diagram yet</strong>Paste gene names into the lists on the left,<br>then click <strong>Generate Diagram</strong>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats pane -->
+      <div class="vpane" id="vpane-stats">
+        <div class="vcard">
+          <div class="vcard-title">Hypergeometric Test</div>
+          <div class="vcard-sub">P(X &gt; k&minus;1) &middot; BH correction &middot; N = universe size</div>
+          <div id="stats-content"><div class="banner banner-warn">Generate a diagram with &ge;2 lists first.</div></div>
+        </div>
+      </div>
+
+      <!-- Gene sets pane -->
+      <div class="vpane" id="vpane-genes">
+        <div class="vcard">
+          <div class="vcard-title">Intersection Gene Sets</div>
+          <div class="vcard-sub">All genes in each region (exclusive and shared), post-conversion &middot; sorted alphabetically</div>
+          <div class="gene-search" id="gene-search-row" style="display:none">
+            <input type="text" id="gene-search" placeholder="Search genes…" oninput="filterGeneTable()">
+          </div>
+          <div id="genes-content"><div class="banner banner-warn">Generate a diagram first.</div></div>
+        </div>
+      </div>
+
+      <!-- ID Conversion pane -->
+      <div class="vpane" id="vpane-idconv">
+        <div class="vcard">
+          <div class="vcard-title">ID Conversion Report</div>
+          <div class="vcard-sub">Namespace detection and conversion details per list</div>
+          <div id="idconv-content"><div class="banner banner-warn">Generate a diagram first.</div></div>
+        </div>
+      </div>
+
+    </div><!-- /main-panel -->
+  </div><!-- /body-split -->
+</div><!-- /shell -->
+
+<script>
+// ── Constants ────────────────────────────────────────────────────────────────
+const MAX_LISTS = 5;
+const COLORS    = ["#C2185B","#5E35B1","#00897B","#E65100","#1565C0"];
+const NAMES_DEF = ["List A","List B","List C","List D","List E"];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let activeFlags  = [true,true,false,false,false];
+let currentResult = null;
+let allGeneRows  = [];   // for search filtering
+
+// ── Build sidebar list cards ─────────────────────────────────────────────────
+(function buildCards() {
+  const container = document.getElementById("list-cards");
+  for (let i = 0; i < MAX_LISTS; i++) {
+    const isOn = i < 2;
+    const col  = COLORS[i];
+    const card = document.createElement("div");
+    card.className = "lcard " + (isOn ? "is-on" : "is-off");
+    card.id = "lcard-" + i;
+    card.style.setProperty("--card-color", col);
+    card.innerHTML = `
+      <div class="lcard-head">
+        <div class="lcard-dot"></div>
+        <input class="lcard-name" id="lname-${i}" type="text" value="${NAMES_DEF[i]}" autocomplete="off">
+        <span class="ns-pill" id="nspill-${i}"></span>
+        <span class="lcard-badge" id="badge-${i}">0</span>
+        <label class="tgl">
+          <input type="checkbox" id="tgl-${i}" ${isOn?"checked":""} onchange="toggleList(${i},this.checked)">
+          <span class="tgl-track"></span>
+        </label>
+      </div>
+      <div class="gene-area">
+        <textarea id="genes-${i}" placeholder="Paste genes\u2026&#10;One per line, or comma-separated.&#10;Accepts symbols, ENSG, RefSeq, Entrez." rows="4" oninput="updateCard(${i})"></textarea>
+      </div>
+      <div class="token-strip" id="strip-${i}"></div>`;
+    container.appendChild(card);
+  }
+})();
+
+// ── Card toggle ──────────────────────────────────────────────────────────────
+function toggleList(i, on) {
+  activeFlags[i] = on;
+  document.getElementById("lcard-"+i).className = "lcard " + (on ? "is-on" : "is-off");
+}
+
+// ── Gene parsing ─────────────────────────────────────────────────────────────
+function parseGenes(txt) {
+  if (!txt || !txt.trim()) return [];
+  let toks = txt.split(/[,;\t\r\n]+/);
+  toks = toks.flatMap(t => t.split(/\s+/));
+  toks = toks.map(t => t.trim()).filter(t => t.length > 0);
+  return [...new Set(toks)];
+}
+
+// ── Namespace detection ──────────────────────────────────────────────────────
+function detectNs(genes) {
+  if (!genes.length) return "symbol";
+  const bare = genes.map(g => g.toUpperCase().replace(/\.\d+$/, ""));
+  const n = bare.length;
+  const scores = {
+    ensembl_gene:       bare.filter(g => /^ENSG\d{11}$/.test(g)).length,
+    ensembl_transcript: bare.filter(g => /^ENST\d{11}$/.test(g)).length,
+    refseq:             bare.filter(g => /^(NM|NR|XM|XR|NP|XP)_/.test(g)).length,
+    entrez:             bare.filter(g => /^\d+$/.test(g)).length
+  };
+  const best = Object.keys(scores).reduce((a,b) => scores[a] >= scores[b] ? a : b);
+  return scores[best] / n > 0.4 ? best : "symbol";
+}
+
+const NS_LABEL = {symbol:"Symbol",ensembl_gene:"ENSG",ensembl_transcript:"ENST",refseq:"RefSeq",entrez:"Entrez"};
+const NS_CLS   = {symbol:"ns-symbol",ensembl_gene:"ns-ensg",ensembl_transcript:"ns-enst",refseq:"ns-refseq",entrez:"ns-entrez"};
+
+// ── Live card updates (cosmetic) ─────────────────────────────────────────────
+function updateCard(i) {
+  const genes = parseGenes(document.getElementById("genes-"+i).value);
+  const n     = genes.length;
+  const badge = document.getElementById("badge-"+i);
+  const pill  = document.getElementById("nspill-"+i);
+  const strip = document.getElementById("strip-"+i);
+  if (badge) badge.textContent = n.toLocaleString();
+  if (pill) {
+    if (n > 0) {
+      const ns = detectNs(genes);
+      pill.textContent = NS_LABEL[ns] || ns;
+      pill.className   = "ns-pill visible " + (NS_CLS[ns] || "ns-symbol");
+    } else { pill.className = "ns-pill"; }
+  }
+  if (strip) {
+    if (n > 0) {
+      strip.textContent = genes.slice(0,10).join("  ·  ") + (n > 10 ? `  … +${n-10} more` : "");
+      strip.className   = "token-strip visible";
+    } else { strip.className = "token-strip"; }
+  }
+}
+
+// ── ID conversion via MyGene.info ────────────────────────────────────────────
+async function convertIds(genes, fromNs, species) {
+  const scope = {
+    ensembl_gene:       "ensembl.gene",
+    ensembl_transcript: "ensembl.transcript",
+    refseq:             "refseq",
+    entrez:             "entrezgene"
+  }[fromNs] || "symbol,alias";
+
+  const queries  = genes.map(g => g.replace(/\.\d+$/, ""));
+  const mapped   = {};
+  const unmapped = [];
+
+  for (let start = 0; start < genes.length; start += 500) {
+    const batch  = genes.slice(start, start + 500);
+    const qbatch = queries.slice(start, start + 500);
+    try {
+      const resp = await fetch("https://mygene.info/v3/query", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({
+          q:       qbatch.join(","),
+          scopes:  scope,
+          fields:  "symbol",
+          species: species,
+          size:    String(batch.length)
+        })
+      });
+      if (!resp.ok) { unmapped.push(...batch); continue; }
+      const hits = await resp.json();
+      const hitArr = Array.isArray(hits) ? hits : (hits.hits || []);
+      for (const h of hitArr) {
+        const qi = qbatch.findIndex(q => q.toLowerCase() === (h.query||"").toLowerCase());
+        if (qi >= 0 && h.symbol) mapped[batch[qi]] = h.symbol.toUpperCase();
+        else if (qi >= 0)        unmapped.push(batch[qi]);
+      }
+    } catch(e) { unmapped.push(...batch); }
+  }
+  const remaining = genes.filter(g => !(g in mapped) && !unmapped.includes(g));
+  return { mapped, unmapped: [...new Set([...unmapped, ...remaining])] };
+}
+
+// ── Pure-JS hypergeometric test (no external libraries) ──────────────────────
+// Log of n!  (using Stirling / log-gamma for large n)
+function logFact(n) {
+  if (n <= 1) return 0;
+  let s = 0;
+  for (let i = 2; i <= n; i++) s += Math.log(i);
+  return s;
+}
+
+// log C(n,k) = logFact(n) - logFact(k) - logFact(n-k)
+function logBinom(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  if (k === 0 || k === n) return 0;
+  return logFact(n) - logFact(k) - logFact(n-k);
+}
+
+// P(X = x) for hypergeometric: K successes in N, draw n
+// phyper_pmf(x, N, K, n)  —  N = pop total, K = successes in pop, n = drawn
+function logPhyperPmf(x, N, K, n) {
+  return logBinom(K,x) + logBinom(N-K, n-x) - logBinom(N, n);
+}
+
+// P(X > k) = sum_{x=k+1}^{min(K,n)} pmf(x)
+function phyperUpperTail(k, K, N_minus_K, n) {
+  // Our signature: K successes, N-K failures, draw n
+  const N = K + N_minus_K;
+  const lo = k + 1;
+  const hi = Math.min(K, n);
+  if (lo > hi) return 0;
+
+  // Compute in log space, then sum with log-sum-exp
+  const logs = [];
+  for (let x = lo; x <= hi; x++) {
+    logs.push(logPhyperPmf(x, N, K, n));
+  }
+  const maxLog = Math.max(...logs);
+  if (!isFinite(maxLog)) return 0;
+  return Math.exp(maxLog + Math.log(logs.reduce((s,l) => s + Math.exp(l - maxLog), 0)));
+}
+
+// Run hypergeometric test for all pairs
+// Matches R: pval = phyper(overlap-1, n2, universe-n2, n1, lower.tail=FALSE)
+function hyperTest(lists, names, universe) {
+  const rows = [];
+  for (let i = 0; i < lists.length - 1; i++) {
+    for (let j = i + 1; j < lists.length; j++) {
+      const setI  = new Set(lists[i]);
+      const raw   = lists[j].filter(g => setI.has(g)).length;
+      const k     = Math.max(raw - 1, 0);     // phyper(overlap-1, …)
+      const n1    = lists[i].length;
+      const n2    = lists[j].length;
+      // N = universe, K = n2 (successes in population), n = n1 (draws)
+      const pval  = phyperUpperTail(k, n2, universe - n2, n1);
+      rows.push({
+        comparison: `${names[i]} \u2229 ${names[j]}`,
+        n1, n2, overlap: raw,
+        pct1: n1 > 0 ? (100*raw/n1).toFixed(1)+"%" : "0.0%",
+        pct2: n2 > 0 ? (100*raw/n2).toFixed(1)+"%" : "0.0%",
+        universe,
+        pval: +pval.toPrecision(4)
+      });
+    }
+  }
+  // BH correction
+  const padj = bhCorrect(rows.map(r => r.pval));
+  rows.forEach((r,i) => { r.padj = +padj[i].toPrecision(4); r.sig = r.pval < 0.05; });
+  return rows;
+}
+
+function bhCorrect(pvals) {
+  const n = pvals.length;
+  if (n === 0) return [];
+  const idx = pvals.map((p,i) => ({p,i})).sort((a,b) => a.p - b.p);
+  const adj = new Array(n);
+  for (let rank = 0; rank < n; rank++) adj[idx[rank].i] = idx[rank].p * n / (rank+1);
+  for (let rank = n-2; rank >= 0; rank--) adj[idx[rank].i] = Math.min(adj[idx[rank].i], adj[idx[rank+1].i]);
+  return adj.map(p => Math.min(p, 1));
+}
+
+// ── Intersection gene sets (all regions) ────────────────────────────────────
+function allRegions(lists, names) {
+  const nL = lists.length;
+  const rows = [];
+
+  // Iterate over all 2^nL - 1 non-empty subsets
+  for (let mask = 1; mask < (1 << nL); mask++) {
+    const inIdx  = [];
+    const outIdx = [];
+    for (let i = 0; i < nL; i++) (mask & (1<<i)) ? inIdx.push(i) : outIdx.push(i);
+
+    // Intersection of all "in" sets, minus union of all "out" sets
+    let genes = [...lists[inIdx[0]]];
+    for (let k = 1; k < inIdx.length; k++) {
+      const s = new Set(lists[inIdx[k]]);
+      genes = genes.filter(g => s.has(g));
+    }
+    if (outIdx.length > 0) {
+      const exclude = new Set(outIdx.flatMap(k => lists[k]));
+      genes = genes.filter(g => !exclude.has(g));
+    }
+    genes.sort();
+
+    const label = inIdx.map(i => names[i]).join(" \u2229 ");
+    const type  = inIdx.length === 1 ? "exclusive" : "shared";
+    rows.push({ mask, label, count: genes.length, genes, type, inIdx });
+  }
+  return rows;
+}
+
+// ── Pure-SVG Venn diagram renderer ──────────────────────────────────────────
+// Fixed circle/ellipse positions for 2-5 sets
+const POSITIONS = {
+  2: [
+    {cx:220, cy:250, rx:140, ry:140},
+    {cx:380, cy:250, rx:140, ry:140}
+  ],
+  3: [
+    {cx:250, cy:190, rx:130, ry:130},
+    {cx:380, cy:330, rx:130, ry:130},
+    {cx:120, cy:330, rx:130, ry:130}
+  ],
+  4: [
+    {cx:210, cy:200, rx:130, ry:105},
+    {cx:390, cy:200, rx:130, ry:105},
+    {cx:210, cy:330, rx:130, ry:105},
+    {cx:390, cy:330, rx:130, ry:105}
+  ],
+  5: [
+    {cx:300, cy:130, rx:135, ry:90},
+    {cx:430, cy:215, rx:135, ry:90},
+    {cx:385, cy:365, rx:135, ry:90},
+    {cx:215, cy:365, rx:135, ry:90},
+    {cx:170, cy:215, rx:135, ry:90}
+  ]
+};
+
+// Rotation angles for 4 and 5 sets (to create proper overlaps)
+const ROTATIONS = {
+  4: [0, 0, 0, 0],
+  5: [0, 72, 144, 216, 288]
+};
+
+// Centroid approximation for regions via point sampling
+function approxCentroid(positions, rotations, inMask, nL, svgW, svgH) {
+  const step = 10;
+  let sx = 0, sy = 0, cnt = 0;
+  const minX = 40, maxX = svgW - 40;
+  const minY = 40, maxY = svgH - 40;
+
+  for (let x = minX; x <= maxX; x += step) {
+    for (let y = minY; y <= maxY; y += step) {
+      let inside = true;
+      for (let i = 0; i < nL; i++) {
+        const shouldBe = !!(inMask & (1 << i));
+        if (pointInEllipse(x, y, positions[i], rotations ? rotations[i] : 0) !== shouldBe) {
+          inside = false; break;
+        }
+      }
+      if (inside) { sx += x; sy += y; cnt++; }
+    }
+  }
+  if (cnt === 0) {
+    // Fallback: centroid of "in" circles
+    let ax = 0, ay = 0, ac = 0;
+    for (let i = 0; i < nL; i++) {
+      if (inMask & (1 << i)) { ax += positions[i].cx; ay += positions[i].cy; ac++; }
+    }
+    return ac > 0 ? {x: ax/ac, y: ay/ac} : {x: svgW/2, y: svgH/2};
+  }
+  return {x: sx/cnt, y: sy/cnt};
+}
+
+function pointInEllipse(px, py, e, rot) {
+  const cx = e.cx, cy = e.cy, rx = e.rx, ry = e.ry;
+  if (!rot) {
+    return ((px-cx)*(px-cx))/(rx*rx) + ((py-cy)*(py-cy))/(ry*ry) <= 1.0;
+  }
+  const rad = rot * Math.PI / 180;
+  const dx  = px - cx, dy = py - cy;
+  const xr  =  dx * Math.cos(rad) + dy * Math.sin(rad);
+  const yr  = -dx * Math.sin(rad) + dy * Math.cos(rad);
+  return (xr*xr)/(rx*rx) + (yr*yr)/(ry*ry) <= 1.0;
+}
+
+function drawVennSVG(lists, names, colors) {
+  const nL   = lists.length;
+  const svgW = parseInt(document.getElementById("svg-width").value)  || 600;
+  const svgH = parseInt(document.getElementById("svg-height").value) || 500;
+  const title = document.getElementById("plot-title").value.trim();
+  const titleH = title ? 30 : 0;
+
+  const pos = (POSITIONS[nL] || POSITIONS[2]).map(p => ({...p}));
+  const rot = (ROTATIONS[nL] || []).concat([0,0,0,0,0]).slice(0, nL);
+
+  // Scale positions to fit svgW x (svgH - titleH)
+  // Find bounding box of raw positions
+  const rawMinX = Math.min(...pos.map(p => p.cx - p.rx));
+  const rawMaxX = Math.max(...pos.map(p => p.cx + p.rx));
+  const rawMinY = Math.min(...pos.map(p => p.cy - p.ry));
+  const rawMaxY = Math.max(...pos.map(p => p.cy + p.ry));
+  const rawW    = rawMaxX - rawMinX;
+  const rawH    = rawMaxY - rawMinY;
+  const pad     = 48;
+  const availW  = svgW - 2*pad;
+  const availH  = (svgH - titleH) - 2*pad;
+  const scaleX  = availW / rawW;
+  const scaleY  = availH / rawH;
+  const scale   = Math.min(scaleX, scaleY, 1.4);  // don't overzoom
+
+  const offX = pad - rawMinX * scale + (availW - rawW * scale) / 2;
+  const offY = pad + titleH - rawMinY * scale + (availH - rawH * scale) / 2;
+
+  const spos = pos.map(p => ({
+    cx: p.cx * scale + offX,
+    cy: p.cy * scale + offY,
+    rx: p.rx * scale,
+    ry: p.ry * scale
+  }));
+
+  // Compute all region centroids and counts
+  const regions = allRegions(lists, names);
+
+  let svgParts = [`<svg id="venn-svg" xmlns="http://www.w3.org/2000/svg" width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="background:#fff;font-family:'IBM Plex Sans',sans-serif">`];
+
+  // Title
+  if (title) {
+    svgParts.push(`<text x="${svgW/2}" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#1C1917">${escHtml(title)}</text>`);
+  }
+
+  // Draw ellipses
+  for (let i = 0; i < nL; i++) {
+    const p   = spos[i];
+    const col = colors[i];
+    const r   = rot[i];
+    const transform = r ? ` transform="rotate(${r} ${p.cx} ${p.cy})"` : "";
+    svgParts.push(`<ellipse cx="${p.cx.toFixed(1)}" cy="${p.cy.toFixed(1)}" rx="${p.rx.toFixed(1)}" ry="${p.ry.toFixed(1)}" fill="${col}" fill-opacity="0.22" stroke="${col}" stroke-width="1.8"${transform}/>`);
+  }
+
+  // Region count labels
+  for (const reg of regions) {
+    if (reg.count === 0) continue;
+    const c = approxCentroid(spos, rot, reg.mask, nL, svgW, svgH);
+    svgParts.push(`<text x="${c.x.toFixed(1)}" y="${c.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="700" fill="#1C1917">${reg.count}</text>`);
+  }
+
+  // Set name labels (outside circles)
+  for (let i = 0; i < nL; i++) {
+    const p = spos[i];
+    // Place label further out from the centroid of all circles
+    const allCx = spos.reduce((s,q) => s + q.cx, 0) / nL;
+    const allCy = spos.reduce((s,q) => s + q.cy, 0) / nL;
+    const dx = p.cx - allCx, dy = p.cy - allCy;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    const lx = (p.cx + (dx/dist) * (p.rx + 16)).toFixed(1);
+    const ly = (p.cy + (dy/dist) * (p.ry + 16)).toFixed(1);
+    const anchor = dx < -4 ? "end" : dx > 4 ? "start" : "middle";
+    svgParts.push(`<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" font-size="13" font-weight="600" fill="${colors[i]}">${escHtml(names[i])}</text>`);
+  }
+
+  svgParts.push(`</svg>`);
+  return svgParts.join("\n");
+}
+
+// ── Generate (main handler) ──────────────────────────────────────────────────
+async function generate() {
+  const btn = document.getElementById("gen-btn");
+  btn.innerHTML = '<span class="spinner"></span>Processing\u2026';
+  btn.disabled = true;
+
+  try {
+    // Collect active lists
+    const raw = [];
+    for (let i = 0; i < MAX_LISTS; i++) {
+      if (!activeFlags[i]) continue;
+      const genes = parseGenes(document.getElementById("genes-"+i).value || "");
+      if (!genes.length) continue;
+      const name  = (document.getElementById("lname-"+i).value || NAMES_DEF[i]).trim() || NAMES_DEF[i];
+      raw.push({ genes, name, color: COLORS[i], idx: i });
+    }
+
+    if (raw.length < 1) {
+      showBanners([{cls:"banner-err", msg:"Paste gene names into at least one active list."}]);
+      document.getElementById("venn-container").innerHTML = '<div id="venn-placeholder"><strong>No diagram yet</strong>Paste gene names into the lists on the left,<br>then click <strong>Generate Diagram</strong>.</div>';
+      return;
+    }
+
+    // Detect namespaces
+    raw.forEach(r => { r.ns = detectNs(r.genes); });
+    const namespaces = raw.map(r => r.ns);
+    const allSame    = new Set(namespaces).size === 1;
+
+    const doConvert = document.getElementById("auto-convert").checked &&
+                      document.getElementById("target-ns").value === "symbol" &&
+                      !allSame;
+    const species   = document.getElementById("species").value;
+
+    const convLog = [];
+    for (const r of raw) {
+      if (!doConvert || r.ns === "symbol") {
+        r.final = r.ns === "symbol"
+          ? [...new Set(r.genes.map(g => g.toUpperCase()))]
+          : [...new Set(r.genes)];
+        convLog.push({ ns: r.ns, converted: false, nIn: r.genes.length, nOut: r.final.length, unmapped: [] });
+      } else {
+        const res = await convertIds(r.genes, r.ns, species);
+        r.final   = [...new Set(Object.values(res.mapped))];
+        convLog.push({ ns: r.ns, converted: true, nIn: r.genes.length, nOut: r.final.length, unmapped: res.unmapped, mapped: res.mapped });
+      }
+    }
+
+    // Validate
+    const empty = raw.filter(r => r.final.length === 0);
+    if (empty.length) {
+      showBanners([{cls:"banner-err", msg:`Lists have 0 genes after processing: ${empty.map(r=>r.name).join(", ")}. Check ID conversion.`}]);
+      return;
+    }
+    if (raw.length < 2) {
+      showBanners([{cls:"banner-err", msg:"Enable at least 2 non-empty lists to draw an overlap diagram."}]);
+      return;
+    }
+
+    const lists  = raw.map(r => r.final);
+    const names  = raw.map(r => r.name);
+    const colors = raw.map(r => r.color);
+
+    currentResult = { lists, names, colors, convLog, raw, allSame, doConvert };
+
+    // Draw SVG Venn
+    const svgHtml = drawVennSVG(lists, names, colors);
+    document.getElementById("venn-container").innerHTML = svgHtml;
+
+    // Stat pills
+    renderPills(lists, names, colors);
+
+    // Banners
+    const bannerMsgs = [{cls:"banner-ok", msg:"\u2713\u00a0 Within-list duplicates removed automatically. Intersections return unique values."}];
+    if (doConvert) {
+      const nUn = convLog.reduce((s,l) => s + l.unmapped.length, 0);
+      bannerMsgs.push({cls:"banner-info", msg:`\u21c4\u00a0 ID conversion applied via MyGene.info \u00b7 see ID Conversion tab.${nUn > 0 ? ` \u00b7 ${nUn} IDs could not be mapped (excluded).` : ""}`});
+    } else if (!allSame && raw.length >= 2) {
+      bannerMsgs.push({cls:"banner-warn", msg:"\u26a0\u00a0 Lists may use different ID namespaces. Enable auto-conversion or ensure all lists use the same ID type."});
+    }
+    showBanners(bannerMsgs);
+
+    // Stats
+    renderStats(lists, names);
+
+    // Gene sets
+    renderGeneSets(lists, names);
+
+    // ID conversion report
+    renderIdConv(raw, convLog, colors);
+
+    // Enable exports
+    document.getElementById("dl-svg").disabled = false;
+    document.getElementById("dl-csv").disabled = false;
+
+  } finally {
+    btn.innerHTML = "&#9654;&#xfe0e;&nbsp; Generate Diagram";
+    btn.disabled  = false;
+  }
+}
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function renderPills(lists, names, colors) {
+  const union  = [...new Set(lists.flat())].length;
+  const shared = lists.slice(1).reduce(
+    (acc,l) => { const s = new Set(l); return acc.filter(g => s.has(g)); },
+    [...lists[0]]
+  ).length;
+
+  let html = '<div class="pills">';
+  lists.forEach((l,i) => {
+    html += `<div class="pill" style="border-top:3px solid ${colors[i]}"><span class="pill-num">${l.length.toLocaleString()}</span><span class="pill-lbl">${escHtml(names[i])}</span></div>`;
+  });
+  html += `<div class="pill"><span class="pill-num">${union.toLocaleString()}</span><span class="pill-lbl">Union</span></div>`;
+  html += `<div class="pill"><span class="pill-num">${shared.toLocaleString()}</span><span class="pill-lbl">All Shared</span></div>`;
+  html += '</div>';
+  document.getElementById("stat-pills").innerHTML = html;
+}
+
+function showBanners(msgs) {
+  document.getElementById("banners").innerHTML =
+    msgs.map(m => `<div class="banner ${m.cls}">${m.msg}</div>`).join("");
+}
+
+function renderStats(lists, names) {
+  const doHyper  = document.getElementById("run-hyper").checked;
+  const el = document.getElementById("stats-content");
+  if (!doHyper) {
+    el.innerHTML = '<div class="banner banner-warn">Enable \'Run test\' in the sidebar to see results.</div>';
+    return;
+  }
+  const universe = parseInt(document.getElementById("universe-size").value) || 12000;
+  const rows = hyperTest(lists, names, universe);
+  if (!rows.length) { el.innerHTML = '<div class="banner banner-warn">No pairwise overlaps found.</div>'; return; }
+
+  let html = '<div style="overflow-x:auto"><table id="stats-table"><thead><tr>';
+  ["Comparison","N\u2081","N\u2082","Overlap","% L1","% L2","Universe","P-value","P-adj (BH)","Sig"].forEach(h => { html += `<th>${h}</th>`; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    const sigClass = r.pval < 0.05 ? "pval-sig" : r.pval < 0.1 ? "pval-trend" : "";
+    html += `<tr>
+      <td>${escHtml(r.comparison)}</td>
+      <td style="text-align:center">${r.n1.toLocaleString()}</td>
+      <td style="text-align:center">${r.n2.toLocaleString()}</td>
+      <td style="text-align:center;color:#C2185B;font-weight:600">${r.overlap}</td>
+      <td style="text-align:center">${r.pct1}</td>
+      <td style="text-align:center">${r.pct2}</td>
+      <td style="text-align:center">${r.universe.toLocaleString()}</td>
+      <td class="${sigClass}" style="text-align:center">${r.pval}</td>
+      <td style="text-align:center">${r.padj}</td>
+      <td style="text-align:center">${r.sig ? '<span class="sig-check">\u2713</span>' : ''}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function renderGeneSets(lists, names) {
+  const regions = allRegions(lists, names);
+  allGeneRows   = regions;
+  const el = document.getElementById("genes-content");
+  const searchRow = document.getElementById("gene-search-row");
+
+  if (!regions.length) {
+    el.innerHTML = '<div class="banner banner-warn">No gene data.</div>';
+    searchRow.style.display = "none";
+    return;
+  }
+  searchRow.style.display = "flex";
+  const searchInput = document.getElementById("gene-search");
+  if (searchInput) searchInput.value = "";
+  renderGeneTable(regions);
+}
+
+function renderGeneTable(rows) {
+  const el   = document.getElementById("genes-content");
+  const shown = rows.filter(r => r.count > 0);
+  if (!shown.length) { el.innerHTML = '<div class="banner banner-warn">No matching genes.</div>'; return; }
+
+  let html = '<div style="overflow-x:auto"><table id="genes-table"><thead><tr><th>Region</th><th>Type</th><th>Count</th><th>Genes</th></tr></thead><tbody>';
+  shown.forEach(r => {
+    html += `<tr>
+      <td style="white-space:nowrap;font-weight:600">${escHtml(r.label)}</td>
+      <td style="white-space:nowrap;font-size:10px;color:#78716C;text-transform:capitalize">${r.type}</td>
+      <td class="count-cell" style="text-align:center">${r.count}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${escHtml(r.genes.join(", "))}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function filterGeneTable() {
+  const q = (document.getElementById("gene-search").value || "").toLowerCase().trim();
+  if (!q) { renderGeneTable(allGeneRows); return; }
+  const filtered = allGeneRows.map(r => ({
+    ...r,
+    genes: r.genes.filter(g => g.toLowerCase().includes(q)),
+    count: r.genes.filter(g => g.toLowerCase().includes(q)).length
+  }));
+  renderGeneTable(filtered);
+}
+
+function renderIdConv(raw, convLog, colors) {
+  const el = document.getElementById("idconv-content");
+  let html = "";
+  raw.forEach((r, i) => {
+    const lg  = convLog[i];
+    const col = colors[i];
+    html += `<div class="id-entry">
+      <div class="id-entry-head">
+        <div class="id-dot" style="background:${col}"></div>
+        <strong style="font-size:13px">${escHtml(r.name)}</strong>
+      </div>
+      <div class="id-entry-body">
+        <div>Detected namespace: <strong>${NS_LABEL[lg.ns] || lg.ns}</strong></div>
+        <div>Input genes (after dedup): <strong>${lg.nIn.toLocaleString()}</strong></div>
+        <div>Genes used in diagram: <strong>${lg.nOut.toLocaleString()}</strong></div>
+        <div>${lg.converted ? "Converted to gene symbols via <strong>MyGene.info</strong>" : "No conversion applied"}</div>
+        ${lg.unmapped && lg.unmapped.length > 0
+          ? `<div class="banner banner-warn" style="margin-top:6px">Unmapped IDs (${lg.unmapped.length}): ${escHtml(lg.unmapped.slice(0,40).join(", "))}${lg.unmapped.length > 40 ? ` \u2026 and ${lg.unmapped.length-40} more` : ""}</div>`
+          : ""}
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html || '<div class="banner banner-warn">No data.</div>';
+}
+
+// ── Exports ───────────────────────────────────────────────────────────────────
+function downloadSVG() {
+  const svgEl = document.getElementById("venn-svg");
+  if (!svgEl) return;
+  const clone = svgEl.cloneNode(true);
+  clone.setAttribute("xmlns","http://www.w3.org/2000/svg");
+  const styleEl = document.createElementNS("http://www.w3.org/2000/svg","style");
+  styleEl.textContent = "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@600;700&display=swap');";
+  clone.insertBefore(styleEl, clone.firstChild);
+  const blob = new Blob([new XMLSerializer().serializeToString(clone)], {type:"image/svg+xml"});
+  const a = Object.assign(document.createElement("a"), {href:URL.createObjectURL(blob), download:`venn_${Date.now()}.svg`});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function downloadCSV() {
+  if (!currentResult) return;
+  const {lists, names} = currentResult;
+  const regions  = allRegions(lists, names);
+  const csvRows  = [["Region","Type","Count","Genes"]];
+  regions.filter(r => r.count > 0).forEach(r => {
+    csvRows.push([
+      `"${r.label.replace(/"/g,'""')}"`,
+      r.type,
+      r.count,
+      `"${r.genes.join(", ").replace(/"/g,'""')}"`
+    ]);
+  });
+  const blob = new Blob([csvRows.map(r=>r.join(",")).join("\n")], {type:"text/csv"});
+  const a = Object.assign(document.createElement("a"), {href:URL.createObjectURL(blob), download:`venn_intersections_${new Date().toISOString().slice(0,10)}.csv`});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function showPane(name) {
+  document.querySelectorAll(".vpane").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".vtab-btn").forEach(el => el.classList.remove("active"));
+  document.getElementById("vpane-"+name).classList.add("active");
+  const btn = document.querySelector(`.vtab-btn[onclick="showPane('${name}')"]`);
+  if (btn) btn.classList.add("active");
+}
+
+// ── Utility ───────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+</script>
+<script src="/js/site.js"></script>
+<script src="/js/sessions.js"></script>
+<script>
+// ─── Session persistence ───────────────────────────────────────────────────────
+function getVennState() {
+  const lists = [];
+  const names = [];
+  for (let i = 0; i < 5; i++) {
+    const ta = document.getElementById('genes-' + i);
+    const ln = document.getElementById('lname-' + i);
+    lists.push(ta ? ta.value : '');
+    names.push(ln ? ln.value : '');
+  }
+  const state = {
+    lists, names,
+    activeFlags: activeFlags.slice(),
+    species:      document.getElementById('species').value,
+    targetNs:     document.getElementById('target-ns').value,
+    autoConvert:  document.getElementById('auto-convert').checked,
+    universeSize: document.getElementById('universe-size').value,
+    runHyper:     document.getElementById('run-hyper').checked,
+    svgWidth:     document.getElementById('svg-width').value,
+    svgHeight:    document.getElementById('svg-height').value,
+    plotTitle:    document.getElementById('plot-title').value,
+  };
+  return { stateJson: JSON.stringify(state), files: [] };
+}
+
+function loadVennState(stateJson) {
+  let ui; try { ui = JSON.parse(stateJson); } catch(_) { ui = {}; }
+
+  if (ui.lists) {
+    for (let i = 0; i < 5; i++) {
+      const ta = document.getElementById('genes-' + i);
+      if (ta && ui.lists[i] !== undefined) { ta.value = ui.lists[i]; updateCard(i); }
+      const ln = document.getElementById('lname-' + i);
+      if (ln && ui.names && ui.names[i] !== undefined) ln.value = ui.names[i];
+    }
+  }
+  if (ui.activeFlags) {
+    for (let i = 0; i < 5; i++) {
+      const cb = document.getElementById('tgl-' + i);
+      if (cb) { cb.checked = ui.activeFlags[i]; toggleList(i, ui.activeFlags[i]); }
+    }
+  }
+  if (ui.species)      document.getElementById('species').value      = ui.species;
+  if (ui.targetNs)     document.getElementById('target-ns').value     = ui.targetNs;
+  if (ui.autoConvert  !== undefined) document.getElementById('auto-convert').checked   = ui.autoConvert;
+  if (ui.universeSize !== undefined) document.getElementById('universe-size').value     = ui.universeSize;
+  if (ui.runHyper     !== undefined) document.getElementById('run-hyper').checked       = ui.runHyper;
+  if (ui.svgWidth)     document.getElementById('svg-width').value     = ui.svgWidth;
+  if (ui.svgHeight)    document.getElementById('svg-height').value    = ui.svgHeight;
+  if (ui.plotTitle    !== undefined) document.getElementById('plot-title').value        = ui.plotTitle;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  SessionManager.mount('venn', getVennState, loadVennState);
+});
+</script>
+</body>
+</html>

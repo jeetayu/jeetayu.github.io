@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bioinformatic Protocols – Jeet Biswas</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Proteomics &bull; Computational Genomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/notebook/">Notebook &#9662;</a>
+    <div class="dropdown">
+      <a href="/notebook/search.html">&#128269; Search All Notes</a>
+      <a href="/notebook/august-2025.html">August 2025 Notes</a>
+      <a href="/notebook/2024-march.html">2024 March Notes</a>
+      <a href="/notebook/2021.html">2021 Notes</a>
+      <a href="/notebook/2018.html">2018 Notes</a>
+      <a href="/notebook/2016-2017.html">2016&#8211;2017 Notes</a>
+      <a href="/notebook/2015-2016.html">2015&#8211;2016 Notes</a>
+      <a href="/notebook/2014-2015.html">2014&#8211;2015 Notes</a>
+      <a href="/notebook/todo.html">To-Do List</a>
+      <a href="/notebook/ip-addresses.html">IP Addresses</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link active" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+      <a href="/protocols.html">&#128209; Full Protocol Book</a>
+    </div>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/publications.html">Publications</a>
+  </div>
+  <div class="nav-item">
+    <a class="nav-link" href="/people.html">People</a>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/boilerplate/">Boiler-Plate &#9662;</a>
+    <div class="dropdown">
+      <a href="/boilerplate/grants.html">For Grants</a>
+      <a href="/boilerplate/papers.html">For Papers</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+<div class="page-title"><h2>Bioinformatic Protocols</h2></div>
+<div class="container">
+  <div class="breadcrumb"><a href="/protocols/">Protocols</a> / Bioinformatics</div>
+
+  <div class="card">
+    <h2>Data Servers &amp; HPC Access</h2>
+    <table>
+      <tr><th>System</th><th>Address / Path</th><th>Notes</th></tr>
+      <tr><td>Einstein Data Server</td><td><code>Dataserver://data.einstein.yu.edu</code></td><td>—</td></tr>
+      <tr><td>Abdel-Wahab Lab Server</td><td><code>\\reststop\public</code></td><td>SMB share</td></tr>
+      <tr><td>FISH Probe Server</td><td><code>http://jeet.zapto.org</code></td><td>Internal MERFISH probe design</td></tr>
+      <tr><td>IGO Sequencing (MSKCC)</td><td><code>rsync from /igo/delivery/share/</code></td><td>or via MSKCC VPN + IRIS transfer node <code>isxfer01</code></td></tr>
+      <tr><td>IRIS cluster login</td><td><code>islogin01.mskcc.org</code></td><td>SLURM; use sbatch / squeue / scancel</td></tr>
+      <tr><td>Rockefeller HPC</td><td>SLURM; home / store / scratch quotas</td><td>Login at rcode.rockefeller.edu (GitLab)</td></tr>
+      <tr><td>MSKCC VPN</td><td>GlobalProtect</td><td>Required for SAIL data download</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Calculating Microscopy Pixel Size</h2>
+    <p>Determines the actual image pixel size in microns for quantitative microscopy analysis.</p>
+    <h3>Required Parameters</h3>
+    <ul>
+      <li><strong>Objective magnification</strong> (e.g., 60x)</li>
+      <li><strong>Lens magnification</strong> — optional relay lens (1.25x, 1.6x, or 2x)</li>
+      <li><strong>C mount value</strong> — typically 1x</li>
+      <li><strong>Camera pixel size</strong> — actual sensor pixel dimensions in µm</li>
+      <li><strong>Binning factor</strong> — 1×1, 2×2, or 4×4 (reduces noise at cost of resolution)</li>
+    </ul>
+    <h3>Formula</h3>
+    <div class="info-box">
+      <strong>Image pixel size = camera pixel size × binning ÷ (objective mag × lens mag × C mount)</strong>
+    </div>
+    <h3>Example</h3>
+    <p>Cascade 512 camera with 16 µm/pixel CCD, 60x objective, 1×1 binning, no relay lens:</p>
+    <pre><code>16 µm × 1 ÷ (60 × 1 × 1) = 0.267 µm/pixel (266.7 nm/pixel)</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>STAR Genome Index Builds</h2>
+    <table>
+      <tr><th>Genome</th><th>genomeSAindexNbases</th><th>Notes</th></tr>
+      <tr><td>hg38 / hg19 / mm10 / rn6</td><td>14 (default)</td><td><code>ulimit -n 30000</code> before building</td></tr>
+      <tr><td>dm6 (Drosophila)</td><td>12</td><td>Smaller genome</td></tr>
+      <tr><td>sacCer3 (yeast)</td><td>10</td><td>Smallest — required</td></tr>
+      <tr><td>danRer10 (zebrafish dr10)</td><td>14</td><td>TRIBE zebrafish experiments</td></tr>
+    </table>
+    <pre><code>STAR --runMode genomeGenerate --runThreadN 8 \
+  --genomeDir /path/to/genome_index \
+  --genomeFastaFiles /path/to/genome.fa \
+  --sjdbGTFfile /path/to/genes.gtf \
+  --genomeSAindexNbases 14</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>RNA-seq Alignment &amp; Quantification</h2>
+    <pre><code># STAR alignment with strand-specific gene counts
+STAR --runMode alignReads \
+  --quantMode GeneCounts \
+  --genomeDir /path/to/STAR_genome \
+  --readFilesIn sample_R1.fastq.gz sample_R2.fastq.gz \
+  --readFilesCommand zcat \
+  --outSAMtype BAM SortedByCoordinate \
+  --outFileNamePrefix sample/
+
+# Verify strand specificity: column 4 (fr-firststrand) should have highest total
+awk -F"\t" 'NR > 4 {sum+=$4} END {print sum}' sample_ReadsPerGene.out.tab</code></pre>
+    <h3>Normalized BigWig from BAM</h3>
+    <pre><code>sorted_bam=$1; genome_fai_file=$2; prefix=${1%.bam*}
+count=$(samtools view -c $sorted_bam)
+norm_value=$(awk -v n=$count -v d=10000000 'BEGIN { printf "%.3f", (n/d) }')
+bamToBed -split -i $sorted_bam > $prefix.bed
+sort -k1,1 -k2,2n $prefix.bed > $prefix.sort.bed
+genomeCoverageBed -bg -i $prefix.sort.bed -scale $norm_value -g $genome_fai_file > $prefix.bedgraph
+bedGraphToBigWig $prefix.bedgraph $genome_fai_file $prefix.bw
+rm $prefix.bed $prefix.sort.bed $prefix.bedgraph</code></pre>
+    <p>Use the <a href="/calculators.html">BigWig Normalization Calculator</a> for the scale factor.</p>
+    <h3>Differential Expression — DEGUST</h3>
+    <ul>
+      <li>Web tool: <code>degust.erc.monash.edu</code></li>
+      <li>Input: STAR GeneCounts output (column 4 for fr-firststrand)</li>
+      <li>Cutoffs: FDR &lt; 0.05, fold-change ≥ 2</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>rMATS — Alternative Splicing</h2>
+    <pre><code># Standard command (hg19, paired-end, novel splice sites)
+rmats.py \
+  --b1 control_bams.txt \
+  --b2 experimental_bams.txt \
+  --gtf /path/to/hg19/genes.gtf \
+  --bi /path/to/hg19_star_index \
+  --od output_dir/ \
+  -t paired \
+  --novelSS \
+  --variable-read-length \
+  --allow-clipping \
+  --readLength 150 \
+  --cstat 0.0001 \
+  --libType fr-firststrand \
+  --tmp output_tmp/</code></pre>
+    <p><strong>libType options:</strong> <code>fr-firststrand</code> (TruSeq stranded), <code>fr-unstranded</code> (unstranded or older data), <code>single</code> for single-end.</p>
+    <h3>Jutils — Convert rMATS for Venn Diagrams</h3>
+    <pre><code>python3 /path/to/Jutils/jutils.py convert-results \
+  --rmats-dir experiment_unstrand_novel/ \
+  --out-dir jutils_output/
+# GitHub: https://github.com/Splicebox/Jutils</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>SRA Data Download</h2>
+    <pre><code>prefetch SRR_ACCESSION
+fastq-dump --split-files --origfmt --gzip SRR_ACCESSION
+
+# Delayed job submission (HPC workaround)
+echo "nohup ../hg_paired.sh sample_R1.fq.gz sample_R2.fq.gz &" | at now + 6 hours</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>bedtools Reference</h2>
+    <pre><code># Extend features by N bp each side
+bedtools slop -i features.bed -g genome.fa.fai -b 500
+
+# Calculate GC content around editing sites
+bedtools nuc -fi genome.fa -bed extended.bed -s > gc_output.bed
+
+# Compute coverage
+bedtools coverage -a features.bed -b aligned.bam
+
+# Subset BAM to specific locus (e.g. CD47 on hg38)
+samtools view -b -h input.bam "chr3:108041091-108093031" > output.bam</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Mass Spectrometry — IP2 Pipeline</h2>
+    <h3>IP2 Search Parameters (TMT/ABPP)</h3>
+    <table>
+      <tr><th>Modification</th><th>Mass</th><th>Residue</th></tr>
+      <tr><td>Iodoacetamide (static)</td><td>+57.02 Da</td><td>Cys (C)</td></tr>
+      <tr><td>TMT 16-plex (static)</td><td>+304.2071 Da</td><td>K and N-term</td></tr>
+      <tr><td>Desthiobiotin (diff)</td><td>+398.25 Da</td><td>Cys (C)</td></tr>
+    </table>
+    <p>Enzyme: trypsin (tryptic only for cleanliness). Allow 2 missed cleavages.</p>
+    <h3>Post-IP2 PowerShell Pipeline</h3>
+    <pre><code># Run on Windows (Orbitrap PC)
+start_pipeline.ps1   # canonical pipeline
+start_pipeline_beta.ps1   # beta/isoform pipeline
+
+# Steps: RawConverter → ProLuCID search → census-out → process_file_folder
+# → combine_file_folder → annotate_non_canonical_peptides → PCA plot</code></pre>
+    <h3>Ligandability vs Reactivity</h3>
+    <p><strong>Reactivity profiling:</strong> probe added to lysate — measures all cysteines accessible in vitro.<br>
+    <strong>Ligandability profiling:</strong> probe added to live cells or intact cell lysate with compound pre-treatment — measures pharmacologically relevant cysteines.</p>
+  </div>
+
+  <div class="card">
+    <h2>GSEA — Gene Set Enrichment Analysis</h2>
+    <p>Four input files required:</p>
+    <ol>
+      <li>Expression dataset (.gct or .txt): normalized RNA-seq counts</li>
+      <li>Phenotype labels (.cls file): sample class assignments</li>
+      <li>Gene sets (.gmt): download from MSigDB (hallmarks, KEGG, GO)</li>
+      <li>Chip annotation (.chip): gene symbol ↔ probe ID mapping</li>
+    </ol>
+    <div class="info-box">Use normalized (not raw) read counts from STAR GeneCounts or DESeq2 vst-normalized values.</div>
+  </div>
+</div>
+<footer>Jeet Biswas – Research Site &bull; Hosted on Raspberry Pi &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
+<script src="/js/site.js"></script>
+</body>
+</html>
