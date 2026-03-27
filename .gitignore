@@ -28,3 +28,4 @@ apps/generate_*.py
 tools/
 scripts/
 notebook/
+apps/addgene-cache/

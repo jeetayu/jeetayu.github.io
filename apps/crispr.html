@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRISPR Screen Analysis — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.main{flex:1;padding:20px;max-width:1040px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vcard-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vcard-sub{font-size:11px;color:#78716C;margin-bottom:14px}
+.banner{border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.banner-info{background:#EEF2FF;border:1px solid #C7D2FE;color:#3730A3}
+.banner-warn{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:10px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.8px}
+.field input,.field select,.field textarea{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Mono",monospace;font-size:12px;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#C2185B}
+.field .hint{font-size:10px;color:#A8A29E;margin-top:2px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.action-btn{background:#C2185B;border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:700;padding:9px 22px;transition:background .15s}
+.action-btn:hover:not(:disabled){background:#A3144E}
+.action-btn:disabled{background:#E2DDD8;color:#A8A29E;cursor:default}
+.sec-btn{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:6px;color:#44403C;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 14px;transition:background .15s}
+.sec-btn:hover:not(:disabled){background:#F0EDE9}
+.sec-btn:disabled{opacity:.5;cursor:default}
+/* Wizard */
+.wizard-steps{display:flex;gap:0;margin-bottom:20px;overflow:hidden}
+.wizard-step{flex:1;padding:9px 4px;font-size:10px;font-weight:600;text-align:center;background:#F5F4F1;border:1px solid #E2DDD8;border-right:none;color:#78716C;cursor:pointer;transition:background .15s}
+.wizard-step:first-child{border-radius:6px 0 0 6px}
+.wizard-step:last-child{border-right:1px solid #E2DDD8;border-radius:0 6px 6px 0}
+.wizard-step.active{background:#C2185B;color:#fff;border-color:#C2185B;z-index:1}
+.wizard-step.done{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+.wizard-step .step-num{display:block;font-size:15px;font-weight:700;margin-bottom:1px}
+/* Drop zone */
+.dropzone{border:2px dashed #D1C9C0;border-radius:8px;padding:28px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#FAFAF9}
+.dropzone:hover,.dropzone.drag-over{border-color:#C2185B;background:#FFF1F5}
+.dropzone .dz-icon{font-size:2rem;margin-bottom:8px;display:block}
+.dropzone .dz-label{font-size:13px;font-weight:600;color:#44403C}
+.dropzone .dz-hint{font-size:11px;color:#78716C;margin-top:4px}
+/* File QC rows */
+.file-qc{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:8px 12px;margin-bottom:5px;font-size:12px}
+.file-qc.counting{border-color:#FDE68A;background:#FFFBEB}
+.file-qc.done-ok{border-color:#A7F3D0;background:#ECFDF5}
+.file-qc.done-warn{border-color:#FDE68A;background:#FFFBEB}
+.file-qc.done-err{border-color:#FECDD3;background:#FFF1F2}
+.pct-bar{height:6px;border-radius:3px;background:#E2DDD8;width:80px;overflow:hidden;flex-shrink:0}
+.pct-bar-fill{height:100%;border-radius:3px;background:#C2185B;transition:width .3s}
+/* Sample design table */
+.design-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.design-table th{background:#F5F4F1;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#78716C;font-weight:700;padding:7px 10px;text-align:left;border:1px solid #E2DDD8}
+.design-table td{padding:6px 8px;border:1px solid #E2DDD8;background:#fff}
+.design-table input,.design-table select{background:#FAFAF9;border:1px solid #E2DDD8;border-radius:4px;padding:4px 8px;font-family:"IBM Plex Mono",monospace;font-size:11px;outline:none;width:100%}
+.design-table input:focus,.design-table select:focus{border-color:#C2185B}
+/* Comparison rows */
+.comp-row{display:grid;grid-template-columns:140px 1fr 1fr auto;gap:8px;align-items:center;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:8px 10px;margin-bottom:6px;font-size:12px}
+.comp-row input,.comp-row select{width:100%}
+/* Progress steps */
+.progress-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.prog-step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:#F5F4F1;border:1px solid #E2DDD8;font-size:12px}
+.prog-step.done{background:#ECFDF5;border-color:#A7F3D0}
+.prog-step.running{background:#FFF8F0;border-color:#FDE68A;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.prog-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.prog-icon.done{background:#065F46;color:#fff}
+.prog-icon.running{background:#F59E0B;color:#fff}
+.prog-icon.queued{background:#E2DDD8;color:#78716C}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #E2DDD8;border-top-color:#C2185B;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.log-viewer{background:#0D1117;color:#E6EDF3;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:12px;border-radius:6px;max-height:260px;overflow-y:auto;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+.result-file{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid #E2DDD8;border-radius:5px;margin-bottom:5px;background:#FAFAF9}
+.result-file-name{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600}
+.result-file-size{font-size:10px;color:#78716C}
+.job-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid #E2DDD8;border-radius:5px;margin-bottom:5px;background:#FAFAF9;cursor:pointer;transition:background .1s}
+.job-row:hover{background:#FFF1F5}
+.status-badge{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase}
+.status-running{background:#FEF3C7;color:#92400E}
+.status-completed{background:#ECFDF5;color:#065F46}
+.status-failed{background:#FFF1F2;color:#9F1239}
+.status-queued{background:#EEF2FF;color:#3730A3}
+.sec-head{font-size:11px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#E2DDD8;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+  <div>
+    <div class="topbar-logo"><em>CRISPR</em> Screen Analysis</div>
+    <div class="topbar-sub">Biswas Lab &middot; MSKCC &middot; Client-side counting + MAGeCK server analysis</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="banner banner-info">
+    <strong>How it works:</strong> FASTQ files are counted <em>in your browser</em> (no upload). Only the small count matrix (~1 MB) is sent to the server for MAGeCK analysis. Requires the CRISPR server running at port 5003.
+  </div>
+
+  <!-- Wizard steps -->
+  <div class="wizard-steps" id="wizard-steps">
+    <div class="wizard-step active" onclick="tryGoStep(0)"><span class="step-num">1</span>Project</div>
+    <div class="wizard-step"        onclick="tryGoStep(1)"><span class="step-num">2</span>Library</div>
+    <div class="wizard-step"        onclick="tryGoStep(2)"><span class="step-num">3</span>FASTQs</div>
+    <div class="wizard-step"        onclick="tryGoStep(3)"><span class="step-num">4</span>Design</div>
+    <div class="wizard-step"        onclick="tryGoStep(4)"><span class="step-num">5</span>Parameters</div>
+    <div class="wizard-step"        onclick="tryGoStep(5)"><span class="step-num">6</span>Run &amp; Results</div>
+  </div>
+
+  <!-- ── Step 0: Project ─────────────────────────────────────────────────── -->
+  <div class="vcard" id="step-0">
+    <div class="vcard-title">Project Setup</div>
+    <div class="vcard-sub">Name your screen and choose organism and analysis mode.</div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Project Name</label>
+        <input type="text" id="proj-name" value="CRISPR_Screen_1" placeholder="e.g. Brunello_K562_Aug2024">
+      </div>
+      <div class="field">
+        <label>Organism</label>
+        <select id="proj-org">
+          <option value="human">Human (hg38)</option>
+          <option value="mouse">Mouse (mm10)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Screen Type</label>
+        <select id="screen-type">
+          <option value="negative">Negative selection (dropout / fitness)</option>
+          <option value="positive">Positive selection (survival / resistance)</option>
+          <option value="both">Both directions</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Analysis Mode</label>
+        <select id="analysis-mode">
+          <option value="rra">RRA only (fast, &lt;1 min)</option>
+          <option value="mle">MLE only (&sim;5&ndash;10 min)</option>
+          <option value="both">Both RRA + MLE</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <button class="action-btn" onclick="goStep(1)">Next: Library &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── Step 1: Library ────────────────────────────────────────────────── -->
+  <div class="vcard" id="step-1" style="display:none">
+    <div class="vcard-title">sgRNA Library</div>
+    <div class="vcard-sub">Upload your sgRNA library file in MAGeCK format (tab-separated: id, sequence, gene). One guide per line.</div>
+
+    <div class="banner banner-warn">
+      <strong>Format:</strong> MAGeCK library file — 3 columns: <code>sgRNA_id&nbsp;&nbsp;sequence&nbsp;&nbsp;gene</code><br>
+      No header required. Common libraries: Brunello (human, 77k), Brie (mouse, 78k), GeCKOv2 (130k), TKOv3 (71k).
+    </div>
+
+    <div class="dropzone" id="lib-dropzone" onclick="document.getElementById('lib-file-input').click()">
+      <span class="dz-icon">&#128218;</span>
+      <div class="dz-label">Drop library file or click to browse</div>
+      <div class="dz-hint">.txt, .csv, .tsv &bull; gzip OK</div>
+    </div>
+    <input type="file" id="lib-file-input" accept=".txt,.csv,.tsv,.gz" style="display:none" onchange="loadLibraryFile(this.files[0])">
+
+    <div id="lib-status" style="margin-top:12px;display:none">
+      <div id="lib-banner" class="banner banner-info">Parsing library…</div>
+      <div id="lib-stats" style="font-size:12px;margin-top:6px"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="sec-btn" onclick="goStep(0)">&larr; Back</button>
+      <button class="action-btn" id="lib-next-btn" disabled onclick="goStep(2)">Next: FASTQ Files &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── Step 2: FASTQ Files ────────────────────────────────────────────── -->
+  <div class="vcard" id="step-2" style="display:none">
+    <div class="vcard-title">FASTQ Files</div>
+    <div class="vcard-sub">Drop all FASTQ files (one per sample). Counting runs in your browser — no upload required.</div>
+
+    <div class="field" style="margin-bottom:8px">
+      <label>Guide offset (bp from read start)</label>
+      <input type="number" id="guide-offset" value="0" min="0" max="50" style="width:120px">
+      <div class="hint">0 = guide starts at position 1. Adjust if there is a constant 5' sequence before the guide.</div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Guide length (bp)</label>
+      <input type="number" id="guide-len" value="20" min="15" max="30" style="width:120px">
+    </div>
+
+    <div class="dropzone" id="fq-dropzone" onclick="document.getElementById('fq-file-input').click()">
+      <span class="dz-icon">&#9889;</span>
+      <div class="dz-label">Drop FASTQ files or click to browse</div>
+      <div class="dz-hint">.fastq, .fastq.gz &bull; Multiple files OK &bull; All counted locally</div>
+    </div>
+    <input type="file" id="fq-file-input" accept=".fastq,.fastq.gz,.fq,.fq.gz" multiple style="display:none" onchange="addFastqFiles(this.files)">
+
+    <div id="fq-list" style="margin-top:12px"></div>
+
+    <div id="fq-summary" style="display:none;margin-top:10px;padding:10px 14px;background:#F5F4F1;border-radius:6px;font-size:12px"></div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="sec-btn" onclick="goStep(1)">&larr; Back</button>
+      <button class="sec-btn" id="btn-count" disabled onclick="startCounting()">&#9654; Count guides</button>
+      <button class="action-btn" id="fq-next-btn" disabled onclick="goStep(3)">Next: Sample Design &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── Step 3: Sample Design ──────────────────────────────────────────── -->
+  <div class="vcard" id="step-3" style="display:none">
+    <div class="vcard-title">Sample Design</div>
+    <div class="vcard-sub">Assign sample names and control/treatment groups. Then define comparisons.</div>
+
+    <div class="sec-head">Samples</div>
+    <table class="design-table" id="design-table">
+      <thead><tr>
+        <th style="width:40%">FASTQ file</th>
+        <th>Sample name</th>
+        <th style="width:130px">Group</th>
+      </tr></thead>
+      <tbody id="design-tbody"></tbody>
+    </table>
+
+    <div class="sec-head" style="margin-top:16px">Comparisons</div>
+    <div class="banner banner-info" style="font-size:11px">
+      Define which samples to compare. <strong>Treatment</strong> = perturbed/selected. <strong>Control</strong> = baseline/pre-selection. Use comma-separated sample names or indices (0-based column order) matching MAGeCK convention.
+    </div>
+    <div id="comp-rows"></div>
+    <button class="sec-btn" style="margin-top:6px" onclick="addComparison()">+ Add Comparison</button>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="sec-btn" onclick="goStep(2)">&larr; Back</button>
+      <button class="action-btn" onclick="goStep(4)">Next: Parameters &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── Step 4: Parameters ─────────────────────────────────────────────── -->
+  <div class="vcard" id="step-4" style="display:none">
+    <div class="vcard-title">Analysis Parameters</div>
+    <div class="vcard-sub">MAGeCK settings. Defaults work well for most screens.</div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Normalization Method</label>
+        <select id="norm-method">
+          <option value="median">Median (total count)</option>
+          <option value="control">Control sgRNAs</option>
+          <option value="none">None</option>
+        </select>
+        <div class="hint">Use "Control" if you have non-targeting control sgRNAs identified below.</div>
+      </div>
+      <div class="field">
+        <label>FDR Threshold (display only)</label>
+        <input type="number" id="fdr-thresh" value="0.1" min="0.01" max="0.5" step="0.01">
+        <div class="hint">Used only for highlighting in plots.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Non-targeting control sgRNA name pattern (optional)</label>
+      <input type="text" id="ctrl-pattern" placeholder="e.g. NONTARGETING or CTRL or NT_">
+      <div class="hint">If filled, any guide whose gene name matches this string (case-insensitive) is used as control for normalization.</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="sec-btn" onclick="goStep(3)">&larr; Back</button>
+      <button class="action-btn" onclick="goStep(5)">Review &amp; Submit &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── Step 5: Run & Results ──────────────────────────────────────────── -->
+  <div class="vcard" id="step-5" style="display:none">
+    <div class="vcard-title">Run &amp; Results</div>
+    <div class="vcard-sub">Review configuration and submit to the MAGeCK server.</div>
+
+    <div id="submit-area">
+      <div id="config-preview" style="margin-bottom:14px"></div>
+      <div id="server-status-banner" style="margin-bottom:10px;display:none"></div>
+      <button class="action-btn" id="btn-submit" onclick="submitJob()">&#9654; Submit to MAGeCK Server</button>
+    </div>
+
+    <div id="monitor-area" style="display:none;margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <span id="job-status-badge" class="status-badge status-running">running</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#78716C;margin-left:8px" id="job-id-display"></span>
+        </div>
+        <button class="sec-btn" onclick="stopPolling()">Stop monitoring</button>
+      </div>
+
+      <div class="progress-steps" id="progress-steps"></div>
+
+      <div style="font-size:11px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Pipeline Log</div>
+      <div class="log-viewer" id="log-viewer">Waiting for output…</div>
+
+      <div id="results-area" style="display:none;margin-top:16px">
+        <div class="banner banner-ok">&#10003; Analysis complete!</div>
+        <div class="sec-head">Result Files</div>
+        <div id="result-files"></div>
+        <div id="plot-area" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Previous Jobs -->
+  <div class="vcard">
+    <div class="vcard-title">Previous Jobs</div>
+    <div id="jobs-list"><div style="font-size:12px;color:#78716C">Loading…</div></div>
+    <button class="sec-btn" style="margin-top:8px" onclick="loadJobs()">&#8635; Refresh</button>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = {
+  libraryGuides: [],     // [{id, seq, gene}]
+  libraryName:   '',
+  fastqFiles:    [],     // File objects
+  countResults:  [],     // [{name, counts, readsTotal, readsMapped, mappingPct}]
+  sampleNames:   {},     // filename → sample name
+  sampleGroups:  {},     // filename → 'control'|'treatment'
+  compCount:     0,
+};
+
+const API = '/api/crispr';
+let worker   = null;
+let pollTimer = null;
+let currentJobId = null;
+let _countingInProgress = false;
+
+// ─── Wizard ───────────────────────────────────────────────────────────────────
+function goStep(n) {
+  [0,1,2,3,4,5].forEach(i => {
+    const el = document.getElementById('step-'+i);
+    if (el) el.style.display = (i === n) ? '' : 'none';
+    const tab = document.querySelectorAll('.wizard-step')[i];
+    if (tab) tab.classList.toggle('active', i === n);
+  });
+  if (n === 3) buildDesignTable();
+  if (n === 5) { buildConfigPreview(); checkServerPing(); }
+}
+
+function tryGoStep(n) {
+  // Allow jumping back freely; forward only if requirements met
+  const cur = [...document.querySelectorAll('.wizard-step')].findIndex(t => t.classList.contains('active'));
+  if (n <= cur) goStep(n);
+}
+
+// ─── Step 1: Library ─────────────────────────────────────────────────────────
+function setupLibDropzone() {
+  const dz = document.getElementById('lib-dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) loadLibraryFile(e.dataTransfer.files[0]);
+  });
+}
+
+async function loadLibraryFile(file) {
+  if (!file) return;
+  document.getElementById('lib-status').style.display = '';
+  setBanner('lib-banner', 'info', 'Parsing library file…');
+  document.getElementById('lib-next-btn').disabled = true;
+  S.libraryGuides = [];
+  S.libraryName   = file.name;
+
+  try {
+    let text;
+    if (file.name.endsWith('.gz')) {
+      const stream = file.stream().pipeThrough(new DecompressionStream('gzip'));
+      const chunks = [];
+      const reader = stream.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      let total = 0;
+      for (const c of chunks) total += c.length;
+      const buf = new Uint8Array(total);
+      let pos = 0;
+      for (const c of chunks) { buf.set(c, pos); pos += c.length; }
+      text = new TextDecoder().decode(buf);
+    } else {
+      text = await file.text();
+    }
+
+    const lines = text.split('\n');
+    let parsed = 0, skipped = 0;
+    const guides = [];
+    const seenIds = new Set();
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const parts = line.split(/\t|,/);
+      if (parts.length < 3) { skipped++; continue; }
+      const [id, seq, gene] = parts.map(p => p.trim());
+      if (!id || !seq || !gene) { skipped++; continue; }
+      if (!/^[ACGT]+$/i.test(seq)) { skipped++; continue; }
+      if (seenIds.has(id)) { skipped++; continue; }
+      seenIds.add(id);
+      guides.push({ id, seq: seq.toUpperCase(), gene });
+      parsed++;
+    }
+
+    if (parsed < 100) {
+      setBanner('lib-banner', 'err', `Too few guides parsed (${parsed}). Check file format: id\\tsequence\\tgene, one per line.`);
+      return;
+    }
+
+    S.libraryGuides = guides;
+
+    // Gene stats
+    const genes = new Set(guides.map(g => g.gene));
+    const seqLens = guides.map(g => g.seq.length);
+    const minL = Math.min(...seqLens), maxL = Math.max(...seqLens);
+
+    document.getElementById('lib-stats').innerHTML =
+      `<strong>${parsed.toLocaleString()}</strong> guides &bull; <strong>${genes.size.toLocaleString()}</strong> genes &bull; ` +
+      `guide length ${minL === maxL ? minL : minL + '–' + maxL} bp` +
+      (skipped ? ` &bull; <span style="color:#92400E">${skipped} lines skipped</span>` : '');
+
+    setBanner('lib-banner', 'ok', `&#10003; Library loaded: ${file.name}`);
+    document.getElementById('lib-next-btn').disabled = false;
+
+    // Send to worker
+    initWorker();
+    worker.postMessage({ type: 'load_library', data: { guides } });
+
+  } catch(err) {
+    setBanner('lib-banner', 'err', 'Error: ' + err.message);
+  }
+}
+
+// ─── Step 2: FASTQ Files ─────────────────────────────────────────────────────
+function setupFqDropzone() {
+  const dz = document.getElementById('fq-dropzone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    addFastqFiles(e.dataTransfer.files);
+  });
+}
+
+function addFastqFiles(fileList) {
+  for (const f of fileList) {
+    if (!f.name.match(/\.(fastq|fq)(\.gz)?$/i)) continue;
+    if (S.fastqFiles.find(x => x.name === f.name)) continue;
+    S.fastqFiles.push(f);
+  }
+  renderFqList();
+  document.getElementById('btn-count').disabled = (S.fastqFiles.length === 0 || !S.libraryGuides.length);
+}
+
+function removeFastqFile(name) {
+  S.fastqFiles = S.fastqFiles.filter(f => f.name !== name);
+  S.countResults = S.countResults.filter(r => r.name !== name);
+  renderFqList();
+  document.getElementById('btn-count').disabled = (S.fastqFiles.length === 0);
+  checkFqAllDone();
+}
+
+function renderFqList() {
+  const el = document.getElementById('fq-list');
+  if (!S.fastqFiles.length) { el.innerHTML = ''; return; }
+  el.innerHTML = S.fastqFiles.map(f => {
+    const res = S.countResults.find(r => r.name === f.name);
+    let cls = '', statusHtml = '';
+    if (!res) {
+      cls = '';
+      statusHtml = `<span style="font-size:11px;color:#78716C">${fmtSize(f.size)}</span>`;
+    } else if (res.error) {
+      cls = 'done-err';
+      statusHtml = `<span style="color:#9F1239;font-size:11px">Error: ${escH(res.error)}</span>`;
+    } else {
+      const pct = res.mappingPct;
+      cls = pct >= 60 ? 'done-ok' : 'done-warn';
+      statusHtml = `<span style="font-size:11px;font-weight:700;color:${pct >= 60 ? '#065F46' : '#92400E'}">${pct}%</span>
+        <span style="font-size:10px;color:#78716C">${res.readsMapped.toLocaleString()}/${res.readsTotal.toLocaleString()} mapped</span>`;
+    }
+    return `<div class="file-qc ${cls}" id="fqrow-${CSS.escape(f.name)}">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;word-break:break-all">${escH(f.name)}</span>
+      <span id="fqstatus-${CSS.escape(f.name)}" style="display:flex;align-items:center;gap:8px">${statusHtml}</span>
+      <span style="font-size:10px;color:#78716C">${fmtSize(f.size)}</span>
+      <button onclick="removeFastqFile('${escH(f.name).replace(/'/g,"\\'")}');" style="background:none;border:none;color:#A8A29E;cursor:pointer;font-size:15px;padding:2px 4px" title="Remove">&#215;</button>
+    </div>`;
+  }).join('');
+}
+
+function initWorker() {
+  if (worker) return;
+  worker = new Worker('/js/crispr_worker.js');
+  worker.onmessage = handleWorkerMsg;
+  worker.onerror = e => console.error('Worker error:', e);
+}
+
+function handleWorkerMsg(e) {
+  const msg = e.data;
+  if (msg.type === 'library_loaded') {
+    console.log(`Worker: library loaded (${msg.count} guides)`);
+    return;
+  }
+  if (msg.type === 'file_start') {
+    updateFileRow(msg.name, 'counting', null);
+    return;
+  }
+  if (msg.type === 'file_progress') {
+    updateFileRow(msg.name, 'counting', msg.pct);
+    return;
+  }
+  if (msg.type === 'file_done') {
+    const existing = S.countResults.findIndex(r => r.name === msg.name);
+    if (existing >= 0) S.countResults[existing] = msg.result;
+    else S.countResults.push(msg.result);
+    updateFileRow(msg.name, 'done', null, msg.result);
+    return;
+  }
+  if (msg.type === 'all_done') {
+    _countingInProgress = false;
+    document.getElementById('btn-count').disabled = false;
+    checkFqAllDone();
+    renderFqSummary();
+    return;
+  }
+  if (msg.type === 'error') {
+    _countingInProgress = false;
+    document.getElementById('btn-count').disabled = false;
+    alert('Worker error: ' + msg.message);
+    return;
+  }
+}
+
+function updateFileRow(name, phase, pct, result) {
+  const safeId = CSS.escape(name);
+  const row = document.getElementById('fqrow-' + safeId);
+  const statusEl = document.getElementById('fqstatus-' + safeId);
+  if (!row || !statusEl) { renderFqList(); return; }
+
+  if (phase === 'counting') {
+    row.className = 'file-qc counting';
+    statusEl.innerHTML = `<span class="spinner"></span><span style="font-size:11px;color:#92400E">Counting…</span>`;
+  } else if (phase === 'done' && result) {
+    if (result.error) {
+      row.className = 'file-qc done-err';
+      statusEl.innerHTML = `<span style="color:#9F1239;font-size:11px">Error: ${escH(result.error)}</span>`;
+    } else {
+      const pct = result.mappingPct;
+      row.className = 'file-qc ' + (pct >= 60 ? 'done-ok' : 'done-warn');
+      statusEl.innerHTML = `<span style="font-size:11px;font-weight:700;color:${pct >= 60 ? '#065F46' : '#92400E'}">${pct}%</span>
+        <span style="font-size:10px;color:#78716C">${result.readsMapped.toLocaleString()}/${result.readsTotal.toLocaleString()} mapped</span>`;
+    }
+  }
+}
+
+function startCounting() {
+  if (_countingInProgress) return;
+  if (!S.fastqFiles.length) { alert('Add FASTQ files first.'); return; }
+  if (!S.libraryGuides.length) { alert('Load a library first (Step 2).'); return; }
+
+  _countingInProgress = true;
+  S.countResults = [];
+  document.getElementById('btn-count').disabled = true;
+  document.getElementById('fq-next-btn').disabled = true;
+  document.getElementById('fq-summary').style.display = 'none';
+  renderFqList();
+
+  initWorker();
+  const offset   = parseInt(document.getElementById('guide-offset').value) || 0;
+  const guideLen = parseInt(document.getElementById('guide-len').value) || 20;
+
+  worker.postMessage({ type: 'count_files', data: { files: S.fastqFiles, offset, guideLen } });
+}
+
+function checkFqAllDone() {
+  const allDone = S.fastqFiles.length > 0 &&
+    S.fastqFiles.every(f => S.countResults.find(r => r.name === f.name));
+  document.getElementById('fq-next-btn').disabled = !allDone;
+}
+
+function renderFqSummary() {
+  const el = document.getElementById('fq-summary');
+  if (!S.countResults.length) { el.style.display = 'none'; return; }
+
+  let totalReads = 0, totalMapped = 0;
+  for (const r of S.countResults) { totalReads += r.readsTotal || 0; totalMapped += r.readsMapped || 0; }
+  const overallPct = totalReads > 0 ? ((totalMapped / totalReads) * 100).toFixed(1) : 0;
+  const pctColor = overallPct >= 60 ? '#065F46' : '#92400E';
+
+  el.style.display = '';
+  el.innerHTML = `<strong>Counting complete.</strong>
+    ${S.countResults.length} files &bull;
+    ${totalReads.toLocaleString()} total reads &bull;
+    <span style="color:${pctColor};font-weight:700">${overallPct}% overall mapping rate</span>
+    ${overallPct < 50 ? '<br><span style="color:#92400E">&#9888; Low mapping rate. Check guide offset, length, or that the correct library was used.</span>' : ''}`;
+}
+
+// ─── Step 3: Sample Design ────────────────────────────────────────────────────
+function buildDesignTable() {
+  const tbody = document.getElementById('design-tbody');
+  tbody.innerHTML = '';
+  for (const f of S.fastqFiles) {
+    if (!S.sampleNames[f.name]) {
+      // Auto-name: strip common suffixes
+      S.sampleNames[f.name] = f.name.replace(/\.(fastq|fq)(\.gz)?$/i, '')
+                                     .replace(/_R1_001$|_R1$|_1$/, '');
+    }
+    if (!S.sampleGroups[f.name]) S.sampleGroups[f.name] = 'treatment';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#78716C;word-break:break-all">${escH(f.name)}</td>
+      <td><input type="text" value="${escH(S.sampleNames[f.name])}" onchange="S.sampleNames['${escH(f.name)}'] = this.value"></td>
+      <td><select onchange="S.sampleGroups['${escH(f.name)}'] = this.value">
+        <option value="treatment" ${S.sampleGroups[f.name] === 'treatment' ? 'selected' : ''}>Treatment</option>
+        <option value="control"   ${S.sampleGroups[f.name] === 'control'   ? 'selected' : ''}>Control</option>
+      </select></td>`;
+    tbody.appendChild(tr);
+  }
+
+  // Init comparison if none
+  const compContainer = document.getElementById('comp-rows');
+  if (!compContainer.children.length) addComparison();
+}
+
+let _compIdx = 0;
+function addComparison() {
+  _compIdx++;
+  const idx = _compIdx;
+  const div = document.createElement('div');
+  div.className = 'comp-row';
+  div.id = 'comp-' + idx;
+  div.innerHTML = `
+    <input type="text" placeholder="Comparison name" value="Treated_vs_Control" id="comp-name-${idx}">
+    <input type="text" placeholder="Treatment sample names (comma-sep)" id="comp-treat-${idx}">
+    <input type="text" placeholder="Control sample names (comma-sep)" id="comp-ctrl-${idx}">
+    <button onclick="document.getElementById('comp-${idx}').remove()" style="background:none;border:none;color:#A8A29E;cursor:pointer;font-size:16px;padding:2px 6px">&#215;</button>`;
+  document.getElementById('comp-rows').appendChild(div);
+
+  // Auto-fill from sample groups
+  autoFillComparison(idx);
+}
+
+function autoFillComparison(idx) {
+  const treats = [], ctrls = [];
+  for (const f of S.fastqFiles) {
+    const name = S.sampleNames[f.name] || f.name;
+    if (S.sampleGroups[f.name] === 'treatment') treats.push(name);
+    else ctrls.push(name);
+  }
+  const te = document.getElementById('comp-treat-' + idx);
+  const ce = document.getElementById('comp-ctrl-'  + idx);
+  if (te && !te.value) te.value = treats.join(',');
+  if (ce && !ce.value) ce.value = ctrls.join(',');
+}
+
+function collectComparisons() {
+  const rows = document.querySelectorAll('[id^="comp-"]');
+  const out = [];
+  for (const row of rows) {
+    const idx = row.id.split('-')[1];
+    const name    = (document.getElementById('comp-name-'+idx)?.value || '').trim();
+    const treatRaw = document.getElementById('comp-treat-'+idx)?.value || '';
+    const ctrlRaw  = document.getElementById('comp-ctrl-'+idx)?.value  || '';
+    if (!name) continue;
+    const treatment = treatRaw.split(',').map(s => s.trim()).filter(Boolean);
+    const control   = ctrlRaw.split(',').map(s => s.trim()).filter(Boolean);
+    if (!treatment.length || !control.length) continue;
+    out.push({ name, treatment, control });
+  }
+  return out;
+}
+
+// ─── Step 5: Config preview ───────────────────────────────────────────────────
+function buildConfigPreview() {
+  const comps  = collectComparisons();
+  const treats = S.fastqFiles.filter(f => S.sampleGroups[f.name] === 'treatment').map(f => S.sampleNames[f.name]);
+  const ctrls  = S.fastqFiles.filter(f => S.sampleGroups[f.name] === 'control').map(f => S.sampleNames[f.name]);
+  const mode   = v('analysis-mode');
+
+  let html = `<div style="background:#F5F4F1;border:1px solid #E2DDD8;border-radius:6px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.8">`;
+  html += `<strong>project:</strong> ${escH(v('proj-name'))} (${escH(v('proj-org'))})\n`;
+  html += `<strong>library:</strong> ${escH(S.libraryName)} — ${S.libraryGuides.length.toLocaleString()} guides\n`;
+  html += `<strong>analysis:</strong> ${mode} | <strong>norm:</strong> ${v('norm-method')}\n`;
+  html += `<strong>samples (${S.fastqFiles.length}):</strong> `;
+  html += S.fastqFiles.map(f => escH(S.sampleNames[f.name]) + ' [' + S.sampleGroups[f.name] + ']').join(', ') + '\n';
+  html += `<strong>comparisons:</strong>\n`;
+  for (const c of comps) {
+    html += `  • ${escH(c.name)}: treat=[${c.treatment.map(escH).join(', ')}] vs ctrl=[${c.control.map(escH).join(', ')}]\n`;
+  }
+  html += `<strong>FDR threshold:</strong> ${v('fdr-thresh')}\n`;
+  if (v('ctrl-pattern')) html += `<strong>control pattern:</strong> ${escH(v('ctrl-pattern'))}\n`;
+  html += '</div>';
+  document.getElementById('config-preview').innerHTML = html;
+}
+
+async function checkServerPing() {
+  const el = document.getElementById('server-status-banner');
+  try {
+    const r = await fetch(`${API}/ping`);
+    const d = await r.json();
+    if (d.mageck_found) {
+      el.className = 'banner banner-ok';
+      el.innerHTML = `&#10003; Server reachable &bull; MAGeCK found at <code>${escH(d.mageck)}</code>`;
+    } else {
+      el.className = 'banner banner-warn';
+      el.innerHTML = `&#9888; Server reachable but MAGeCK not found. Install with: <code>conda create -n mageck -c bioconda mageck</code>`;
+    }
+  } catch(e) {
+    el.className = 'banner banner-err';
+    el.innerHTML = `&#10007; Cannot reach CRISPR server. Run: <code>bash api/start_crispr_server.sh</code>`;
+  }
+  el.style.display = '';
+}
+
+// ─── Build count matrix ───────────────────────────────────────────────────────
+function buildCountMatrix() {
+  // Ordered samples from fastqFiles in user's design table order
+  const samples = S.fastqFiles.map(f => S.sampleNames[f.name] || f.name);
+  const resultsMap = {};
+  for (const r of S.countResults) {
+    const sampleName = S.sampleNames[r.name] || r.name;
+    resultsMap[sampleName] = r.counts;
+  }
+
+  const lines = ['sgRNA\tgene\t' + samples.join('\t')];
+  for (const g of S.libraryGuides) {
+    const row = [g.id, g.gene];
+    for (const s of samples) {
+      const cnt = resultsMap[s] ? (resultsMap[s][g.id] || 0) : 0;
+      row.push(cnt);
+    }
+    lines.push(row.join('\t'));
+  }
+  return lines.join('\n');
+}
+
+// ─── Identify control sgRNA IDs ───────────────────────────────────────────────
+function getControlSgRNAIds() {
+  const pattern = v('ctrl-pattern').toLowerCase().trim();
+  if (!pattern) return [];
+  return S.libraryGuides
+    .filter(g => g.gene.toLowerCase().includes(pattern))
+    .map(g => g.id);
+}
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+async function submitJob() {
+  if (!S.countResults.length) { alert('Count FASTQ files first (Step 3).'); return; }
+  const comps = collectComparisons();
+  if (!comps.length) { alert('Define at least one comparison (Step 4).'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Building count matrix…';
+
+  const matrix = buildCountMatrix();
+  const controlIds = getControlSgRNAIds();
+
+  // Sample column mapping (MAGeCK uses column names from header)
+  const config = {
+    project_name:   v('proj-name'),
+    organism:       v('proj-org'),
+    screen_type:    v('screen-type'),
+    analysis_mode:  v('analysis-mode'),
+    norm_method:    v('norm-method'),
+    fdr_threshold:  parseFloat(v('fdr-thresh')) || 0.1,
+    control_ids:    controlIds,
+    comparisons:    comps,
+  };
+
+  btn.textContent = 'Submitting…';
+
+  try {
+    const fd = new FormData();
+    fd.append('count_matrix', new Blob([matrix], { type: 'text/plain' }), 'count_matrix.txt');
+    fd.append('config', JSON.stringify(config));
+
+    const resp = await fetch(`${API}/submit`, { method: 'POST', body: fd });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Error: ' + (data.error || resp.status)); return; }
+
+    currentJobId = data.job_id;
+    document.getElementById('submit-area').style.display  = 'none';
+    document.getElementById('monitor-area').style.display = '';
+    document.getElementById('job-id-display').textContent = 'Job: ' + currentJobId;
+    startPolling(currentJobId);
+    loadJobs();
+  } catch(e) {
+    alert('Network error: ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Submit to MAGeCK Server';
+}
+
+// ─── Polling ──────────────────────────────────────────────────────────────────
+function startPolling(jobId) {
+  if (pollTimer) clearInterval(pollTimer);
+  pollStatus(jobId);
+  pollTimer = setInterval(() => pollStatus(jobId), 4000);
+}
+function stopPolling() { if (pollTimer) clearInterval(pollTimer); pollTimer = null; }
+
+async function pollStatus(jobId) {
+  try {
+    const resp = await fetch(`${API}/status/${jobId}`);
+    const data = await resp.json();
+    if (!resp.ok) return;
+    updateMonitor(data);
+    if (data.status === 'completed' || data.status === 'failed') stopPolling();
+  } catch(e) { /* network hiccup */ }
+}
+
+function updateMonitor(data) {
+  const badge = document.getElementById('job-status-badge');
+  badge.textContent = data.status;
+  badge.className = 'status-badge status-' + (data.status || 'queued');
+
+  // Steps
+  const stepsEl = document.getElementById('progress-steps');
+  stepsEl.innerHTML = (data.steps || []).map(s => {
+    const icon = s.status === 'done' ? '✓' : s.status === 'running' ? '…' : '○';
+    return `<div class="prog-step ${s.status}">
+      <div class="prog-icon ${s.status}">${icon}</div>
+      <span style="font-weight:600">${escH(s.label)}</span>
+    </div>`;
+  }).join('');
+
+  // Log
+  const logEl = document.getElementById('log-viewer');
+  if (data.log) { logEl.textContent = data.log; logEl.scrollTop = logEl.scrollHeight; }
+
+  // Results
+  if (data.status === 'completed') {
+    document.getElementById('results-area').style.display = '';
+    const filesEl = document.getElementById('result-files');
+    filesEl.innerHTML = (data.results || []).map(r =>
+      `<div class="result-file">
+        <div>
+          <div class="result-file-name">${escH(r.label)}</div>
+          <div class="result-file-size">${fmtSize(r.size)}</div>
+        </div>
+        <a href="${escH(r.url)}" download><button class="sec-btn">&#128229; Download</button></a>
+      </div>`).join('');
+
+    // Render plots from inline result_data
+    if (data.result_data && Object.keys(data.result_data).length) {
+      renderResultPlots(data.result_data, v('fdr-thresh') ? parseFloat(v('fdr-thresh')) : 0.1);
+    }
+  }
+}
+
+// ─── Results plots ────────────────────────────────────────────────────────────
+function renderResultPlots(resultData, fdrCut) {
+  const plotArea = document.getElementById('plot-area');
+  plotArea.innerHTML = '';
+
+  for (const [compName, compData] of Object.entries(resultData)) {
+    for (const [modeName, table] of Object.entries(compData)) {
+      const title = `${compName.replace(/_/g,' ')} — ${modeName.toUpperCase()}`;
+
+      // Determine column names (RRA vs MLE differ)
+      const headers = table.headers || [];
+      const isRRA = modeName === 'rra';
+
+      // Extract columns
+      const genes = [], lfc = [], fdr = [], sigNeg = [], sigPos = [];
+      for (const row of (table.rows || [])) {
+        const gene = row['id'] || row['Gene'] || '';
+        let lf = 0, fd = 1;
+        if (isRRA) {
+          // Use negative selection direction for display
+          lf = parseFloat(row['neg|lfc'] || row['neg.lfc'] || 0);
+          fd = parseFloat(row['neg|fdr'] || row['neg.fdr'] || 1);
+        } else {
+          // MLE: use treatment beta
+          const bKey = headers.find(h => h.includes('treatment') && h.includes('beta'));
+          const pKey = headers.find(h => h.includes('treatment') && h.includes('fdr'));
+          lf = parseFloat((bKey && row[bKey]) || 0);
+          fd = parseFloat((pKey && row[pKey]) || 1);
+        }
+        if (isNaN(lf)) lf = 0;
+        if (isNaN(fd) || fd <= 0) fd = 1;
+        genes.push(gene);
+        lfc.push(lf);
+        fdr.push(fd);
+        sigNeg.push(fd < fdrCut && lf < 0);
+        sigPos.push(fd < fdrCut && lf > 0);
+      }
+
+      if (!genes.length) continue;
+
+      const logFDR = fdr.map(f => -Math.log10(Math.max(f, 1e-10)));
+
+      // Color: blue=neg hits, red=pos hits, gray=non-sig
+      const colors = genes.map((_, i) =>
+        sigNeg[i] ? '#2563EB' : sigPos[i] ? '#DC2626' : '#A8A29E');
+
+      const hoverText = genes.map((g, i) =>
+        `${g}<br>LFC: ${lfc[i].toFixed(3)}<br>FDR: ${fdr[i].toExponential(2)}`);
+
+      // Top labels (top 10 by FDR)
+      const topIdxs = [...genes.keys()]
+        .filter(i => sigNeg[i] || sigPos[i])
+        .sort((a, b) => fdr[a] - fdr[b])
+        .slice(0, 10);
+
+      const traces = [{
+        type: 'scatter', mode: 'markers',
+        x: lfc, y: logFDR,
+        text: hoverText, hoverinfo: 'text',
+        marker: { color: colors, size: 5, opacity: 0.8 },
+        name: 'Genes',
+      }];
+
+      // Label top hits
+      if (topIdxs.length) {
+        traces.push({
+          type: 'scatter', mode: 'text',
+          x: topIdxs.map(i => lfc[i]),
+          y: topIdxs.map(i => logFDR[i]),
+          text: topIdxs.map(i => genes[i]),
+          textposition: 'top center',
+          textfont: { size: 9, color: '#333' },
+          showlegend: false, hoverinfo: 'skip',
+        });
+      }
+
+      const container = document.createElement('div');
+      container.style.marginBottom = '24px';
+      plotArea.appendChild(container);
+
+      Plotly.newPlot(container, traces, {
+        title: { text: title, font: { size: 13 } },
+        xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#ccc' },
+        yaxis: { title: '-log₁₀(FDR)' },
+        shapes: [{
+          type: 'line', x0: 0, x1: 1, xref: 'paper',
+          y0: -Math.log10(fdrCut), y1: -Math.log10(fdrCut),
+          line: { color: '#E2DDD8', dash: 'dash', width: 1 },
+        }],
+        margin: { t: 40, l: 55, r: 20, b: 50 },
+        height: 380,
+        font: { family: 'IBM Plex Sans, sans-serif', size: 11 },
+        plot_bgcolor: '#FAFAF9', paper_bgcolor: '#fff',
+      }, { responsive: true, displayModeBar: false });
+
+      // Top hits table
+      const tableHits = [...genes.keys()]
+        .filter(i => sigNeg[i] || sigPos[i])
+        .sort((a, b) => fdr[a] - fdr[b])
+        .slice(0, 50);
+
+      if (tableHits.length) {
+        const tbl = document.createElement('div');
+        tbl.style.marginTop = '10px';
+        tbl.innerHTML = `<div style="font-size:11px;font-weight:700;color:#78716C;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Top Hits (FDR &lt; ${fdrCut})</div>
+          <table style="border-collapse:collapse;width:100%;font-size:11px">
+            <tr><th style="text-align:left;padding:4px 8px;background:#F5F4F1;border:1px solid #E2DDD8">Gene</th>
+                <th style="text-align:right;padding:4px 8px;background:#F5F4F1;border:1px solid #E2DDD8">LFC</th>
+                <th style="text-align:right;padding:4px 8px;background:#F5F4F1;border:1px solid #E2DDD8">FDR</th>
+                <th style="text-align:center;padding:4px 8px;background:#F5F4F1;border:1px solid #E2DDD8">Dir</th></tr>
+          ${tableHits.map(i => `<tr>
+            <td style="padding:4px 8px;border:1px solid #E2DDD8;font-weight:600">${escH(genes[i])}</td>
+            <td style="padding:4px 8px;border:1px solid #E2DDD8;text-align:right;font-family:'IBM Plex Mono',monospace">${lfc[i].toFixed(3)}</td>
+            <td style="padding:4px 8px;border:1px solid #E2DDD8;text-align:right;font-family:'IBM Plex Mono',monospace">${fdr[i].toExponential(2)}</td>
+            <td style="padding:4px 8px;border:1px solid #E2DDD8;text-align:center;color:${sigNeg[i]?'#2563EB':'#DC2626'}">${sigNeg[i]?'↓ neg':'↑ pos'}</td>
+          </tr>`).join('')}
+          </table>`;
+        container.appendChild(tbl);
+      }
+    }
+  }
+}
+
+// ─── Job history ─────────────────────────────────────────────────────────────
+async function loadJobs() {
+  try {
+    const resp = await fetch(`${API}/jobs`);
+    if (!resp.ok) throw new Error(resp.status);
+    const jobs = await resp.json();
+    const el = document.getElementById('jobs-list');
+    if (!jobs.length) { el.innerHTML = '<div style="font-size:12px;color:#78716C">No jobs yet.</div>'; return; }
+    el.innerHTML = jobs.map(j => `
+      <div class="job-row" onclick="openJob('${j.job_id}')">
+        <div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700">${escH(j.project || j.job_id)}</span>
+          <span style="font-size:10px;color:#78716C;margin-left:8px">${j.job_id}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:#78716C">${j.created ? new Date(j.created * 1000).toLocaleString() : ''}</span>
+          <span class="status-badge status-${j.status}">${j.status}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('jobs-list').innerHTML =
+      '<div style="font-size:12px;color:#9F1239">Server unreachable — is the CRISPR server running?</div>';
+  }
+}
+
+function openJob(jobId) {
+  currentJobId = jobId;
+  goStep(5);
+  document.getElementById('submit-area').style.display  = 'none';
+  document.getElementById('monitor-area').style.display = '';
+  document.getElementById('job-id-display').textContent = 'Job: ' + jobId;
+  startPolling(jobId);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function v(id)    { return document.getElementById(id)?.value || ''; }
+function escH(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtSize(b) {
+  if (!b) return '—';
+  if (b > 1e9) return (b/1e9).toFixed(1)+' GB';
+  if (b > 1e6) return (b/1e6).toFixed(1)+' MB';
+  if (b > 1e3) return (b/1e3).toFixed(1)+' KB';
+  return b+' B';
+}
+function setBanner(id, type, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'banner banner-' + type;
+  el.innerHTML = msg;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  setupLibDropzone();
+  setupFqDropzone();
+  loadJobs();
+});
+</script>
+<script src="/js/site.js"></script>
+</body>
+</html>

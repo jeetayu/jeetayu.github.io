@@ -324,7 +324,8 @@ async function loadGene() {
       renderGeneInfo(geneInfo);
       allIsos     = serverCache.isoforms;
       isoformData = buildGtexFromJson(serverCache.gtex_boxplot);
-      tcgaData    = serverCache.tcga_boxplot ? buildTcgaFromJson(serverCache.tcga_boxplot) : null;
+      tcgaData    = (serverCache.tcga_boxplot && Object.keys(serverCache.tcga_boxplot).length)
+                    ? buildTcgaFromJson(serverCache.tcga_boxplot) : null;
       pctData     = serverCache.pct_total    || null;
       gtexLog2    = serverCache.log2_scale   || false;
       const preActive = sym === "SF1"
@@ -333,6 +334,14 @@ async function loadGene() {
       buildIsoCheckboxes(allIsos, preActive);
       setMsg("gtex-plot", "");
       replot();
+      // Re-render whichever non-GTEx tab is currently active
+      const _ap = document.querySelector('.vpane.active');
+      if (_ap) {
+        const _pn = _ap.id.replace('vpane-', '');
+        if      (_pn === 'tcga')    renderTcgaPlot();
+        else if (_pn === 'pct')     renderPctPlot();
+        else if (_pn === 'heatmap') renderHeatmapPlot();
+      }
     } catch(err) {
       setMsg("gtex-plot", `<div class="banner banner-err">Error rendering ${sym}: ${err.message}</div>`);
       console.error("loadGene cached path error:", err);
@@ -366,6 +375,13 @@ async function loadGene() {
       pctData     = null;
       buildIsoCheckboxes(isos, null);
       replot();
+      const _ap2 = document.querySelector('.vpane.active');
+      if (_ap2) {
+        const _pn2 = _ap2.id.replace('vpane-', '');
+        if      (_pn2 === 'tcga')    renderTcgaPlot();
+        else if (_pn2 === 'pct')     renderPctPlot();
+        else if (_pn2 === 'heatmap') renderHeatmapPlot();
+      }
     } else {
       setMsg("gtex-plot", '<div class="banner banner-warn">No GTEx expression data found for this gene.</div>');
     }
@@ -400,7 +416,7 @@ function buildIsoCheckboxes(isos, preActive) {
     const label = document.createElement("label");
     label.className = "iso-check";
     label.innerHTML = `
-      <input type="checkbox" ${checked?"checked":""} onchange="toggleIso('${iso}',this.checked)">
+      <input type="checkbox" value="${iso}" ${checked?"checked":""} onchange="toggleIso('${iso}',this.checked)">
       <span class="iso-dot" style="background:${col}"></span>${iso}`;
     container.appendChild(label);
   });
@@ -443,7 +459,8 @@ async function lookupGene(symbol) {
 function renderGeneInfo(g) {
   const el = document.getElementById("gene-info-box");
   if (!g) { el.innerHTML = ""; return; }
-  const coords = g.chr ? `chr${escHtml(String(g.chr))}:${Number(g.start).toLocaleString()}–${Number(g.end).toLocaleString()} &middot; strand: ${g.strand > 0 ? "+" : "−"}` : "";
+  const chrStr = String(g.chr).replace(/^chr/i, '');
+  const coords = g.chr ? `chr${escHtml(chrStr)}:${Number(g.start).toLocaleString()}–${Number(g.end).toLocaleString()} &middot; strand: ${g.strand > 0 ? "+" : "−"}` : "";
   el.innerHTML = `<div class="gene-info">
     <strong>${escHtml(g.symbol)}</strong>
     ${escHtml(g.ensg)}${coords ? "<br>" + coords : ""}
@@ -749,8 +766,12 @@ function renderTcgaPlot() {
 
 // ── Build pct from boxplot data ───────────────────────────────────────────────
 // Computes {category: {iso: pct}} from boxplot stats using median TPM
-function computePctFromBoxplot(boxplotData) {
+function computePctFromBoxplot(boxplotData, isLog2) {
   if (!boxplotData) return null;
+  // Back-transform log2(TPM+0.001) → raw TPM if needed, then floor at 0
+  const rawVal = (v) => v == null ? 0
+    : isLog2 ? Math.max(0, Math.pow(2, v) - 0.001)
+    : Math.max(0, v);
   const result = {};
   const cats = new Set();
   for (const iso of Object.keys(boxplotData)) {
@@ -761,7 +782,7 @@ function computePctFromBoxplot(boxplotData) {
     let sum = 0;
     for (const iso of Object.keys(boxplotData)) {
       const s = boxplotData[iso][cat];
-      result[cat][iso] = (s && s.median != null) ? Math.max(0, s.median) : 0;
+      result[cat][iso] = (s && s.median != null) ? rawVal(s.median) : 0;
       sum += result[cat][iso];
     }
     // Normalize to %
@@ -808,7 +829,7 @@ function renderPctPlot() {
 
   // GTEx — compute from boxplot medians, same method as TCGA
   if (isoformData) {
-    const gtexPct = computePctFromBoxplot(isoformData);
+    const gtexPct = computePctFromBoxplot(isoformData, gtexLog2);
     renderStackedPct("pct-plot-gtex", gtexPct, isos);
   } else {
     setMsg("pct-plot-gtex", '<div class="banner banner-info">GTEx isoform % not available for this gene.</div>');
@@ -827,9 +848,10 @@ function renderPctPlot() {
 function renderHeatmapPlot() {
   // GTEx heatmap — computed from boxplot medians, same method as TCGA
   if (isoformData) {
-    const gtexPct  = computePctFromBoxplot(isoformData);
+    const gtexPct  = computePctFromBoxplot(isoformData, gtexLog2);
     const tissues  = Object.keys(gtexPct).sort();
     const isos     = allIsos.filter(iso => tissues.some(t => (gtexPct[t]?.[iso] ?? 0) > 0));
+    if (!isos.length) { setMsg("heatmap-gtex", '<div class="banner banner-info">No expressed isoforms found.</div>'); return; }
     const z        = isos.map(iso => tissues.map(t => gtexPct[t]?.[iso] ?? 0));
     const gtexTrace = [{
       type: "heatmap",
@@ -860,6 +882,7 @@ function renderHeatmapPlot() {
     const tcgaPct  = computePctFromBoxplot(tcgaData);
     const projects = Object.keys(tcgaPct).sort();
     const isos     = allIsos.filter(iso => projects.some(p => (tcgaPct[p]?.[iso] ?? 0) > 0));
+    if (!isos.length) { setMsg("heatmap-tcga", '<div class="banner banner-info">No expressed isoforms found.</div>'); return; }
     const z        = isos.map(iso => projects.map(p => tcgaPct[p]?.[iso] ?? 0));
     const tcgaTrace = [{
       type: "heatmap",
@@ -1123,7 +1146,7 @@ async function loadSf1State(stateJson) {
     if (ui.activeIsos && ui.activeIsos.length) {
       activeIsos = new Set(ui.activeIsos);
       // Re-check isoform checkboxes
-      document.querySelectorAll('.iso-check').forEach(cb => {
+      document.querySelectorAll('#iso-checkboxes input[type=checkbox]').forEach(cb => {
         cb.checked = activeIsos.has(cb.value);
       });
       replot();
