@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCLE HLA &times; Expression Explorer &mdash; Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* ── Topbar ─────────────────────────────────────────────────────────────────── */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.status-pill{font-size:11px;border-radius:20px;padding:3px 10px;border:1px solid;white-space:nowrap}
+.status-pill.loading{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.status-pill.ok{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+.status-pill.error{background:#FFF1F2;color:#9F1239;border-color:#FECDD3}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(29,78,216,.25);border-top-color:#1D4ED8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Body layout ────────────────────────────────────────────────────────────── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────────── */
+.sidebar{width:268px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+
+.step-card{border:1px solid #E2DDD8;border-radius:7px;overflow:hidden}
+.step-hdr{padding:7px 11px;font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#fff}
+.step-hdr-1{background:#1565C0}
+.step-hdr-2{background:#00695C}
+.step-hdr-3{background:#2E7D32}
+.step-body{padding:11px 12px;display:flex;flex-direction:column;gap:9px}
+
+.ctrl-lbl{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#78716C;margin-bottom:2px}
+
+/* Locus tabs */
+.locus-tabs{display:flex;gap:3px}
+.locus-tab{flex:1;padding:5px 0;font-size:12px;font-weight:600;border:1px solid #D6D3D1;border-radius:5px;background:#fff;cursor:pointer;text-align:center;color:#57534E;font-family:"IBM Plex Sans",sans-serif;transition:all .15s}
+.locus-tab.active{background:#1565C0;border-color:#1565C0;color:#fff}
+.locus-tab:hover:not(.active){background:#F5F4F1}
+
+/* Allele select */
+.allele-sel{width:100%;padding:6px 8px;border:1px solid #D6D3D1;border-radius:5px;font-size:12px;font-family:"IBM Plex Sans",sans-serif;background:#fff;color:#1C1917;outline:none}
+.allele-sel:focus{border-color:#1565C0}
+
+/* Het checkbox */
+.het-row{display:flex;align-items:center;gap:7px;font-size:12px;color:#57534E;cursor:pointer}
+.het-row input{width:13px;height:13px;cursor:pointer;accent-color:#1565C0;flex-shrink:0}
+
+/* Tissue list */
+.tissue-btns{display:flex;gap:5px}
+.tissue-btns button{flex:1;padding:4px 0;font-size:11px;border:1px solid #D6D3D1;border-radius:4px;background:#fff;cursor:pointer;color:#57534E;font-family:"IBM Plex Sans",sans-serif}
+.tissue-btns button:hover{background:#F5F4F1}
+.tissue-list{display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto}
+.tissue-row{display:flex;align-items:center;gap:6px;font-size:12px;color:#44403C;cursor:pointer;padding:2px 3px;border-radius:3px}
+.tissue-row:hover{background:#F5F4F1}
+.tissue-row input{width:13px;height:13px;cursor:pointer;accent-color:#00695C;flex-shrink:0}
+.tissue-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tissue-n{margin-left:auto;font-size:10px;color:#A8A29E}
+
+/* Gene input */
+.gene-wrap{position:relative}
+.gene-inp{width:100%;padding:6px 8px;border:1px solid #D6D3D1;border-radius:5px;font-size:12px;font-family:"IBM Plex Mono",monospace;background:#fff;color:#1C1917;outline:none}
+.gene-inp:focus{border-color:#2E7D32}
+.gene-inp:disabled{background:#F5F4F1;color:#A8A29E;cursor:not-allowed}
+.gene-sugs{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #D6D3D1;border-top:none;border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.1);z-index:200;max-height:210px;overflow-y:auto;display:none}
+.gene-sug-item{padding:5px 10px;font-size:12px;font-family:"IBM Plex Mono",monospace;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gene-sug-item:hover,.gene-sug-item.sug-active{background:#F0FDF4;color:#166534}
+.sug-max{font-size:10px;color:#A8A29E;white-space:nowrap}
+.gene-hint{font-size:10px;color:#A8A29E;margin-top:3px;min-height:14px}
+.gene-hint.err{color:#B91C1C}
+.query-btn{width:100%;padding:8px;font-size:12px;font-weight:600;border:none;border-radius:5px;background:#2E7D32;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;transition:background .15s}
+.query-btn:hover{background:#1B5E20}
+.query-btn:disabled{background:#D6D3D1;color:#A8A29E;cursor:not-allowed}
+
+/* Sidebar footer */
+.sb-footer{margin-top:auto;padding-top:10px;border-top:1px solid #E2DDD8;font-size:10px;color:#A8A29E;line-height:1.7}
+
+/* ── Main panel ─────────────────────────────────────────────────────────────── */
+.main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+
+/* Banner */
+.banner{padding:9px 14px;border-radius:6px;font-size:12px;line-height:1.5;display:flex;align-items:center;gap:8px}
+.banner-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8}
+.banner-ok{background:#ECFDF5;border:1px solid #A7F3D0;color:#065F46}
+.banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
+
+/* Cards */
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;overflow:hidden}
+.vcard-hdr{display:flex;align-items:baseline;justify-content:space-between;padding:9px 16px;background:#FAFAF9;border-bottom:1px solid #E2DDD8}
+.vcard-title{font-size:13px;font-weight:700;color:#1C1917}
+.vcard-meta{font-size:11px;color:#78716C}
+.vcard-body{padding:14px 16px}
+
+/* Table */
+.hla-scroll{max-height:300px;overflow-y:auto;border:1px solid #E2DDD8;border-radius:5px}
+table.hla-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+table.hla-tbl th{padding:5px 8px;background:#F5F4F1;border-bottom:1px solid #E2DDD8;font-weight:700;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:1}
+table.hla-tbl td{padding:4px 8px;border-bottom:1px solid #F0EDE9;font-family:"IBM Plex Mono",monospace;font-size:11px}
+table.hla-tbl td.td-name{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:12px}
+table.hla-tbl td.td-tissue{font-family:"IBM Plex Sans",sans-serif;font-size:11px}
+table.hla-tbl tr:last-child td{border-bottom:none}
+table.hla-tbl tr:hover td{background:#FAFAF9}
+
+/* Layout helpers */
+.grid-7-3{display:grid;grid-template-columns:60% 40%;gap:14px}
+.grid-3-7{display:grid;grid-template-columns:30% 70%;gap:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#78716C;margin-bottom:7px}
+
+/* Tissue summary */
+.tiss-sum-line{display:flex;align-items:center;gap:7px;font-size:12px;color:#44403C;margin-bottom:3px}
+.tiss-sum-line strong{font-weight:600;margin-left:auto;font-family:"IBM Plex Mono",monospace}
+
+/* Expression placeholder */
+.expr-placeholder{padding:36px 20px;text-align:center;color:#A8A29E;font-size:13px}
+.expr-placeholder kbd{display:inline-block;background:#F5F4F1;border:1px solid #D6D3D1;border-radius:4px;padding:1px 7px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:#57534E}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── Topbar ─────────────────────────────────────────────────────────────── -->
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
+  <span class="topbar-logo">CCLE <em>HLA &times;</em> Expression Explorer</span>
+  <span class="topbar-sub">220 cell lines &bull; CCLE 2018</span>
+  <div class="topbar-right">
+    <span class="status-pill loading" id="expr-pill">
+      <span class="spinner" id="expr-spinner"></span>Loading expression&hellip;
+    </span>
+  </div>
+</div>
+
+<div class="body">
+
+<!-- ── Sidebar ───────────────────────────────────────────────────────────── -->
+<div class="sidebar">
+
+  <!-- Step 1: HLA filter -->
+  <div class="step-card">
+    <div class="step-hdr step-hdr-1">Step 1 &mdash; HLA Filter</div>
+    <div class="step-body">
+      <div>
+        <div class="ctrl-lbl">Locus</div>
+        <div class="locus-tabs" id="locus-tabs"><!-- filled from data --></div>
+      </div>
+      <div>
+        <div class="ctrl-lbl">Allele (2-field)</div>
+        <select class="allele-sel" id="allele-sel"></select>
+        <div style="font-size:10px;color:#A8A29E;margin-top:3px">Select <em>(all)</em> to show all typed lines.</div>
+      </div>
+      <label class="het-row">
+        <input type="checkbox" id="het-chk"> Heterozygous lines only
+      </label>
+    </div>
+  </div>
+
+  <!-- Step 2: Tissue filter -->
+  <div class="step-card">
+    <div class="step-hdr step-hdr-2">Step 2 &mdash; Tissue</div>
+    <div class="step-body">
+      <div class="tissue-btns">
+        <button onclick="tissAll()">All</button>
+        <button onclick="tissNone()">None</button>
+      </div>
+      <div class="tissue-list" id="tissue-list"><!-- filled from data --></div>
+    </div>
+  </div>
+
+  <!-- Step 3: Gene expression -->
+  <div class="step-card">
+    <div class="step-hdr step-hdr-3">Step 3 &mdash; Gene Expression</div>
+    <div class="step-body">
+      <div>
+        <div class="ctrl-lbl">Gene Symbol</div>
+        <div class="gene-wrap">
+          <input class="gene-inp" id="gene-inp" placeholder="Loading expression data&hellip;" disabled autocomplete="off" spellcheck="false">
+          <div class="gene-sugs" id="gene-sugs"></div>
+        </div>
+        <div class="gene-hint" id="gene-hint"></div>
+      </div>
+      <button class="query-btn" id="query-btn" disabled onclick="runQuery()">Show Expression</button>
+    </div>
+  </div>
+
+  <div class="sb-footer" id="sb-footer">Loading&hellip;</div>
+</div><!-- /sidebar -->
+
+<!-- ── Main ──────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- Status banner -->
+  <div class="banner banner-info" id="main-banner">
+    <span class="spinner"></span>Loading HLA metadata&hellip;
+  </div>
+
+  <!-- Card 1: HLA results -->
+  <div class="vcard" id="card-hla" style="display:none">
+    <div class="vcard-hdr">
+      <span class="vcard-title" id="hla-card-title">HLA Filter</span>
+      <span class="vcard-meta" id="hla-card-meta"></span>
+    </div>
+    <div class="vcard-body grid-7-3">
+      <div>
+        <div class="sec-lbl">Matched cell lines</div>
+        <div class="hla-scroll" id="hla-tbl-wrap"></div>
+      </div>
+      <div>
+        <div class="sec-lbl">Dataset allele frequencies &mdash; top 20</div>
+        <div id="allele-chart" style="width:100%;height:260px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Tissue distribution -->
+  <div class="vcard" id="card-tissue" style="display:none">
+    <div class="vcard-hdr">
+      <span class="vcard-title" id="tissue-card-title">Tissue Filter</span>
+      <span class="vcard-meta" id="tissue-card-meta"></span>
+    </div>
+    <div class="vcard-body grid-3-7">
+      <div>
+        <div class="sec-lbl">Selection summary</div>
+        <div id="tissue-summary"></div>
+      </div>
+      <div>
+        <div class="sec-lbl">Tissue distribution of HLA-matched lines</div>
+        <div id="tissue-chart" style="width:100%;height:220px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Expression -->
+  <div class="vcard" id="card-expr">
+    <div class="vcard-hdr">
+      <span class="vcard-title" id="expr-card-title">Step 3 &mdash; Gene Expression</span>
+      <span class="vcard-meta" id="expr-card-meta"></span>
+    </div>
+    <div class="vcard-body" id="expr-body">
+      <div class="expr-placeholder" id="expr-ph">
+        Enter a gene symbol above and click <kbd>Show Expression</kbd>.<br>
+        <span style="font-size:11px;color:#C2DDD8">Waiting for expression data to load&hellip;</span>
+      </div>
+      <div id="expr-plots" style="display:none">
+        <div class="grid-2">
+          <div>
+            <div class="sec-lbl">TPM</div>
+            <div id="tpm-chart"></div>
+          </div>
+          <div>
+            <div class="sec-lbl">log&#x2082;(TPM + 1)</div>
+            <div id="log2-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /body -->
+</div><!-- /shell -->
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const S = {
+  locus  : 'A',      // active HLA locus key (discovered from data)
+  allele : '(all)',  // selected 2-field allele
+  het    : false,    // heterozygous-only filter
+  tissues: new Set() // selected tissue_type values
+};
+
+let META      = null; // { hla:[], loci:[], alleles:{L:[...]}, tissues:[] }
+let EXPR      = null; // { version, generated, n_lines, n_genes, lines:[], genes:{SYM:[]} }
+let GENE_LIST = [];   // sorted gene symbols (set after EXPR loads)
+let LAST_GENE = null; // last queried gene
+let SugFocus  = -1;   // keyboard nav index in suggestion list
+
+// Tissue palette — grows automatically as new tissues appear
+const TPAL = ['#C2185B','#1565C0','#E65100','#2E7D32','#6A1B9A',
+              '#00695C','#F9A825','#AD1457','#0277BD','#558B2F',
+              '#4527A0','#00838F','#BF360C','#1A237E','#33691E'];
+const tcolors = {};
+function tclr(t){
+  if (!tcolors[t]) tcolors[t] = TPAL[Object.keys(tcolors).length % TPAL.length];
+  return tcolors[t];
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function gel(id){ return document.getElementById(id); }
+function cleanT(t){
+  return (t||'').replace(/_AND_/g,' & ').replace(/_/g,' ')
+    .toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+// ─── Data Loading ─────────────────────────────────────────────────────────────
+async function loadAll(){
+  try {
+    setBanner('info', 'Loading HLA metadata…', true);
+    const r1 = await fetch('ccle-meta.json');
+    if (!r1.ok) throw new Error('ccle-meta.json: HTTP ' + r1.status);
+    buildMeta(await r1.json());
+    bootUI();
+    showMainCards();
+    render();
+
+    // Expression data loads in background — HLA + tissue filters are already live
+    setBanner('info', 'Loading expression data…', true);
+    const r2 = await fetch('ccle-expr.json.gz');
+    if (!r2.ok) throw new Error('ccle-expr.json.gz: HTTP ' + r2.status);
+    const buf = await r2.arrayBuffer();
+    EXPR = JSON.parse(pako.inflate(new Uint8Array(buf), {to:'string'}));
+    GENE_LIST = Object.keys(EXPR.genes).sort();
+    enableGene();
+    setBanner('ok',
+      GENE_LIST.length.toLocaleString() + ' genes · ' +
+      EXPR.n_lines + ' cell lines · built ' + EXPR.generated.slice(0,10));
+    setExprPill('ok',
+      GENE_LIST.length.toLocaleString() + ' genes ready');
+    gel('sb-footer').innerHTML =
+      META.hla.length + ' HLA-typed lines<br>' +
+      GENE_LIST.length.toLocaleString() + ' genes<br>' +
+      'Built: ' + EXPR.generated.slice(0,10);
+    gel('expr-ph').innerHTML =
+      'Enter a gene symbol above and click <kbd style="background:#F5F4F1;border:1px solid #D6D3D1;border-radius:4px;padding:1px 7px;font-family:\'IBM Plex Mono\',monospace;font-size:11px">Show Expression</kbd>.';
+
+  } catch(e){
+    setBanner('err', 'Error: ' + e.message);
+    setExprPill('error', 'Error');
+    console.error(e);
+  }
+}
+
+// ─── Meta Processing ──────────────────────────────────────────────────────────
+function buildMeta(rows){
+  // Discover HLA loci from column names ending in "1_2f" / "2_2f".
+  // Future loci (DRB1, DQB1, etc.) will appear automatically when
+  // prepare_data.R + export_for_web.R produce updated JSON files.
+  const sample = rows[0] || {};
+  const loci   = Object.keys(sample)
+    .map(k=>{ const m=k.match(/^([A-Z][A-Z0-9]*)1_2f$/); return m?m[1]:null; })
+    .filter(Boolean).sort();
+
+  // Allele lists per locus
+  const alleles = {};
+  loci.forEach(locus => {
+    const s = new Set();
+    rows.forEach(r => {
+      [r[locus+'1_2f'], r[locus+'2_2f']].forEach(a => { if(a) s.add(a); });
+    });
+    alleles[locus] = ['(all)', ...[...s].sort()];
+  });
+
+  const tissues = [...new Set(rows.map(r=>r.tissue_type).filter(Boolean))].sort();
+
+  META = { hla:rows, loci, alleles, tissues };
+  S.locus   = loci[0] || 'A';
+  S.tissues = new Set(tissues);
+}
+
+// ─── UI Bootstrap ─────────────────────────────────────────────────────────────
+function bootUI(){
+  // Locus tabs
+  gel('locus-tabs').innerHTML = META.loci.map(l=>
+    `<button class="locus-tab${l===S.locus?' active':''}" onclick="setLocus('${l}')">${l}</button>`
+  ).join('');
+
+  refreshAlleleSelect();
+  buildTissueList();
+
+  gel('sb-footer').innerHTML = META.hla.length + ' HLA-typed lines<br>Expression loading…';
+}
+
+function buildTissueList(){
+  const hlaRows = hlaFiltered();
+  const cnts    = {};
+  hlaRows.forEach(r => { cnts[r.tissue_type] = (cnts[r.tissue_type]||0)+1; });
+
+  gel('tissue-list').innerHTML = META.tissues.map(t => {
+    const n   = cnts[t]||0;
+    const chk = S.tissues.has(t) ? 'checked' : '';
+    return `<label class="tissue-row">
+      <input type="checkbox" ${chk} onchange="toggleTiss('${escH(t)}',this.checked)">
+      <span class="tissue-dot" style="background:${tclr(t)}"></span>
+      <span>${escH(cleanT(t))}</span>
+      <span class="tissue-n">${n}</span>
+    </label>`;
+  }).join('');
+}
+
+// ─── Locus / Allele Controls ──────────────────────────────────────────────────
+function setLocus(l){
+  S.locus  = l;
+  S.allele = '(all)';
+  gel('locus-tabs').querySelectorAll('.locus-tab')
+    .forEach(b => b.classList.toggle('active', b.textContent===l));
+  refreshAlleleSelect();
+  update();
+}
+
+function refreshAlleleSelect(){
+  const sel = gel('allele-sel');
+  const list = META.alleles[S.locus] || ['(all)'];
+  sel.innerHTML = list.map(a =>
+    `<option value="${escH(a)}"${a===S.allele?' selected':''}>${escH(a)}</option>`
+  ).join('');
+}
+
+// ─── Tissue Controls ─────────────────────────────────────────────────────────
+function toggleTiss(t, on){ on ? S.tissues.add(t) : S.tissues.delete(t); update(); }
+function tissAll() { S.tissues = new Set(META.tissues); buildTissueList(); update(); }
+function tissNone(){ S.tissues = new Set();             buildTissueList(); update(); }
+
+// ─── Filtering ────────────────────────────────────────────────────────────────
+function hlaFiltered(){
+  let rows = META.hla;
+  if (S.allele !== '(all)'){
+    const c1 = S.locus+'1_2f', c2 = S.locus+'2_2f';
+    rows = rows.filter(r => r[c1]===S.allele || r[c2]===S.allele);
+  }
+  if (S.het){
+    const c1 = S.locus+'1_2f', c2 = S.locus+'2_2f';
+    rows = rows.filter(r => r[c1]!==r[c2]);
+  }
+  return rows;
+}
+
+function tissFiltered(rows){ return rows.filter(r => S.tissues.has(r.tissue_type)); }
+function filtered(){ return tissFiltered(hlaFiltered()); }
+
+// ─── Master Update ────────────────────────────────────────────────────────────
+function update(){
+  if (!META) return;
+  buildTissueList();
+  renderHLA();
+  renderTissue();
+  if (LAST_GENE) renderExpr(LAST_GENE);
+}
+
+function render(){ renderHLA(); renderTissue(); }
+
+// ─── Section 1: HLA ───────────────────────────────────────────────────────────
+function renderHLA(){
+  const rows = hlaFiltered();
+  const all  = S.allele==='(all)' ? 'all alleles' : S.allele;
+  gel('hla-card-title').textContent =
+    `Step 1 — HLA Filter: ${rows.length} line${rows.length!==1?'s':''} · ${S.locus} ${all}`;
+  gel('hla-card-meta').textContent = META.hla.length + ' total HLA-typed';
+
+  renderHLATable(rows);
+  renderAlleleChart();
+}
+
+function renderHLATable(rows){
+  const wrap = gel('hla-tbl-wrap');
+  if (!rows.length){
+    wrap.innerHTML = '<div style="padding:14px;text-align:center;color:#A8A29E;font-size:12px">No lines match this filter.</div>';
+    return;
+  }
+  // Headers: Cell Line | Tissue | then all loci pairs (A1/A2, B1/B2, ...)
+  const locHdrs = META.loci.flatMap(l=>[`<th>${l}1</th>`,`<th>${l}2</th>`]).join('');
+  const bodyRows = rows.map(r => {
+    const locCells = META.loci.flatMap(l=>[
+      `<td>${escH(r[l+'1_2f']||'—')}</td>`,
+      `<td>${escH(r[l+'2_2f']||'—')}</td>`
+    ]).join('');
+    return `<tr>
+      <td class="td-name">${escH(r.cell_line)}</td>
+      <td class="td-tissue">${escH(cleanT(r.tissue_type))}</td>
+      ${locCells}
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table class="hla-tbl">
+    <thead><tr><th>Cell Line</th><th>Tissue</th>${locHdrs}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>`;
+}
+
+function renderAlleleChart(){
+  const c1 = S.locus+'1_2f', c2 = S.locus+'2_2f';
+  const cnts = {};
+  META.hla.forEach(r => {
+    [r[c1],r[c2]].forEach(a => { if(a) cnts[a]=(cnts[a]||0)+1; });
+  });
+  const top = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  if (!top.length) return;
+  const ys = top.map(x=>x[0]).reverse();
+  const xs = top.map(x=>x[1]).reverse();
+  Plotly.react('allele-chart', [{
+    type:'bar', orientation:'h',
+    y:ys, x:xs,
+    marker:{color: ys.map(a=>a===S.allele?'#C2185B':'#5B9BD5')},
+    text:xs.map(String), textposition:'outside',
+    hovertemplate:'%{y}: %{x} lines<extra></extra>'
+  }],{
+    margin:{t:4,r:50,l:6,b:26},
+    xaxis:{title:'# lines',fixedrange:true,titlefont:{size:11}},
+    yaxis:{automargin:true,tickfont:{size:10,family:'IBM Plex Mono'},fixedrange:true},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
+    hoverlabel:{bgcolor:'#1C1917',font:{color:'#fff',size:11}},
+    showlegend:false
+  },{responsive:true,displayModeBar:false});
+}
+
+// ─── Section 2: Tissue ───────────────────────────────────────────────────────
+function renderTissue(){
+  const hla  = hlaFiltered();
+  const tiss = tissFiltered(hla);
+  gel('tissue-card-title').textContent =
+    `Step 2 — Tissue Filter: ${hla.length} → ${tiss.length} line${tiss.length!==1?'s':''}`;
+  gel('tissue-card-meta').textContent =
+    S.tissues.size + ' / ' + META.tissues.length + ' tissue type' +
+    (META.tissues.length!==1?'s':'') + ' selected';
+
+  renderTissueChart(hla);
+  renderTissueSummary(tiss);
+}
+
+function renderTissueChart(hla){
+  const cnts = {};
+  hla.forEach(r => { cnts[r.tissue_type]=(cnts[r.tissue_type]||0)+1; });
+  const entries = Object.entries(cnts).sort((a,b)=>b[1]-a[1]);
+  const ys = entries.map(x=>cleanT(x[0])).reverse();
+  const xs = entries.map(x=>x[1]).reverse();
+  const raw= entries.map(x=>x[0]).reverse();
+  Plotly.react('tissue-chart',[{
+    type:'bar',orientation:'h',
+    y:ys,x:xs,
+    marker:{color:raw.map(t=>S.tissues.has(t)?tclr(t):'#D6D3D1')},
+    text:xs.map(String),textposition:'outside',
+    hovertemplate:'%{y}: %{x} lines<extra></extra>'
+  }],{
+    margin:{t:4,r:50,l:6,b:26},
+    xaxis:{title:'# lines',fixedrange:true,titlefont:{size:11}},
+    yaxis:{automargin:true,tickfont:{size:11},fixedrange:true},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',
+    hoverlabel:{bgcolor:'#1C1917',font:{color:'#fff',size:11}},
+    showlegend:false
+  },{responsive:true,displayModeBar:false});
+}
+
+function renderTissueSummary(tiss){
+  const cnts = {};
+  tiss.forEach(r=>{ cnts[r.tissue_type]=(cnts[r.tissue_type]||0)+1; });
+  const total = tiss.length;
+  const lines = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).map(([t,n])=>
+    `<div class="tiss-sum-line">
+      <span class="tissue-dot" style="background:${tclr(t)}"></span>
+      <span>${escH(cleanT(t))}</span>
+      <strong>${n}</strong>
+    </div>`
+  ).join('');
+  gel('tissue-summary').innerHTML =
+    `<div style="font-size:13px;font-weight:700;margin-bottom:8px">${total} line${total!==1?'s':''}</div>${lines}`;
+}
+
+// ─── Section 3: Gene Expression ───────────────────────────────────────────────
+function runQuery(){
+  const raw = (gel('gene-inp').value||'').trim();
+  gel('gene-hint').textContent = '';
+  gel('gene-hint').className   = 'gene-hint';
+  if (!raw || !EXPR) return;
+
+  // Case-insensitive exact → prefix → bail
+  let hit = GENE_LIST.find(g=>g.toUpperCase()===raw.toUpperCase());
+  if (!hit){
+    const p = GENE_LIST.filter(g=>g.toUpperCase().startsWith(raw.toUpperCase()));
+    if (p.length){ hit=p[0]; gel('gene-inp').value=hit; }
+  }
+  if (!hit){
+    gel('gene-hint').textContent = `‘${raw}’ not found.`;
+    gel('gene-hint').className   = 'gene-hint err';
+    return;
+  }
+
+  hideSugs();
+  renderExpr(hit);
+}
+
+function renderExpr(gene){
+  LAST_GENE = gene;
+  const lines = filtered();
+  if (!lines.length){ showExprEmpty('No cell lines pass the current HLA + tissue filter.'); return; }
+  if (!EXPR.genes[gene]){ showExprEmpty(`‘${gene}’ not in expression matrix.`); return; }
+
+  // Map EXPR line positions
+  const lineIdx = {};
+  EXPR.lines.forEach((l,i)=>{ lineIdx[l]=i; });
+
+  const rows = lines
+    .filter(r => lineIdx[r.cell_line]!==undefined)
+    .map(r => ({
+      name  : r.cell_line,
+      tissue: r.tissue_type,
+      tpm   : EXPR.genes[gene][lineIdx[r.cell_line]]
+    }))
+    .sort((a,b)=>b.tpm-a.tpm);
+
+  if (!rows.length){ showExprEmpty('No cell lines in current selection have expression data.'); return; }
+
+  gel('expr-card-title').textContent =
+    `Step 3 — Expression: ${gene}`;
+  gel('expr-card-meta').textContent  =
+    `${rows.length} line${rows.length!==1?'s':''}`;
+
+  showExprPlots();
+  plotExprBars('tpm-chart',  gene, rows, v=>v,           'TPM');
+  plotExprBars('log2-chart', gene, rows, v=>Math.log2(v+1), 'log₂(TPM + 1)');
+}
+
+function plotExprBars(divId, gene, rows, xfn, xLabel){
+  // One Plotly trace per tissue — gives correct legend and color
+  const sorted     = [...rows].sort((a,b)=>xfn(b.tpm)-xfn(a.tpm));
+  const allNames   = sorted.map(r=>r.name);   // used for categoryarray ordering
+  const tissueSet  = [...new Set(sorted.map(r=>r.tissue))];
+
+  const traces = tissueSet.map(t => {
+    const sub = sorted.filter(r=>r.tissue===t);
+    const xs  = sub.map(r=>xfn(r.tpm));
+    return {
+      type:'bar', orientation:'h', name:cleanT(t),
+      y:sub.map(r=>r.name),
+      x:xs,
+      marker:{color:tclr(t)},
+      text:xs.map(v=>v<0.005?'0':v.toFixed(2)),
+      textposition:'outside',
+      hovertemplate:'%{y}<br>'+xLabel+': %{x:.3f}<extra>'+cleanT(t)+'</extra>'
+    };
+  });
+
+  const h = Math.max(300, rows.length*18+90);
+  gel(divId).style.height = h+'px';
+
+  Plotly.react(divId, traces, {
+    barmode:'overlay',
+    height:h,
+    margin:{t:6,r:70,l:6,b:36},
+    xaxis:{title:xLabel,fixedrange:true,rangemode:'tozero',titlefont:{size:11}},
+    yaxis:{
+      automargin:true, fixedrange:true,
+      tickfont:{size:10,family:'IBM Plex Mono'},
+      categoryorder:'array', categoryarray:allNames
+    },
+    legend:{orientation:'h',y:-0.06,font:{size:11}},
+    plot_bgcolor:'#fff', paper_bgcolor:'#fff',
+    hoverlabel:{bgcolor:'#1C1917',font:{color:'#fff',size:11}}
+  },{responsive:true,displayModeBar:false});
+}
+
+function showExprEmpty(msg){
+  gel('expr-plots').style.display='none';
+  gel('expr-ph').style.display='block';
+  gel('expr-ph').innerHTML = `<span style="color:#78716C">${escH(msg)}</span>`;
+  gel('expr-card-title').textContent='Step 3 — Gene Expression';
+  gel('expr-card-meta').textContent='';
+}
+
+function showExprPlots(){
+  gel('expr-ph').style.display='none';
+  gel('expr-plots').style.display='block';
+}
+
+// ─── Gene Autocomplete ────────────────────────────────────────────────────────
+function enableGene(){
+  const inp = gel('gene-inp');
+  inp.disabled    = false;
+  inp.placeholder = 'e.g. HMHA1, MAGEA3, HLA-A';
+  gel('query-btn').disabled = false;
+}
+
+function onGeneInput(){
+  const v = (gel('gene-inp').value||'').trim();
+  gel('gene-hint').textContent='';
+  if (v.length<2 || !GENE_LIST.length){ hideSugs(); return; }
+  const up  = v.toUpperCase();
+  const pre = GENE_LIST.filter(g=>g.toUpperCase().startsWith(up));
+  const con = GENE_LIST.filter(g=>!g.toUpperCase().startsWith(up) && g.toUpperCase().includes(up));
+  const hits = [...pre,...con].slice(0,12);
+  if (!hits.length){ hideSugs(); return; }
+  SugFocus = -1;
+  gel('gene-sugs').innerHTML = hits.map(g=>{
+    const mx = EXPR&&EXPR.genes[g] ? 'max '+Math.max(...EXPR.genes[g]).toFixed(1)+' TPM' : '';
+    return `<div class="gene-sug-item" data-g="${escH(g)}">${escH(g)}<span class="sug-max">${mx}</span></div>`;
+  }).join('');
+  gel('gene-sugs').style.display='block';
+  gel('gene-sugs').querySelectorAll('.gene-sug-item').forEach(it=>{
+    it.addEventListener('mousedown', e=>{ e.preventDefault(); pickGene(it.dataset.g); });
+  });
+}
+
+function onGeneKey(e){
+  const items = gel('gene-sugs').querySelectorAll('.gene-sug-item');
+  if (e.key==='Enter'){ if(SugFocus>=0) pickGene(items[SugFocus].dataset.g); else runQuery(); return; }
+  if (e.key==='Escape'){ hideSugs(); return; }
+  if (!items.length) return;
+  if (e.key==='ArrowDown'){ e.preventDefault(); SugFocus=Math.min(SugFocus+1,items.length-1); }
+  else if (e.key==='ArrowUp'){ e.preventDefault(); SugFocus=Math.max(SugFocus-1,-1); }
+  else return;
+  items.forEach((it,i)=>it.classList.toggle('sug-active',i===SugFocus));
+}
+
+function pickGene(g){ gel('gene-inp').value=g; hideSugs(); runQuery(); }
+function hideSugs(){ gel('gene-sugs').style.display='none'; SugFocus=-1; }
+
+// ─── Banner / Pill Helpers ────────────────────────────────────────────────────
+function setBanner(type, msg, spin=false){
+  const b=gel('main-banner');
+  const types={'info':'banner-info','ok':'banner-ok','err':'banner-err'};
+  b.className='banner '+(types[type]||'banner-info');
+  b.innerHTML=(spin?'<span class="spinner"></span>':'')+escH(msg);
+  b.style.display='flex';
+}
+
+function setExprPill(state, text){
+  const p=gel('expr-pill');
+  const cls={'ok':'ok','error':'error','loading':'loading'};
+  p.className='status-pill '+(cls[state]||'loading');
+  gel('expr-spinner').style.display = state==='loading'?'':'none';
+  p.textContent=text;
+}
+
+function showMainCards(){
+  gel('card-hla').style.display='';
+  gel('card-tissue').style.display='';
+  gel('main-banner').style.display='none';
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  gel('allele-sel').addEventListener('change', function(){ S.allele=this.value; update(); });
+  gel('het-chk').addEventListener('change',   function(){ S.het=this.checked;  update(); });
+  gel('gene-inp').addEventListener('input',  onGeneInput);
+  gel('gene-inp').addEventListener('keydown', onGeneKey);
+  document.addEventListener('click', e=>{
+    if (!gel('gene-inp').contains(e.target) && !gel('gene-sugs').contains(e.target))
+      hideSugs();
+  });
+  loadAll();
+});
+</script>
+</body>
+</html>
