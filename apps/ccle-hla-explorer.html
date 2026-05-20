@@ -32,7 +32,7 @@ html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;back
 .body{display:flex;flex:1;overflow:hidden}
 
 /* ── Sidebar ────────────────────────────────────────────────────────────────── */
-.sidebar{width:268px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sidebar{width:268px;flex-shrink:0;min-height:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
 
 .step-card{border:1px solid #E2DDD8;border-radius:7px;overflow:hidden}
 .step-hdr{padding:7px 11px;font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#fff}
@@ -87,7 +87,7 @@ html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;back
 .sb-footer{margin-top:auto;padding-top:10px;border-top:1px solid #E2DDD8;font-size:10px;color:#A8A29E;line-height:1.7}
 
 /* ── Main panel ─────────────────────────────────────────────────────────────── */
-.main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.main{flex:1;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 
 /* Banner */
 .banner{padding:9px 14px;border-radius:6px;font-size:12px;line-height:1.5;display:flex;align-items:center;gap:8px}
@@ -134,7 +134,7 @@ table.hla-tbl tr:hover td{background:#FAFAF9}
 <div class="topbar">
   <a class="topbar-back" href="/apps.html">&#8592; Apps</a>
   <span class="topbar-logo">CCLE <em>HLA &times;</em> Expression Explorer</span>
-  <span class="topbar-sub">220 cell lines &bull; CCLE 2018</span>
+  <span class="topbar-sub" id="topbar-sub">CCLE 2018</span>
   <div class="topbar-right">
     <span class="status-pill loading" id="expr-pill">
       <span class="spinner" id="expr-spinner"></span>Loading expression&hellip;
@@ -367,6 +367,7 @@ function buildMeta(rows){
   META = { hla:rows, loci, alleles, tissues };
   S.locus   = loci[0] || 'A';
   S.tissues = new Set(tissues);
+  gel('topbar-sub').textContent = rows.length + ' cell lines • CCLE 2018';
 }
 
 // ─── UI Bootstrap ─────────────────────────────────────────────────────────────
