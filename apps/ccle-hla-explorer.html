@@ -96,8 +96,8 @@ html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;back
 .banner-err{background:#FFF1F2;border:1px solid #FECDD3;color:#9F1239}
 
 /* Cards */
-.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px;overflow:hidden}
-.vcard-hdr{display:flex;align-items:baseline;justify-content:space-between;padding:9px 16px;background:#FAFAF9;border-bottom:1px solid #E2DDD8}
+.vcard{background:#fff;border:1px solid #E2DDD8;border-radius:8px}
+.vcard-hdr{display:flex;align-items:baseline;justify-content:space-between;padding:9px 16px;background:#FAFAF9;border-bottom:1px solid #E2DDD8;border-radius:8px 8px 0 0}
 .vcard-title{font-size:13px;font-weight:700;color:#1C1917}
 .vcard-meta{font-size:11px;color:#78716C}
 .vcard-body{padding:14px 16px}
@@ -538,7 +538,7 @@ function renderTissueChart(hla){
   const ys = entries.map(x=>cleanT(x[0])).reverse();
   const xs = entries.map(x=>x[1]).reverse();
   const raw= entries.map(x=>x[0]).reverse();
-  const h  = Math.max(440, entries.length * 44 + 60);
+  const h  = Math.max(300, entries.length * 30 + 60);
   gel('tissue-chart').style.height = h + 'px';
   Plotly.react('tissue-chart',[{
     type:'bar',orientation:'h',
