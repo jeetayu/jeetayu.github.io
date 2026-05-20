@@ -538,7 +538,7 @@ function renderTissueChart(hla){
   const ys = entries.map(x=>cleanT(x[0])).reverse();
   const xs = entries.map(x=>x[1]).reverse();
   const raw= entries.map(x=>x[0]).reverse();
-  const h  = Math.max(220, entries.length * 22 + 60);
+  const h  = Math.max(440, entries.length * 44 + 60);
   gel('tissue-chart').style.height = h + 'px';
   Plotly.react('tissue-chart',[{
     type:'bar',orientation:'h',
