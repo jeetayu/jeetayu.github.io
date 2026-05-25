@@ -1,0 +1,135 @@
+/* ─── App Mobile Responsiveness ──────────────────────────────────────────────
+   Shared across all lab apps. Loaded at end of <head> so it overrides
+   any inline <style> blocks in individual app files.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Hamburger — hidden on desktop, shown on mobile */
+.app-hamburger { display: none; }
+
+@media (max-width: 767px) {
+
+  /* ── Topbar ─────────────────────────────────────────────────────────────── */
+  .topbar {
+    padding: 0 12px !important;
+    gap: 8px !important;
+    height: 48px !important;
+  }
+  .topbar-sub  { display: none !important; }
+  .topbar-logo { font-size: 14px !important; }
+  /* Allow topbar-right to shrink so hamburger always has room */
+  .topbar-right { flex-shrink: 1; min-width: 0; }
+
+  /* Hamburger button — appended last in topbar, no auto-margin needed */
+  .app-hamburger {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid #E2DDD8;
+    border-radius: 5px;
+    color: #78716C;
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app-hamburger:active { background: #F5F4F1; }
+
+  /* ── Sidebar drawer ──────────────────────────────────────────────────────── */
+  .sidebar {
+    position: fixed !important;
+    top: 48px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: min(280px, 85vw) !important;
+    transform: translateX(-110%) !important;
+    transition: transform 0.25s ease !important;
+    z-index: 300 !important;
+    box-shadow: none !important;
+    border-right: 1px solid #E2DDD8 !important;
+    overflow-y: auto !important;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0) !important;
+    box-shadow: 6px 0 28px rgba(0,0,0,0.18) !important;
+  }
+
+  /* ── Backdrop overlay ───────────────────────────────────────────────────── */
+  .sidebar-overlay {
+    display: none !important;
+    position: fixed !important;
+    top: 48px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 299;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sidebar-overlay.sidebar-open { display: block !important; }
+
+  /* ── Body layout ─────────────────────────────────────────────────────────── */
+  .body-split {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ── Main / main-panel padding ──────────────────────────────────────────── */
+  .main, .main-panel {
+    padding: 12px !important;
+    min-width: 0;
+  }
+
+  /* ── Cards ──────────────────────────────────────────────────────────────── */
+  .card { padding: 12px 14px !important; }
+
+  /* ── Charts ─────────────────────────────────────────────────────────────── */
+  #chart-wrap { height: 220px !important; }
+  canvas { max-width: 100%; }
+
+  /* ── Tables — horizontal scroll instead of overflow ─────────────────────── */
+  .expr-table, .panel-tbl, table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Stat chips ──────────────────────────────────────────────────────────── */
+  .stat-chips { flex-wrap: wrap; }
+  .chip { min-width: 76px; padding: 5px 8px; }
+  .chip-val { font-size: 1rem; }
+
+  /* ── Tab / vtab rows ─────────────────────────────────────────────────────── */
+  .tab-row, .vtabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
+  }
+  .tab-btn { white-space: nowrap; }
+
+  /* ── Prevent iOS auto-zoom on focused inputs (triggers at < 16px) ─────────
+     Set font-size on common input classes rather than globally to avoid
+     disrupting app-specific sizing elsewhere.                               */
+  .search-input, .flow-search, input[type="text"], input[type="search"], select {
+    font-size: 16px !important;
+  }
+
+  /* ── Go-row label (rMATS / maser) ── wrap instead of truncate ────────────── */
+  .go-row-label {
+    width: 140px !important;
+    white-space: normal !important;
+    font-size: 9px !important;
+  }
+
+}
+
+/* Desktop: never show overlay or hamburger */
+@media (min-width: 768px) {
+  .app-hamburger   { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+}

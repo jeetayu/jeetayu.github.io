@@ -98,3 +98,80 @@ function biswasLabCopy(text, btn) {
     initCopyButtons();
   }
 })();
+
+// ── Mobile navigation hamburger ───────────────────────────────────────────────
+// Wraps nav items in a toggleable div and injects a hamburger button.
+// Works on every page that uses the <nav>/<div class="nav-item"> pattern
+// without requiring any HTML changes.
+(function () {
+  function initMobileNav() {
+    var nav = document.querySelector("nav");
+    if (!nav) return;
+
+    var items = Array.from(nav.querySelectorAll(":scope > .nav-item"));
+    if (!items.length) return;
+
+    // Wrap all nav-items in a collapsible container
+    var wrap = document.createElement("div");
+    wrap.className = "nav-items-wrap";
+    items.forEach(function (item) { wrap.appendChild(item); });
+    nav.insertBefore(wrap, nav.firstChild);
+
+    // Create hamburger button
+    var btn = document.createElement("button");
+    btn.className = "nav-hamburger";
+    btn.setAttribute("aria-label", "Toggle navigation");
+    btn.setAttribute("aria-expanded", "false");
+    btn.textContent = "☰";  // ☰
+    nav.appendChild(btn);
+
+    // Toggle open/close
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var isOpen = nav.classList.toggle("nav-open");
+      btn.textContent = isOpen ? "✕" : "☰";  // ✕ or ☰
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+
+    // Dropdown items: tap the nav-link to toggle accordion on mobile
+    items.forEach(function (item) {
+      var link = item.querySelector(".nav-link");
+      var dropdown = item.querySelector(".dropdown");
+      if (!link || !dropdown) return;
+
+      link.addEventListener("click", function (e) {
+        if (window.innerWidth > 680) return;  // desktop: let hover handle it
+        e.preventDefault();
+        // Close other open dropdowns
+        items.forEach(function (other) {
+          if (other !== item) other.classList.remove("dropdown-open");
+        });
+        item.classList.toggle("dropdown-open");
+      });
+    });
+
+    // Close nav when clicking outside
+    document.addEventListener("click", function (e) {
+      if (!nav.contains(e.target)) {
+        nav.classList.remove("nav-open");
+        btn.textContent = "☰";
+        btn.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    // Close nav on Escape
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        nav.classList.remove("nav-open");
+        btn.textContent = "☰";
+        btn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMobileNav);
+  } else {
+    initMobileNav();
+  }
+})();

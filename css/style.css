@@ -605,3 +605,107 @@ footer a { color: #88aacc; }
   margin: 0 auto;
   padding: 1.4rem 1.6rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE / RESPONSIVE — main site
+   Hamburger button is injected by site.js; this CSS shows/hides it and
+   controls the nav panel. No HTML pages need modification.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Hamburger button (injected by JS) */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #b8c8e0;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: .55rem .85rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-hamburger:hover { color: #fff; }
+
+/* Nav items wrapper (injected by JS to allow show/hide as a group) */
+.nav-items-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 680px) {
+
+  /* ── Header & page-title ── */
+  header {
+    padding: .9rem 1.1rem .75rem;
+  }
+  header h1    { font-size: 1.35rem; }
+  header .subtitle { font-size: .8rem; }
+
+  .page-title  { padding: .9rem 1.1rem .75rem; }
+  .page-title h2 { font-size: 1.25rem; }
+  .page-title p  { font-size: .82rem; }
+
+  /* ── Container ── */
+  .container { padding: 1rem .9rem 2rem; }
+
+  /* ── Nav: hamburger mode ── */
+  nav {
+    flex-wrap: nowrap;
+    align-items: center;
+    position: relative;
+  }
+
+  .nav-hamburger { display: block; }
+
+  /* Items wrap: hidden until nav.nav-open */
+  .nav-items-wrap {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding: .2rem 0 .5rem;
+  }
+  nav.nav-open .nav-items-wrap { display: flex; }
+
+  /* Each nav item takes full width */
+  .nav-item { width: 100%; }
+
+  .nav-link {
+    padding: .65rem 1.25rem;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    display: block;
+    width: 100%;
+  }
+
+  /* Dropdowns: inline accordion on mobile (tap to open) */
+  .dropdown {
+    position: static;
+    display: none;
+    background: rgba(0,0,0,.25);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-width: 100%;
+  }
+  .nav-item.dropdown-open .dropdown { display: block; }
+  .nav-item:hover .dropdown { display: none; }  /* kill hover on mobile */
+  nav.nav-open .nav-item.dropdown-open .dropdown { display: block; }
+
+  .dropdown a { padding: .55rem 2rem; font-size: .85rem; }
+
+  /* ── Publications ── */
+  .pub-card {
+    grid-template-columns: 1fr;
+  }
+  .pub-badge { align-self: unset; }
+
+  /* ── App grid (apps.html) ── */
+  .app-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  /* ── Cards ── */
+  .card { padding: 1rem 1rem; }
+
+}
