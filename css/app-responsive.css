@@ -42,6 +42,9 @@
   /* ── Sidebar drawer ──────────────────────────────────────────────────────── */
   .sidebar {
     position: fixed !important;
+    /* Override any display:none set by legacy @media rules in app <style> blocks.
+       The sidebar must be rendered (not none) so the transform can slide it in. */
+    display: block !important;
     top: 48px !important;
     left: 0 !important;
     bottom: 0 !important;
