@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCLE Surface Marker Explorer — Biswas Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;background:#F5F4F1;color:#1C1917}
+.shell{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;background:#fff;border-bottom:1px solid #E2DDD8;padding:0 24px;height:52px;flex-shrink:0;z-index:10}
+.topbar-back{font-size:12px;color:#78716C;text-decoration:none;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid #E2DDD8;border-radius:5px;transition:background .15s}
+.topbar-back:hover{background:#F5F4F1}
+.topbar-logo{font-size:16px;font-weight:700;letter-spacing:-.3px;color:#1C1917}
+.topbar-logo em{color:#C2185B;font-style:normal}
+.topbar-sub{font-size:11px;color:#78716C}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.status-pill{font-size:11px;border-radius:20px;padding:3px 10px;border:1px solid;white-space:nowrap}
+.status-pill.loading{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.status-pill.ok{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+.status-pill.error{background:#FFF1F2;color:#9F1239;border-color:#FECDD3}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(29,78,216,.25);border-top-color:#1D4ED8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Body split */
+.body-split{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:260px;flex-shrink:0;background:#fff;border-right:1px solid #E2DDD8;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:0}
+.sb-section{margin-bottom:18px}
+.sb-heading{font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A8A29E;margin-bottom:8px}
+.search-row{display:flex;gap:6px}
+.search-input{flex:1;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;color:#1C1917;padding:7px 10px;font-family:"IBM Plex Sans",sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:#C2185B}
+.search-btn{background:#C2185B;border:none;border-radius:5px;color:#fff;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;padding:7px 12px;transition:background .15s;white-space:nowrap}
+.search-btn:hover{background:#A3144E}
+
+/* Autocomplete */
+.suggest-wrap{position:relative;flex:1}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #E2DDD8;border-top:none;border-radius:0 0 5px 5px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.suggest-list div{padding:6px 10px;cursor:pointer;font-size:12px;color:#1C1917}
+.suggest-list div:hover,.suggest-list div.sel{background:#F5F4F1;color:#C2185B}
+.hidden{display:none!important}
+
+/* Flow panel list */
+.flow-list{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto}
+.flow-item{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:12px;transition:background .1s}
+.flow-item:hover{background:#F5F4F1}
+.flow-item.active{background:#FFF0F3;color:#C2185B;font-weight:600}
+.flow-item .fi-label{font-weight:500}
+.flow-item .fi-gene{font-size:10px;color:#A8A29E;font-family:"IBM Plex Mono",monospace}
+.flow-item .fi-mu{font-size:11px;color:#78716C;white-space:nowrap}
+.flow-search{width:100%;background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;margin-bottom:6px}
+.flow-search:focus{border-color:#C2185B}
+
+/* Stat chips */
+.stat-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{background:#fff;border:1px solid #E2DDD8;border-radius:6px;padding:6px 10px;min-width:90px;text-align:center}
+.chip-val{font-size:1.2rem;font-weight:700;color:#1C1917}
+.chip-lbl{font-size:10px;color:#78716C;margin-top:2px}
+.badge-tm{display:inline-block;font-size:10px;padding:2px 7px;background:#E8F5E9;color:#2E7D32;border-radius:12px;margin-left:6px;vertical-align:middle;font-weight:600}
+.badge-flow{display:inline-block;font-size:10px;padding:2px 7px;background:#FFF0F3;color:#C2185B;border-radius:12px;margin:0 2px;vertical-align:middle}
+
+/* Main panel */
+.main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.card{background:#fff;border:1px solid #E2DDD8;border-radius:8px;padding:16px 18px}
+.card-title{font-size:12px;font-weight:700;letter-spacing:.3px;color:#78716C;text-transform:uppercase;margin-bottom:12px}
+.gene-heading{font-size:18px;font-weight:700;letter-spacing:-.3px;margin-bottom:10px}
+
+/* Chart */
+#chart-wrap{height:260px;position:relative}
+
+/* Table */
+.expr-table{width:100%;border-collapse:collapse;font-size:12px}
+.expr-table th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 10px;text-align:left;border-bottom:1px solid #E2DDD8;white-space:nowrap}
+.expr-table td{padding:5px 10px;border-bottom:1px solid #F5F4F1;vertical-align:middle}
+.expr-table tr:last-child td{border-bottom:none}
+.expr-table tr:hover td{background:#FAFAF9}
+.rank-num{color:#A8A29E;font-size:11px;width:28px}
+.bar-cell{width:80px}
+.expr-bar{display:inline-block;height:8px;border-radius:3px;background:#C2185B;opacity:.6;vertical-align:middle}
+.tiss-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;flex-shrink:0}
+
+/* Tab row */
+.tab-row{display:flex;border-bottom:1px solid #E2DDD8;margin-bottom:14px}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:7px 14px;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;color:#78716C;cursor:pointer;transition:color .15s}
+.tab-btn.active{color:#C2185B;border-bottom-color:#C2185B}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* Placeholder */
+.placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#A8A29E;gap:8px;padding:40px 0}
+.placeholder-icon{font-size:2.5rem;opacity:.4}
+.placeholder-text{font-size:13px}
+
+/* Panel overview table */
+.panel-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.panel-tbl th{background:#F5F4F1;color:#78716C;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 10px;text-align:left;border-bottom:1px solid #E2DDD8;cursor:pointer;white-space:nowrap;user-select:none}
+.panel-tbl th:hover{color:#C2185B}
+.panel-tbl th.asc::after{content:" ↑"}
+.panel-tbl th.desc::after{content:" ↓"}
+.panel-tbl td{padding:5px 10px;border-bottom:1px solid #F5F4F1;vertical-align:middle}
+.panel-tbl tr:hover td{background:#FAFAF9;cursor:pointer}
+.panel-tbl tr:last-child td{border-bottom:none}
+
+@media(max-width:680px){.sidebar{display:none}.body-split{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Topbar -->
+<div class="topbar">
+  <a class="topbar-back" href="/apps.html">← Apps</a>
+  <div class="topbar-logo">Biswas<em>Lab</em></div>
+  <div class="topbar-sub">CCLE Surface Marker Explorer</div>
+  <div class="topbar-right">
+    <div class="status-pill loading" id="status-pill">
+      <span class="spinner"></span>Loading…
+    </div>
+  </div>
+</div>
+
+<div class="body-split">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <div class="sb-section">
+      <div class="sb-heading">Gene Search</div>
+      <div class="search-row">
+        <div class="suggest-wrap">
+          <input id="gene-input" class="search-input" type="text" placeholder="e.g. CD34, EPCAM, KIT…"
+                 autocomplete="off" spellcheck="false"
+                 oninput="onInput()" onkeydown="onKey(event)">
+          <div id="suggest-box" class="suggest-list hidden"></div>
+        </div>
+        <button class="search-btn" onclick="search()">Go</button>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-heading">Flow Cytometry Panel</div>
+      <input id="flow-filter" class="flow-search" type="text" placeholder="Filter markers…" oninput="renderFlowList()">
+      <div class="flow-list" id="flow-list"></div>
+    </div>
+
+  </div>
+
+  <!-- Main -->
+  <div class="main" id="main-area">
+    <div class="placeholder" id="placeholder">
+      <div class="placeholder-icon">🔬</div>
+      <div class="placeholder-text">Search a gene or select a flow cytometry marker</div>
+      <div style="font-size:11px;color:#A8A29E;margin-top:4px">26,475 genes · 1,004 CCLE cell lines</div>
+    </div>
+
+    <div id="gene-panel" class="hidden">
+
+      <div class="card">
+        <div id="gene-heading" class="gene-heading"></div>
+        <div class="stat-chips" id="stat-chips"></div>
+      </div>
+
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('chart')">Tissue Expression</button>
+        <button class="tab-btn" onclick="switchTab('table')">Top Cell Lines</button>
+        <button class="tab-btn" onclick="switchTab('panel')">Flow Panel Overview</button>
+      </div>
+
+      <div id="tab-chart" class="tab-pane active">
+        <div class="card">
+          <div class="card-title">Mean log₂(TPM+1) by tissue type</div>
+          <div id="chart-wrap"><canvas id="chart-canvas"></canvas></div>
+        </div>
+      </div>
+
+      <div id="tab-table" class="tab-pane">
+        <div class="card">
+          <div class="card-title">Top 50 expressing cell lines</div>
+          <div style="overflow-x:auto">
+            <table class="expr-table">
+              <thead><tr>
+                <th class="rank-num">#</th>
+                <th>Cell Line</th>
+                <th>Tissue</th>
+                <th>log₂(TPM+1)</th>
+                <th class="bar-cell"></th>
+              </tr></thead>
+              <tbody id="top-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-panel" class="tab-pane">
+        <div class="card">
+          <div class="card-title">Flow cytometry panel — all markers</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+            <input id="panel-search" type="text" placeholder="Filter…"
+                   style="background:#FAFAF9;border:1px solid #E2DDD8;border-radius:5px;padding:5px 8px;font-family:inherit;font-size:12px;outline:none;width:180px"
+                   oninput="renderPanelTable()">
+            <label style="font-size:11px;color:#78716C;display:flex;align-items:center;gap:4px">
+              <input type="checkbox" id="chk-exp" onchange="renderPanelTable()"> Expressed only (&gt;0.5)
+            </label>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="panel-tbl" id="panel-tbl">
+              <thead><tr>
+                <th onclick="sortPanel('label')">Marker</th>
+                <th onclick="sortPanel('gene')">Gene</th>
+                <th onclick="sortPanel('mu')">Mean</th>
+                <th onclick="sortPanel('p1')">% &gt;1</th>
+                <th onclick="sortPanel('p3')">% &gt;3</th>
+                <th onclick="sortPanel('mu')">TM</th>
+              </tr></thead>
+              <tbody id="panel-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /gene-panel -->
+  </div><!-- /main -->
+
+</div><!-- /body-split -->
+</div><!-- /shell -->
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────────
+let DB = null;
+let allGenes = [];
+let chartInst = null;
+let activeGene = null;
+let panelSortCol = 'mu', panelSortAsc = false;
+let panelRows = [];
+
+const TISSUE_COLORS = {
+  HAEMATOPOIETIC_AND_LYMPHOID_TISSUE:'#e41a1c',BREAST:'#ff7f00',
+  CENTRAL_NERVOUS_SYSTEM:'#984ea3',LARGE_INTESTINE:'#4daf4a',
+  LUNG:'#377eb8',OVARY:'#f781bf',PROSTATE:'#a65628',SKIN:'#999',
+  STOMACH:'#e6ab02',URINARY_TRACT:'#66c2a5',LIVER:'#fc8d62',
+  PANCREAS:'#8da0cb',KIDNEY:'#e78ac3',THYROID:'#a6d854',
+  BONE:'#c49a00',SOFT_TISSUE:'#e5c494',ENDOMETRIUM:'#1b9e77',
+  CERVIX:'#d95f02',OESOPHAGUS:'#7570b3',
+  UPPER_AERODIGESTIVE_TRACT:'#b3b3b3',
+};
+const DC = '#aaa';
+
+async function loadData() {
+  const url = 'ccle-expression-data.json.gz';
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const buf = await resp.arrayBuffer();
+  return JSON.parse(pako.inflate(new Uint8Array(buf), {to:'string'}));
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    DB = await loadData();
+    allGenes = Object.keys(DB.genes).sort();
+    buildPanelRows();
+    renderFlowList();
+    setPill('ok', `${allGenes.length.toLocaleString()} genes loaded`);
+    // Demo: show CD34 on load
+    document.getElementById('gene-input').value = 'CD34';
+    search();
+  } catch(e) {
+    setPill('error', 'Load failed: ' + e.message);
+  }
+});
+
+function setPill(type, msg) {
+  const p = document.getElementById('status-pill');
+  p.className = 'status-pill ' + type;
+  p.innerHTML = type === 'loading' ? `<span class="spinner"></span>${msg}` : msg;
+}
+
+// ── Autocomplete ──────────────────────────────────────────────────────────────
+let sugSel = -1;
+function onInput() {
+  const q = document.getElementById('gene-input').value.toUpperCase().trim();
+  const box = document.getElementById('suggest-box');
+  if (q.length < 2) { box.classList.add('hidden'); return; }
+  const m = allGenes.filter(g => g.startsWith(q)).slice(0, 10);
+  if (!m.length) { box.classList.add('hidden'); return; }
+  box.innerHTML = m.map(g => `<div onclick="pick('${g}')">${g}</div>`).join('');
+  box.classList.remove('hidden'); sugSel = -1;
+}
+function onKey(e) {
+  const box = document.getElementById('suggest-box');
+  const items = box.querySelectorAll('div');
+  if (e.key==='ArrowDown'){sugSel=Math.min(sugSel+1,items.length-1);hiSug(items);e.preventDefault();}
+  else if(e.key==='ArrowUp'){sugSel=Math.max(sugSel-1,-1);hiSug(items);e.preventDefault();}
+  else if(e.key==='Enter'){if(sugSel>=0&&items[sugSel])pick(items[sugSel].textContent);else search();box.classList.add('hidden');}
+  else if(e.key==='Escape') box.classList.add('hidden');
+}
+function hiSug(items){items.forEach((el,i)=>el.classList.toggle('sel',i===sugSel));if(sugSel>=0)document.getElementById('gene-input').value=items[sugSel].textContent;}
+function pick(g){document.getElementById('gene-input').value=g;document.getElementById('suggest-box').classList.add('hidden');search();}
+document.addEventListener('click',e=>{if(!e.target.closest('.suggest-wrap'))document.getElementById('suggest-box').classList.add('hidden');});
+
+// ── Search ────────────────────────────────────────────────────────────────────
+function search() {
+  let q = document.getElementById('gene-input').value.toUpperCase().trim();
+  if (!q || !DB) return;
+  document.getElementById('suggest-box').classList.add('hidden');
+  if (!DB.genes[q]) {
+    const m = allGenes.filter(g => g.includes(q));
+    if (m.length) { q = m[0]; document.getElementById('gene-input').value = q; }
+    else { setPill('error', `"${q}" not found`); setTimeout(()=>setPill('ok',allGenes.length.toLocaleString()+' genes loaded'),2000); return; }
+  }
+  activeGene = q;
+  renderGene(q, DB.genes[q]);
+  // Sync flow list highlight
+  document.querySelectorAll('.flow-item').forEach(el => el.classList.toggle('active', el.dataset.gene === q));
+}
+
+function renderGene(name, g) {
+  document.getElementById('placeholder').classList.add('hidden');
+  document.getElementById('gene-panel').classList.remove('hidden');
+
+  // Heading
+  let badges = g.tm ? '<span class="badge-tm">TM</span>' : '';
+  if (g.fl && g.fl.length) badges += g.fl.map(l=>`<span class="badge-flow">${l}</span>`).join('');
+  document.getElementById('gene-heading').innerHTML = name + badges;
+
+  // Stats
+  const top = g.t50[0];
+  document.getElementById('stat-chips').innerHTML = `
+    <div class="chip"><div class="chip-val">${g.mu.toFixed(2)}</div><div class="chip-lbl">Mean log₂TPM+1</div></div>
+    <div class="chip"><div class="chip-val">${g.p1.toFixed(0)}%</div><div class="chip-lbl">Cells &gt; 1</div></div>
+    <div class="chip"><div class="chip-val">${g.p3.toFixed(0)}%</div><div class="chip-lbl">Cells &gt; 3</div></div>
+    <div class="chip"><div class="chip-val">${top ? top[2].toFixed(1) : '0'}</div><div class="chip-lbl">Max (${top ? top[0] : '—'})</div></div>
+  `;
+
+  renderChart(g);
+  renderTopTable(g);
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+function renderChart(g) {
+  const tissues = DB.meta.tissues;
+  const pairs = tissues.map(t => [t, g.tm_[t] || 0]).sort((a,b)=>b[1]-a[1]);
+  const labels = pairs.map(x => x[0].replace(/_/g,' ').replace(/\b([A-Z])/g,c=>c).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()));
+  const vals = pairs.map(x => x[1]);
+  const colors = pairs.map(x => TISSUE_COLORS[x[0]] || DC);
+
+  const ctx = document.getElementById('chart-canvas').getContext('2d');
+  if (chartInst) chartInst.destroy();
+  chartInst = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 0, borderRadius: 3 }] },
+    options: {
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${c.parsed.y.toFixed(2)} log₂(TPM+1)` } }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10, family: "'IBM Plex Sans'" }, maxRotation: 45 }, grid: { display: false } },
+        y: { title: { display: true, text: 'log₂(TPM+1)', font: { size: 11 } }, beginAtZero: true, grid: { color: '#F0EDE8' } }
+      },
+      animation: { duration: 200 },
+      maintainAspectRatio: false,
+    }
+  });
+}
+
+// ── Top table ─────────────────────────────────────────────────────────────────
+function renderTopTable(g) {
+  const max = g.t50.length ? g.t50[0][2] : 1;
+  document.getElementById('top-tbody').innerHTML = g.t50.map((row,i) => `
+    <tr>
+      <td class="rank-num">${i+1}</td>
+      <td><strong>${row[0]}</strong></td>
+      <td>
+        <span class="tiss-dot" style="background:${TISSUE_COLORS[row[1]]||DC}"></span>
+        ${row[1].replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+      </td>
+      <td><code style="font-family:'IBM Plex Mono',monospace;font-size:11px">${row[2].toFixed(2)}</code></td>
+      <td class="bar-cell"><span class="expr-bar" style="width:${Math.round(row[2]/Math.max(max,0.1)*70)}px"></span></td>
+    </tr>`).join('');
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(name) {
+  const names = ['chart','table','panel'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name==='panel') renderPanelTable();
+}
+
+// ── Flow panel sidebar ────────────────────────────────────────────────────────
+function buildPanelRows() {
+  const fp = DB.meta.flow_panel;
+  const seen = new Set();
+  panelRows = [];
+  for (const [label, genes] of Object.entries(fp)) {
+    for (const gene of genes) {
+      const key = label + '|' + gene;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const g = DB.genes[gene];
+      panelRows.push({ label, gene, mu: g?.mu||0, p1: g?.p1||0, p3: g?.p3||0, tm: g?.tm||false, found: !!g });
+    }
+  }
+}
+
+function renderFlowList() {
+  const q = document.getElementById('flow-filter').value.toUpperCase();
+  const rows = panelRows.filter(r => !q || r.label.toUpperCase().includes(q) || r.gene.includes(q));
+  document.getElementById('flow-list').innerHTML = rows.map(r => `
+    <div class="flow-item${activeGene===r.gene?' active':''}" data-gene="${r.gene}" onclick="flowClick('${r.gene}')">
+      <span>
+        <span class="fi-label">${r.label}</span>
+        <span class="fi-gene"> ${r.gene}</span>
+      </span>
+      <span class="fi-mu">${r.found ? r.mu.toFixed(1) : '—'}</span>
+    </div>`).join('');
+}
+
+function flowClick(gene) {
+  document.getElementById('gene-input').value = gene;
+  search();
+  renderFlowList();
+}
+
+// ── Panel overview table ──────────────────────────────────────────────────────
+function sortPanel(col) {
+  if (panelSortCol === col) panelSortAsc = !panelSortAsc;
+  else { panelSortCol = col; panelSortAsc = false; }
+  renderPanelTable();
+}
+
+function renderPanelTable() {
+  const q = (document.getElementById('panel-search')?.value||'').toUpperCase();
+  const expOnly = document.getElementById('chk-exp')?.checked;
+  let rows = panelRows.filter(r => {
+    if (q && !r.label.toUpperCase().includes(q) && !r.gene.includes(q)) return false;
+    if (expOnly && r.mu < 0.5) return false;
+    return true;
+  });
+  const col = panelSortCol, asc = panelSortAsc;
+  rows.sort((a,b) => {
+    const av = a[col], bv = b[col];
+    return typeof av==='number' ? (asc?av-bv:bv-av) : (asc?av.localeCompare(bv):bv.localeCompare(av));
+  });
+  // Update sort indicators
+  const hdrs = document.querySelectorAll('.panel-tbl th');
+  const hdrCols = ['label','gene','mu','p1','p3','mu'];
+  hdrs.forEach((h,i) => { h.classList.remove('asc','desc'); if(hdrCols[i]===col) h.classList.add(asc?'asc':'desc'); });
+
+  document.getElementById('panel-tbody').innerHTML = rows.map(r => `
+    <tr onclick="flowClick('${r.gene}')">
+      <td><strong>${r.label}</strong></td>
+      <td><code style="font-family:'IBM Plex Mono',monospace;font-size:11px">${r.gene}</code></td>
+      <td>${r.found ? r.mu.toFixed(2) : '—'}</td>
+      <td>${r.found ? r.p1.toFixed(0)+'%' : '—'}</td>
+      <td>${r.found ? r.p3.toFixed(0)+'%' : '—'}</td>
+      <td>${r.tm ? '✓' : ''}</td>
+    </tr>`).join('');
+}
+</script>
+</body>
+</html>
