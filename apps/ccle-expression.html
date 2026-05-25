@@ -66,6 +66,7 @@ html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;back
 .chip-lbl{font-size:10px;color:#78716C;margin-top:2px}
 .badge-tm{display:inline-block;font-size:10px;padding:2px 7px;background:#E8F5E9;color:#2E7D32;border-radius:12px;margin-left:6px;vertical-align:middle;font-weight:600}
 .badge-flow{display:inline-block;font-size:10px;padding:2px 7px;background:#FFF0F3;color:#C2185B;border-radius:12px;margin:0 2px;vertical-align:middle}
+.badge-cd{display:inline-block;font-size:10px;padding:2px 7px;background:#EFF6FF;color:#1D4ED8;border-radius:12px;margin:0 2px;vertical-align:middle}
 
 /* Main panel */
 .main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
@@ -232,6 +233,125 @@ html,body{height:100%;font-family:"IBM Plex Sans",sans-serif;font-size:13px;back
 </div><!-- /shell -->
 
 <script>
+// ── CD nomenclature ↔ gene symbol map ────────────────────────────────────────
+// CD_MAP: canonical CD name → primary gene symbol (HGNC)
+// Built from HGNC/UniProt CD antigen committee assignments.
+const CD_MAP = {
+  CD1A:'CD1A',CD1B:'CD1B',CD1C:'CD1C',CD1D:'CD1D',CD1E:'CD1E',
+  CD2:'CD2',CD3D:'CD3D',CD3E:'CD3E',CD3G:'CD3G',CD3Z:'CD247',
+  CD4:'CD4',CD5:'CD5',CD6:'CD6',CD7:'CD7',
+  CD8:'CD8A',CD8A:'CD8A',CD8B:'CD8B',
+  CD9:'CD9',CD10:'MME',
+  CD11A:'ITGAL',CD11B:'ITGAM',CD11C:'ITGAX',
+  CD13:'ANPEP',CD14:'CD14',CD15:'FUT4',
+  CD16:'FCGR3A',CD16A:'FCGR3A',CD16B:'FCGR3B',
+  CD18:'ITGB2',CD19:'CD19',CD20:'MS4A1',
+  CD21:'CR2',CD22:'CD22',CD23:'FCER2',CD24:'CD24',CD25:'IL2RA',
+  CD26:'DPP4',CD27:'CD27',CD28:'CD28',CD29:'ITGB1',CD30:'TNFRSF8',
+  CD31:'PECAM1',CD32:'FCGR2A',CD33:'CD33',CD34:'CD34',
+  CD35:'CR1',CD36:'CD36',CD37:'CD37',CD38:'CD38',CD39:'ENTPD1',
+  CD40:'CD40',CD41:'ITGA2B',CD43:'SPN',CD44:'CD44',CD45:'PTPRC',
+  CD46:'CD46',CD47:'CD47',CD48:'CD48',
+  CD49A:'ITGA1',CD49B:'ITGA2',CD49C:'ITGA3',CD49D:'ITGA4',CD49E:'ITGA5',CD49F:'ITGA6',
+  CD51:'ITGAV',CD54:'ICAM1',CD55:'CD55',CD56:'NCAM1',
+  CD57:'B3GAT1',CD58:'CD58',CD59:'CD59',CD61:'ITGB3',
+  CD62E:'SELE',CD62L:'SELL',CD62P:'SELP',CD63:'CD63',
+  CD64:'FCGR1A',CD66A:'CEACAM1',CD66B:'CEACAM8',CD66C:'CEACAM6',CD66E:'CEACAM5',
+  CD68:'CD68',CD69:'CD69',CD70:'TNFSF7',CD71:'TFRC',
+  CD72:'CD72',CD73:'NT5E',CD74:'CD74',CD79A:'CD79A',CD79B:'CD79B',
+  CD80:'CD80',CD81:'CD81',CD83:'CD83',CD86:'CD86',
+  CD87:'PLAUR',CD88:'C5AR1',CD89:'FCAR',CD90:'THY1',
+  CD93:'CD93',CD94:'KLRD1',CD95:'FAS',CD96:'CD96',
+  CD97:'ADGRE5',CD99:'CD99',CD100:'SEMA4D',CD101:'CD101',
+  CD102:'ICAM2',CD103:'ITGAE',CD104:'ITGB4',CD105:'ENG',
+  CD106:'VCAM1',CD107A:'LAMP1',CD107B:'LAMP2',CD109:'CD109',
+  CD110:'MPL',CD111:'NECTIN1',CD112:'NECTIN2',CD113:'NECTIN3',
+  CD114:'CSF3R',CD115:'CSF1R',CD116:'CSF2RA',CD117:'KIT',
+  CD119:'IFNGR1',CD120A:'TNFRSF1A',CD120B:'TNFRSF1B',
+  CD121A:'IL1R1',CD122:'IL2RB',CD123:'IL3RA',CD124:'IL4R',
+  CD125:'IL5RA',CD126:'IL6R',CD127:'IL7R',
+  CD128A:'CXCR1',CD128B:'CXCR2',CD130:'IL6ST',
+  CD131:'CSF2RB',CD132:'IL2RG',CD133:'PROM1',
+  CD134:'TNFRSF4',CD135:'FLT3',CD136:'MST1R',CD137:'TNFRSF9',
+  CD138:'SDC1',CD140A:'PDGFRA',CD140B:'PDGFRB',
+  CD141:'THBD',CD143:'ACE',CD144:'CDH5',CD146:'MCAM',
+  CD147:'BSG',CD148:'PTPRJ',CD150:'SLAMF1',CD151:'CD151',
+  CD152:'CTLA4',CD154:'TNFSF5',CD155:'PVR',
+  CD158A:'KIR2DL1',CD158B:'KIR2DL2',CD158E1:'KIR3DL1',
+  CD161:'KLRB1',CD162:'SELPLG',CD163:'CD163',CD164:'CD164',
+  CD169:'SIGLEC1',CD170:'SIGLEC5',CD172A:'SIRPA',
+  CD177:'CD177',CD178:'FASLG',CD180:'CD180',
+  CD183:'CXCR3',CD184:'CXCR4',CD185:'CXCR5',CD186:'CXCR6',
+  CD191:'CCR1',CD192:'CCR2',CD193:'CCR3',CD194:'CCR4',
+  CD195:'CCR5',CD196:'CCR6',CD197:'CCR7',CD198:'CCR8',
+  CD200:'CD200',CD201:'PROCR',CD205:'LY75',
+  CD206:'MRC1',CD207:'CLEC4K',CD208:'LAMP3',CD209:'CD209',
+  CD210:'IL10RA',CD213A1:'IL13RA1',CD213A2:'IL13RA2',
+  CD218A:'IL18R1',CD218B:'IL18RAP',
+  CD220:'INSR',CD221:'IGF1R',CD222:'IGF2R',CD223:'LAG3',
+  CD224:'GGT1',CD225:'IFITM1',CD226:'CD226',CD227:'MUC1',
+  CD229:'SLAMF3',CD231:'TSPAN7',CD234:'ACKR1',
+  CD235A:'GYPA',CD235B:'GYPB',CD236:'GYPC',
+  CD239:'BCAM',CD243:'ABCB1',CD244:'SLAMF4',CD247:'CD247',
+  CD248:'CD248',CD252:'TNFSF4',CD253:'TNFSF10',CD254:'TNFSF11',
+  CD256:'TNFSF13',CD257:'TNFSF13B',CD258:'TNFSF14',
+  CD261:'TNFRSF10A',CD262:'TNFRSF10B',CD263:'TNFRSF10C',CD264:'TNFRSF10D',
+  CD265:'TNFRSF11A',CD267:'TNFRSF13B',CD268:'TNFRSF13C',
+  CD269:'TNFRSF17',CD271:'NGFR',CD272:'BTLA',
+  CD273:'PDCD1LG2',CD274:'CD274',CD275:'ICOSLG',
+  CD276:'CD276',CD278:'ICOS',CD279:'PDCD1',
+  CD281:'TLR1',CD282:'TLR2',CD283:'TLR3',CD284:'TLR4',CD289:'TLR9',
+  CD294:'PTGDR2',CD298:'ATP1B3',CD300A:'CD300A',
+  CD303:'CLEC4C',CD304:'NRP1',CD305:'LAIR1',CD309:'KDR',
+  CD314:'KLRK1',CD317:'BST2',CD318:'CDCP1',CD319:'SLAMF7',
+  CD321:'F11R',CD322:'JAM2',CD324:'CDH1',CD325:'CDH2',
+  CD326:'EPCAM',CD328:'SIGLEC7',CD329:'SIGLEC9',
+  CD335:'NCR1',CD336:'NCR2',CD337:'NCR3',CD338:'ABCG2',
+  CD339:'JAG1',CD340:'ERBB2',CD352:'SLAMF6',CD354:'TREM1',
+  CD355:'CRTAM',CD357:'TNFRSF18',CD360:'IL21R',
+  CD362:'SDC2',CD363:'S1PR1',CD366:'HAVCR2',
+  CD369:'CLEC7A',CD370:'CLEC9A',CD371:'CLEC12A',
+  // Common aliases
+  HER2:'ERBB2',EGFR:'EGFR',PDGFR:'PDGFRA',VEGFR2:'KDR',
+  'PD-1':'PDCD1','PD-L1':'CD274','PD-L2':'PDCD1LG2',
+  'LAG-3':'LAG3','TIM-3':'HAVCR2','CTLA-4':'CTLA4',
+  '4-1BB':'TNFRSF9','OX40':'TNFRSF4',GITR:'TNFRSF18',
+  BCMA:'TNFRSF17',TIGIT:'TIGIT',VISTA:'VSIR',
+  'NKG2D':'KLRK1','NKG2A':'KLRC1',
+  CEA:'CEACAM5',PSMA:'FOLH1',MSLN:'MSLN',
+  EPCAM:'EPCAM',NCAM:'NCAM1',PECAM:'PECAM1',
+};
+
+// Build reverse map: gene → all CD aliases
+const GENE_TO_CD = {};
+for (const [cd, gene] of Object.entries(CD_MAP)) {
+  if (!GENE_TO_CD[gene]) GENE_TO_CD[gene] = [];
+  if (!GENE_TO_CD[gene].includes(cd)) GENE_TO_CD[gene].push(cd);
+}
+
+// Resolve input: CD name or alias → gene symbol, or return as-is
+function resolveQuery(raw) {
+  const q = raw.toUpperCase().trim().replace(/[\s\-]/g, '');
+  // Direct CD map hit
+  if (CD_MAP[q]) return { gene: CD_MAP[q], alias: q };
+  // Try with normalised spacing: "CD 45" → "CD45"
+  const noSpace = raw.toUpperCase().replace(/\s+/g,'').trim();
+  if (CD_MAP[noSpace]) return { gene: CD_MAP[noSpace], alias: noSpace };
+  return { gene: raw.toUpperCase().trim(), alias: null };
+}
+
+// Autocomplete candidates: gene names + CD markers
+function buildSuggestions(q) {
+  q = q.toUpperCase().trim();
+  const geneHits = allGenes.filter(g => g.startsWith(q)).slice(0, 7);
+  // CD/alias hits not already in geneHits
+  const cdHits = Object.entries(CD_MAP)
+    .filter(([cd]) => cd.startsWith(q) && !geneHits.includes(CD_MAP[cd]))
+    .slice(0, 5)
+    .map(([cd, gene]) => ({ display: `${cd} → ${gene}`, value: cd }));
+  return { geneHits, cdHits };
+}
+
 // ── Data ─────────────────────────────────────────────────────────────────────
 let DB = null;
 let allGenes = [];
@@ -287,9 +407,13 @@ function onInput() {
   const q = document.getElementById('gene-input').value.toUpperCase().trim();
   const box = document.getElementById('suggest-box');
   if (q.length < 2) { box.classList.add('hidden'); return; }
-  const m = allGenes.filter(g => g.startsWith(q)).slice(0, 10);
-  if (!m.length) { box.classList.add('hidden'); return; }
-  box.innerHTML = m.map(g => `<div onclick="pick('${g}')">${g}</div>`).join('');
+  const { geneHits, cdHits } = buildSuggestions(q);
+  const parts = [
+    ...geneHits.map(g => `<div data-val="${g}" onclick="pick('${g}')">${g}</div>`),
+    ...cdHits.map(c => `<div data-val="${c.value}" onclick="pick('${c.value}')" style="color:#4F46E5">${c.display}</div>`)
+  ];
+  if (!parts.length) { box.classList.add('hidden'); return; }
+  box.innerHTML = parts.join('');
   box.classList.remove('hidden'); sugSel = -1;
 }
 function onKey(e) {
@@ -300,23 +424,25 @@ function onKey(e) {
   else if(e.key==='Enter'){if(sugSel>=0&&items[sugSel])pick(items[sugSel].textContent);else search();box.classList.add('hidden');}
   else if(e.key==='Escape') box.classList.add('hidden');
 }
-function hiSug(items){items.forEach((el,i)=>el.classList.toggle('sel',i===sugSel));if(sugSel>=0)document.getElementById('gene-input').value=items[sugSel].textContent;}
+function hiSug(items){items.forEach((el,i)=>el.classList.toggle('sel',i===sugSel));if(sugSel>=0)document.getElementById('gene-input').value=items[sugSel].dataset.val||items[sugSel].textContent;}
 function pick(g){document.getElementById('gene-input').value=g;document.getElementById('suggest-box').classList.add('hidden');search();}
 document.addEventListener('click',e=>{if(!e.target.closest('.suggest-wrap'))document.getElementById('suggest-box').classList.add('hidden');});
 
 // ── Search ────────────────────────────────────────────────────────────────────
 function search() {
-  let q = document.getElementById('gene-input').value.toUpperCase().trim();
-  if (!q || !DB) return;
+  const raw = document.getElementById('gene-input').value;
+  if (!raw.trim() || !DB) return;
   document.getElementById('suggest-box').classList.add('hidden');
+  const { gene } = resolveQuery(raw);
+  let q = gene;
   if (!DB.genes[q]) {
     const m = allGenes.filter(g => g.includes(q));
-    if (m.length) { q = m[0]; document.getElementById('gene-input').value = q; }
-    else { setPill('error', `"${q}" not found`); setTimeout(()=>setPill('ok',allGenes.length.toLocaleString()+' genes loaded'),2000); return; }
+    if (m.length) { q = m[0]; }
+    else { setPill('error', `"${raw.trim()}" not found`); setTimeout(()=>setPill('ok',allGenes.length.toLocaleString()+' genes loaded'),2000); return; }
   }
+  document.getElementById('gene-input').value = q;
   activeGene = q;
   renderGene(q, DB.genes[q]);
-  // Sync flow list highlight
   document.querySelectorAll('.flow-item').forEach(el => el.classList.toggle('active', el.dataset.gene === q));
 }
 
@@ -327,6 +453,8 @@ function renderGene(name, g) {
   // Heading
   let badges = g.tm ? '<span class="badge-tm">TM</span>' : '';
   if (g.fl && g.fl.length) badges += g.fl.map(l=>`<span class="badge-flow">${l}</span>`).join('');
+  const cdAliases = (GENE_TO_CD[name] || []).filter(cd => !(g.fl||[]).includes(cd));
+  if (cdAliases.length) badges += cdAliases.map(cd=>`<span class="badge-cd">${cd}</span>`).join('');
   document.getElementById('gene-heading').innerHTML = name + badges;
 
   // Stats
