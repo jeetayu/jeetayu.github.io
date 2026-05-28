@@ -1,9 +1,11 @@
 # Per-gene cache (43k files, 2GB) — fetched on demand from Ensembl at runtime
-apps/gene-cache/
-# Keep genome coordinate files used by tribe.html annotation
+# Use wildcard (not trailing slash) so the !exceptions below take effect
+apps/gene-cache/*
+# Keep pre-built genome coordinate JSON files used by tribe.html annotation
 !apps/gene-cache/hg38_gene_coords.json
 !apps/gene-cache/mm10_gene_coords.json
 !apps/gene-cache/hg19_gene_coords.json
+!apps/gene-cache/build_hg38_gene_coords.py
 
 # Flask API backends — not usable on GitHub Pages
 api/
