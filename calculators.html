@@ -84,8 +84,8 @@
   <h3>T4 Ligation Master Mix</h3>
   <div class="row2">
     <div>
-      <label>Backbone mass (ng)</label>
-      <input type="number" id="lig-bb-mass" value="50">
+      <label>Backbone conc. (ng/µL)</label>
+      <input type="number" id="lig-bb-conc" value="50" step="any">
     </div>
     <div>
       <label>Backbone size (bp)</label>
@@ -94,8 +94,8 @@
   </div>
   <div class="row2">
     <div>
-      <label>Insert size (bp)</label>
-      <input type="number" id="lig-ins-size" value="500">
+      <label>Backbone vol. to use (µL)</label>
+      <input type="number" id="lig-bb-vol" value="1" step="any">
     </div>
     <div>
       <label>Insert:Backbone molar ratio</label>
@@ -104,6 +104,16 @@
         <option value="5">5:1 (difficult inserts)</option>
         <option value="1">1:1 (blunt-end)</option>
       </select>
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Insert conc. (ng/µL)</label>
+      <input type="number" id="lig-ins-conc" value="10" step="any">
+    </div>
+    <div>
+      <label>Insert size (bp)</label>
+      <input type="number" id="lig-ins-size" value="500">
     </div>
   </div>
   <label>Total reaction volume (µL)</label>
@@ -407,24 +417,36 @@ function calcPCR() {
 
 // ── Ligation ─────────────────────────────────────────────────────────────
 function calcLigation() {
-  const bbMass = parseFloat(document.getElementById('lig-bb-mass').value);
-  const bbSize = parseFloat(document.getElementById('lig-bb-size').value);
+  const bbConc  = parseFloat(document.getElementById('lig-bb-conc').value);
+  const bbVol   = parseFloat(document.getElementById('lig-bb-vol').value);
+  const bbSize  = parseFloat(document.getElementById('lig-bb-size').value);
+  const insConc = parseFloat(document.getElementById('lig-ins-conc').value);
   const insSize = parseFloat(document.getElementById('lig-ins-size').value);
-  const ratio = parseFloat(document.getElementById('lig-ratio').value);
-  const vol = parseFloat(document.getElementById('lig-vol').value);
+  const ratio   = parseFloat(document.getElementById('lig-ratio').value);
+  const vol     = parseFloat(document.getElementById('lig-vol').value);
 
-  // pmol = mass(ng) / (size(bp) * 0.66 pg/bp) * 1e-3 to get pmol
-  const bbPmol = bbMass / (bbSize * 0.66);
+  // 660 Da/bp for dsDNA → pmol = ng / (bp × 0.66)
+  const bbMass  = bbConc * bbVol;
+  const bbPmol  = bbMass / (bbSize * 0.66);
   const insPmol = bbPmol * ratio;
-  const insMass = r(insPmol * insSize * 0.66);
+  const insMass = insPmol * insSize * 0.66;
+  const insVol  = r(insMass / insConc, 2);
+  const bufVol  = r(vol * 0.1, 1);
+  const h2oVol  = r(vol - bbVol - insVol - bufVol - 1, 2);
+
+  if (h2oVol < 0) {
+    show('lig-result', '<span style="color:red">⚠ Components exceed total volume — reduce volumes or increase reaction volume.</span>');
+    return;
+  }
 
   show('lig-result', `
     <table>
-      <tr><td>Backbone</td><td>${bbMass} ng (${r(bbPmol,4)} pmol)</td></tr>
-      <tr><td>Insert needed</td><td>${insMass} ng (${r(insPmol,4)} pmol, ${ratio}:1 molar ratio)</td></tr>
-      <tr><td>10x T4 Ligase Buffer</td><td>${r(vol*0.1)} µL</td></tr>
+      <tr><td>Backbone</td><td>${bbVol} µL × ${bbConc} ng/µL = ${r(bbMass,2)} ng (${r(bbPmol,4)} pmol)</td></tr>
+      <tr><td>Insert needed</td><td>${insVol} µL × ${insConc} ng/µL = ${r(insMass,2)} ng (${r(insPmol,4)} pmol, ${ratio}:1)</td></tr>
+      <tr><td>10x T4 Ligase Buffer</td><td>${bufVol} µL</td></tr>
       <tr><td>T4 DNA Ligase</td><td>1 µL</td></tr>
-      <tr><td>Backbone + Insert + H₂O</td><td>to ${vol} µL total</td></tr>
+      <tr><td>H₂O</td><td>${h2oVol} µL</td></tr>
+      <tr><td>Total</td><td>${vol} µL</td></tr>
       <tr><td>Incubation</td><td>16°C overnight or RT 10 min (quick ligation)</td></tr>
     </table>`);
 }
@@ -457,8 +479,8 @@ const txOptiMEM   = { '10cm':500, '6cm':250, '6well':125, '12well':75, '24well':
 const txFugPBS    = { '10cm':470, '6cm':200, '6well':100, '12well':50, '24well':25, '96well':10 };
 // JetPRIME buffer volumes (µL) per dish format
 const txJetPrimeBuf = { '10cm':500, '6cm':200, '6well':200, '12well':100, '24well':50, '96well':10 };
-// JetOptimus buffer volumes (µL) per dish format
-const txJetOptimusBuf = { '10cm':250, '6cm':100, '6well':100, '12well':50, '24well':25, '96well':5 };
+// JetOptimus buffer volumes (µL) per dish format — fixed by dish size (Polyplus protocol)
+const txJetOptimusBuf = { '10cm':1000, '6cm':500, '6well':200, '12well':100, '24well':50, '96well':12.5 };
 
 function updateTxUI() {
   const reagent = document.getElementById('tx-reagent').value;
