@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>smiFISH / MERFISH Probe Designer – Jeet Biswas</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.designer-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 860px) { .designer-grid { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  padding: 1.2rem 1.4rem;
+}
+.panel h3 {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--accent, #3a6ea5);
+  border-bottom: 2px solid var(--accent, #3a6ea5);
+  padding-bottom: 0.35rem;
+}
+.panel label {
+  display: block;
+  font-size: 0.82rem;
+  color: #555;
+  margin: 0.7rem 0 0.2rem;
+}
+.panel input[type=text],
+.panel input[type=number],
+.panel select,
+.panel textarea {
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.panel textarea { resize: vertical; font-family: monospace; font-size: 0.78rem; }
+.range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.btn {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+}
+.btn-primary { background: var(--accent, #3a6ea5); color: #fff; width: 100%; margin-top: 1rem; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.4; cursor: default; }
+.btn-sm { font-size: 0.8rem; padding: 0.3rem 0.75rem; margin: 0 0.25rem 0 0; }
+.btn-dl { background: #27ae60; color: #fff; }
+.btn-dl:hover { opacity: 0.88; }
+.btn-outline { background: #fff; border: 1px solid var(--accent, #3a6ea5); color: var(--accent, #3a6ea5); }
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+.tab-bar { display: flex; gap: 0; border-bottom: 2px solid #ddd; margin-bottom: 1rem; }
+.tab {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: inherit;
+  color: #666;
+}
+.tab.active { border-bottom-color: var(--accent, #3a6ea5); color: var(--accent, #3a6ea5); font-weight: 600; }
+
+/* ── Status / progress ───────────────────────────────────────────────────── */
+.status-bar {
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 5px;
+  font-size: 0.82rem;
+  display: none;
+}
+.status-bar.show { display: block; }
+.status-bar.info  { background: #e8f4fd; color: #1a6fa5; }
+.status-bar.ok    { background: #d5f5e3; color: #1a7a40; }
+.status-bar.error { background: #fde8e8; color: #a61a1a; }
+.status-bar.warn  { background: #fef9e7; color: #7a5c1a; }
+
+/* ── Stats row ───────────────────────────────────────────────────────────── */
+.stat-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
+.chip {
+  background: #eef2f8;
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.82rem;
+  color: #2c3e50;
+}
+.chip strong { color: var(--accent, #3a6ea5); }
+
+/* ── Probe table ─────────────────────────────────────────────────────────── */
+.probe-table-wrap { max-height: 480px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 0.75rem; }
+table.probe-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.probe-table th { background: #2c3e50; color: #fff; padding: 0.5rem 0.6rem; position: sticky; top: 0; text-align: left; white-space: nowrap; }
+.probe-table td { padding: 0.35rem 0.6rem; border-bottom: 1px solid #eee; font-family: monospace; }
+.probe-table tr:nth-child(even) td { background: #f8f9fa; }
+.probe-table tr:hover td { background: #e8f4fd; }
+.probe-table .seq { letter-spacing: 0.05em; }
+.gc-low  { color: #e74c3c; }
+.gc-mid  { color: #27ae60; }
+.gc-high { color: #e67e22; }
+
+/* ── Coverage bar ────────────────────────────────────────────────────────── */
+.coverage-wrap { margin-top: 0.75rem; }
+.coverage-bar {
+  height: 20px;
+  background: #eee;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+.coverage-probe {
+  position: absolute;
+  height: 100%;
+  background: var(--accent, #3a6ea5);
+  opacity: 0.7;
+}
+
+/* ── Readout chips ───────────────────────────────────────────────────────── */
+.ro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-top: 0.5rem; }
+.ro-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+}
+.ro-chip input { margin: 0; }
+.ro-chip.selected { border-color: var(--accent, #3a6ea5); background: #eef2f8; }
+
+/* ── Collapsible ─────────────────────────────────────────────────────────── */
+details summary { cursor: pointer; font-weight: 600; font-size: 0.88rem; color: #444; padding: 0.3rem 0; }
+details[open] summary { color: var(--accent, #3a6ea5); }
+
+/* ── Transcript select ───────────────────────────────────────────────────── */
+.transcript-row { display: grid; grid-template-columns: 1fr auto; gap: 0.4rem; align-items: end; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Jeet Biswas</h1>
+  <p class="subtitle">RNA Biology &bull; Transcriptomics &bull; Chemo-Proteomics</p>
+</header>
+<nav>
+  <div class="nav-item"><a class="nav-link" href="/index.html">Home</a></div>
+  <div class="nav-item">
+    <a class="nav-link" href="/protocols/">Protocols &#9662;</a>
+    <div class="dropdown">
+      <a href="/protocols/cell-biology.html">Cell Biology</a>
+      <a href="/protocols/bioinformatics.html">Bioinformatics</a>
+      <a href="/protocols/molecular-biology.html">Molecular Biology</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link" href="/publications.html">Publications</a></div>
+  <div class="nav-item"><a class="nav-link" href="/reagents/">Reagents &#9662;</a>
+    <div class="dropdown">
+      <a href="/reagents/antibodies.html">Antibodies &amp; Probes</a>
+      <a href="/reagents/homemade-plasmids.html">Homemade Plasmids</a>
+      <a href="/reagents/addgene-plasmids.html">Addgene Plasmids</a>
+      <a href="/reagents/cell-lines.html">Cell Lines</a>
+      <a href="/reagents/liquid-nitrogen.html">Liquid Nitrogen</a>
+    </div>
+  </div>
+  <div class="nav-item"><a class="nav-link active" href="/apps.html">Lab Apps</a></div>
+  <div class="nav-item"><a class="nav-link" href="/calculators.html">Calculators</a></div>
+</nav>
+
+<div class="page-title">
+  <h2>smiFISH / MERFISH Probe Designer</h2>
+  <p>On-the-fly probe design using the Oligostan algorithm &mdash; <a href="https://doi.org/10.1093/nar/gkw1198" target="_blank">Tsanov et al. 2016</a></p>
+</div>
+
+<div class="container">
+<div class="designer-grid">
+
+<!-- ══ LEFT PANEL: Input ══════════════════════════════════════════════════ -->
+<div>
+
+  <div class="panel">
+    <h3>1 &mdash; Sequence Source</h3>
+
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('gene')">Gene lookup</button>
+      <button class="tab" onclick="switchTab('paste')">Paste sequence</button>
+    </div>
+
+    <!-- Gene lookup -->
+    <div id="tab-gene">
+      <label>Species</label>
+      <select id="species">
+        <option value="homo_sapiens">Human (hg38 / GRCh38)</option>
+        <option value="mus_musculus">Mouse (mm10 / GRCm39)</option>
+      </select>
+
+      <label>Gene symbol</label>
+      <input type="text" id="gene-input" placeholder="e.g. ACTB, MYC, BRCA1"
+             onkeydown="if(event.key==='Enter') lookupGene()">
+
+      <label>Transcript region</label>
+      <select id="region">
+        <option value="cds">CDS (coding sequence)</option>
+        <option value="3prime_utr">3′ UTR</option>
+        <option value="cdna">Full mRNA (cDNA)</option>
+      </select>
+
+      <label>Transcript</label>
+      <div class="transcript-row">
+        <select id="transcript-select" disabled>
+          <option>— search a gene first —</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="lookupGene()" id="search-btn">Search</button>
+      </div>
+
+      <div class="status-bar" id="status-gene"></div>
+    </div>
+
+    <!-- Paste sequence -->
+    <div id="tab-paste" style="display:none">
+      <label>Paste DNA or RNA sequence (5′ → 3′, any case, spaces/newlines OK)</label>
+      <textarea id="paste-seq" rows="7" placeholder="ATGCATGCATGC..."></textarea>
+      <div class="status-bar" id="status-paste"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:1rem">
+    <h3>2 &mdash; Design Parameters</h3>
+
+    <label>Probe length (nt)</label>
+    <input type="number" id="probe-len" value="20" min="18" max="30">
+
+    <label>GC content (%)</label>
+    <div class="range-row">
+      <div><input type="number" id="gc-min" value="40" min="10" max="90" placeholder="Min"><span style="font-size:.75rem;color:#888">Min</span></div>
+      <div><input type="number" id="gc-max" value="60" min="10" max="90" placeholder="Max"><span style="font-size:.75rem;color:#888">Max</span></div>
+    </div>
+
+    <label>Melting temperature °C &nbsp;<span style="font-size:.75rem;color:#888">(300 mM NaCl)</span></label>
+    <div class="range-row">
+      <div><input type="number" id="tm-min" value="60" min="40" max="90" placeholder="Min"><span style="font-size:.75rem;color:#888">Min</span></div>
+      <div><input type="number" id="tm-max" value="72" min="40" max="90" placeholder="Max"><span style="font-size:.75rem;color:#888">Max</span></div>
+    </div>
+
+    <label>Max probes per gene</label>
+    <input type="number" id="max-probes" value="48" min="5" max="200">
+
+    <label>Min spacing between probes (nt)</label>
+    <input type="number" id="min-spacing" value="2" min="0" max="20">
+
+    <details style="margin-top:.9rem">
+      <summary>Readout (RO) handle sequences</summary>
+      <p style="font-size:.78rem;color:#666;margin:.5rem 0">Select RO sequences to append to probe 5′ and 3′ ends. All probes in a set use the same RO pair.</p>
+      <div class="ro-grid" id="ro-grid"></div>
+      <label style="margin-top:.6rem">5′ handle</label>
+      <select id="ro5"><option value="">None</option></select>
+      <label>3′ handle</label>
+      <select id="ro3"><option value="">None</option></select>
+    </details>
+  </div>
+
+  <button class="btn btn-primary" id="design-btn" onclick="runDesign()" disabled>
+    &#9875; Design Probes
+  </button>
+
+</div>
+
+<!-- ══ RIGHT PANEL: Results ═══════════════════════════════════════════════ -->
+<div id="results-panel" style="display:none">
+
+  <div class="panel">
+    <h3>Results</h3>
+
+    <div class="stat-chips" id="stat-chips"></div>
+
+    <div class="coverage-wrap">
+      <p style="font-size:.78rem;color:#666;margin:0 0 0.3rem">Probe coverage across sequence</p>
+      <div class="coverage-bar" id="coverage-bar"></div>
+    </div>
+
+    <div style="margin-top:.9rem; display:flex; flex-wrap:wrap; gap:.4rem; align-items:center">
+      <strong style="font-size:.85rem">Download:</strong>
+      <button class="btn btn-dl btn-sm" onclick="downloadProbes('fasta')">FASTA</button>
+      <button class="btn btn-dl btn-sm" onclick="downloadProbes('tsv')">TSV table</button>
+      <button class="btn btn-dl btn-sm" onclick="downloadProbes('order')">Plate order format</button>
+    </div>
+
+    <div class="probe-table-wrap">
+      <table class="probe-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Position</th>
+            <th>Probe sequence (5′→3′)</th>
+            <th>GC%</th>
+            <th>Tm °C</th>
+          </tr>
+        </thead>
+        <tbody id="probe-tbody"></tbody>
+      </table>
+    </div>
+
+    <p style="font-size:.75rem;color:#888;margin:.6rem 0 0">
+      Probes are antisense to the input sequence (hybridise directly to mRNA).
+      Tm calculated with SantaLucia 1998 nearest-neighbour parameters, 300 mM NaCl.
+    </p>
+  </div>
+
+  <div class="panel" style="margin-top:1rem">
+    <h3>Ordering Tips</h3>
+    <ul style="font-size:.82rem;line-height:1.6;margin:.4rem 0;padding-left:1.2rem">
+      <li>Order as standard desalted DNA oligos, 25 nmol scale.</li>
+      <li>For &lt;20 probes use IDT or Sigma individual oligo ordering.</li>
+      <li>For &ge;20 probes use IDT plate format (save ~70% cost).</li>
+      <li>RO readout probes labelled with Cy3/Cy5 can be purchased from IDT or synthesised in-house.</li>
+      <li>See <a href="https://doi.org/10.1093/nar/gkw1198" target="_blank">Tsanov et al. 2016</a> for full smiFISH protocol.</li>
+    </ul>
+  </div>
+
+</div><!-- /results-panel -->
+</div><!-- /designer-grid -->
+</div><!-- /container -->
+
+<footer>Jeet Biswas &bull; MSKCC &bull;
+  <a href="https://scholar.google.com/citations?user=l0q1H94AAAAJ" target="_blank">Google Scholar</a> &bull;
+  <a href="/contact.html">Contact</a>
+</footer>
+
+<script>
+'use strict';
+
+// ── Readout sequences (Tsanov 2016 / lab standard) ────────────────────────
+const READOUT_SEQS = {
+  RO1: 'ATACTGGAGCGACGCGTGAT',
+  RO2: 'GTTTGAAGATTCGACCTGGA',
+  RO3: 'CTGCAGGTCGACTCTAGAAA',
+  RO4: 'CTAAGGTACCTAATTGCCTAG',
+  RO5: 'CAGTATTCCCGGGTTCATTAG',
+  RO6: 'GTACCGTAGGATCTGATGAA',
+};
+
+// ── SantaLucia 1998 nearest-neighbour parameters (DNA/DNA) ────────────────
+// [ΔH kcal/mol, ΔS cal/mol/K]
+const NN = {
+  AA:[-7.9,-22.2], TT:[-7.9,-22.2],
+  AT:[-7.2,-20.4], TA:[-7.2,-21.3],
+  CA:[-8.5,-22.7], TG:[-8.5,-22.7],
+  GT:[-8.4,-22.4], AC:[-8.4,-22.4],
+  CT:[-7.8,-21.0], AG:[-7.8,-21.0],
+  GA:[-8.2,-22.2], TC:[-8.2,-22.2],
+  CG:[-10.6,-27.2], GC:[-9.8,-24.4],
+  GG:[-8.0,-19.9], CC:[-8.0,-19.9],
+};
+// Initiation
+const INIT_AT = {dH:2.3, dS:4.1};
+const INIT_GC = {dH:0.1, dS:-2.8};
+
+function calcTm(seq) {
+  // Strand concentration: 250 nM (typical oligo ordering concentration used for Tm comparison)
+  const CT = 250e-9;
+  const R  = 1.987; // cal/mol/K
+  let dH = 0, dS = 0;
+
+  // Initiation (both termini)
+  const ends = [seq[0], seq[seq.length-1]];
+  for (const b of ends) {
+    const init = 'GC'.includes(b) ? INIT_GC : INIT_AT;
+    dH += init.dH; dS += init.dS;
+  }
+
+  // Nearest-neighbour sum (5'→3' on probe strand)
+  for (let i = 0; i < seq.length - 1; i++) {
+    const pair = seq[i] + seq[i+1];
+    const nn = NN[pair];
+    if (nn) { dH += nn[0]; dS += nn[1]; }
+  }
+
+  // Tm in 1 M NaCl
+  const tmK = (dH * 1000) / (dS + R * Math.log(CT / 4));
+  const tm1M = tmK - 273.15;
+
+  // Salt correction to 300 mM NaCl (Owczarzy simplified)
+  return tm1M + 16.6 * Math.log10(0.3);
+}
+
+function revComp(seq) {
+  const comp = {A:'T',T:'A',G:'C',C:'G',N:'N'};
+  return seq.toUpperCase().split('').reverse().map(b => comp[b] || 'N').join('');
+}
+
+function gcPct(seq) {
+  const gc = (seq.match(/[GC]/gi) || []).length;
+  return (gc / seq.length) * 100;
+}
+
+// ── Oligostan-inspired probe design ───────────────────────────────────────
+function designProbes(seq, params) {
+  const { probeLen, gcMin, gcMax, tmMin, tmMax, maxProbes, minSpacing } = params;
+
+  // Normalise sequence
+  const s = seq.toUpperCase().replace(/[^ATGCN]/g, '').replace(/U/g, 'T');
+  if (s.length < probeLen) return { error: `Sequence too short (${s.length} nt < probe length ${probeLen} nt)` };
+
+  const candidates = [];
+
+  for (let i = 0; i <= s.length - probeLen; i++) {
+    const win = s.slice(i, i + probeLen);
+
+    // Skip ambiguous positions
+    if (win.includes('N')) continue;
+
+    // GC filter
+    const gc = gcPct(win);
+    if (gc < gcMin || gc > gcMax) continue;
+
+    // Homopolymer filter: no run of ≥5 identical bases
+    if (/(.)\1{4,}/.test(win)) continue;
+
+    // Probe is antisense → reverse complement of mRNA window
+    const probe = revComp(win);
+
+    // Tm filter (on probe sequence — it's the oligo we're ordering)
+    const tm = calcTm(probe);
+    if (tm < tmMin || tm > tmMax) continue;
+
+    candidates.push({ pos: i, win, probe, gc: Math.round(gc * 10) / 10, tm: Math.round(tm * 10) / 10 });
+  }
+
+  if (candidates.length === 0) {
+    return { error: 'No probes passed all filters. Try relaxing GC% or Tm range.' };
+  }
+
+  // Greedy maximal spacing selection
+  const selected = [];
+  let lastEnd = -Infinity;
+
+  for (const c of candidates) {
+    if (c.pos >= lastEnd + minSpacing) {
+      selected.push(c);
+      lastEnd = c.pos + probeLen;
+      if (selected.length >= maxProbes) break;
+    }
+  }
+
+  return { probes: selected, seqLen: s.length, nCandidates: candidates.length };
+}
+
+// ── Ensembl REST API ───────────────────────────────────────────────────────
+const ENSEMBL = 'https://rest.ensembl.org';
+
+async function ensemblFetch(url) {
+  const r = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => r.statusText);
+    throw new Error(`Ensembl API error ${r.status}: ${txt.slice(0, 120)}`);
+  }
+  return r.json();
+}
+
+let geneTranscripts = []; // populated by lookupGene
+
+async function lookupGene() {
+  const gene    = document.getElementById('gene-input').value.trim();
+  const species = document.getElementById('species').value;
+  if (!gene) return;
+
+  setStatus('status-gene', 'info', `Looking up ${gene} in Ensembl…`);
+  document.getElementById('design-btn').disabled = true;
+  document.getElementById('search-btn').disabled = true;
+
+  try {
+    // 1. Look up gene
+    const data = await ensemblFetch(
+      `${ENSEMBL}/lookup/symbol/${species}/${gene}?expand=1`
+    );
+
+    if (data.error) throw new Error(data.error);
+
+    // 2. Collect protein-coding transcripts (prefer canonical)
+    const txs = (data.Transcript || [])
+      .filter(t => t.biotype === 'protein_coding')
+      .sort((a, b) => (b.is_canonical || 0) - (a.is_canonical || 0));
+
+    if (txs.length === 0) throw new Error('No protein-coding transcripts found for ' + gene);
+
+    geneTranscripts = txs;
+
+    // 3. Populate transcript selector
+    const sel = document.getElementById('transcript-select');
+    sel.innerHTML = '';
+    txs.forEach((t, i) => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `${t.id}${t.is_canonical ? ' ★' : ''} (${t.length} nt)`;
+      sel.appendChild(opt);
+    });
+    sel.disabled = false;
+
+    setStatus('status-gene', 'ok',
+      `Found ${txs.length} protein-coding transcript${txs.length > 1 ? 's' : ''} for ${data.display_name || gene}. ★ = canonical.`);
+    document.getElementById('design-btn').disabled = false;
+
+  } catch(e) {
+    setStatus('status-gene', 'error', e.message);
+  } finally {
+    document.getElementById('search-btn').disabled = false;
+  }
+}
+
+async function fetchSequence() {
+  const mode = document.querySelector('.tab.active').dataset.tab;
+
+  if (mode === 'paste') {
+    const raw = document.getElementById('paste-seq').value;
+    const seq = raw.toUpperCase().replace(/[^ATGCUN\s]/g, '').replace(/\s/g, '').replace(/U/g,'T');
+    if (seq.length < 50) throw new Error('Sequence too short (< 50 nt). Please paste at least 50 nt.');
+    setStatus('status-paste', 'ok', `Loaded ${seq.length.toLocaleString()} nt from pasted sequence.`);
+    return seq;
+  }
+
+  // Gene mode
+  const txId  = document.getElementById('transcript-select').value;
+  const region = document.getElementById('region').value;
+  if (!txId || txId === '— search a gene first —') throw new Error('Search and select a gene first.');
+
+  setStatus('status-gene', 'info', `Fetching ${region} sequence for ${txId}…`);
+
+  const data = await ensemblFetch(
+    `${ENSEMBL}/sequence/id/${txId}?type=${region}&object_type=transcript`
+  );
+
+  if (!data.seq) throw new Error('No sequence returned from Ensembl for ' + region);
+  setStatus('status-gene', 'ok', `Loaded ${data.seq.length.toLocaleString()} nt (${region}) from Ensembl.`);
+  return data.seq;
+}
+
+// ── Main design runner ─────────────────────────────────────────────────────
+let lastResult = null;
+let lastGeneName = '';
+
+async function runDesign() {
+  document.getElementById('design-btn').disabled = true;
+  document.getElementById('results-panel').style.display = 'none';
+
+  try {
+    const seq = await fetchSequence();
+
+    const params = {
+      probeLen:   parseInt(document.getElementById('probe-len').value) || 20,
+      gcMin:      parseFloat(document.getElementById('gc-min').value) || 40,
+      gcMax:      parseFloat(document.getElementById('gc-max').value) || 60,
+      tmMin:      parseFloat(document.getElementById('tm-min').value) || 60,
+      tmMax:      parseFloat(document.getElementById('tm-max').value) || 72,
+      maxProbes:  parseInt(document.getElementById('max-probes').value) || 48,
+      minSpacing: parseInt(document.getElementById('min-spacing').value) || 2,
+    };
+
+    const result = designProbes(seq, params);
+    if (result.error) throw new Error(result.error);
+
+    lastResult = result;
+    lastGeneName = document.getElementById('gene-input').value.trim() ||
+                   document.getElementById('transcript-select').value || 'custom';
+
+    renderResults(result, seq.length, params);
+
+  } catch(e) {
+    const mode = document.querySelector('.tab.active').dataset.tab;
+    setStatus(mode === 'paste' ? 'status-paste' : 'status-gene', 'error', e.message);
+  } finally {
+    document.getElementById('design-btn').disabled = false;
+  }
+}
+
+function renderResults(result, seqLen, params) {
+  const { probes, nCandidates } = result;
+  const tms = probes.map(p => p.tm);
+  const gcs = probes.map(p => p.gc);
+
+  // Stat chips
+  document.getElementById('stat-chips').innerHTML = [
+    `<span class="chip"><strong>${probes.length}</strong> probes</span>`,
+    `<span class="chip">from <strong>${nCandidates}</strong> candidates</span>`,
+    `<span class="chip">Tm <strong>${Math.min(...tms).toFixed(1)}–${Math.max(...tms).toFixed(1)} °C</strong></span>`,
+    `<span class="chip">GC <strong>${Math.min(...gcs).toFixed(0)}–${Math.max(...gcs).toFixed(0)}%</strong></span>`,
+    `<span class="chip">Sequence <strong>${seqLen.toLocaleString()} nt</strong></span>`,
+  ].join('');
+
+  // Coverage bar
+  const bar = document.getElementById('coverage-bar');
+  bar.innerHTML = '';
+  bar.style.position = 'relative';
+  probes.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'coverage-probe';
+    div.style.left  = (p.pos / seqLen * 100) + '%';
+    div.style.width = (params.probeLen / seqLen * 100) + '%';
+    div.title = `#${probes.indexOf(p)+1} pos ${p.pos}`;
+    bar.appendChild(div);
+  });
+
+  // Table
+  const tbody = document.getElementById('probe-tbody');
+  tbody.innerHTML = '';
+  probes.forEach((p, i) => {
+    const gcClass = p.gc < 42 ? 'gc-low' : p.gc > 58 ? 'gc-high' : 'gc-mid';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${i+1}</td>` +
+      `<td>${p.pos}–${p.pos + params.probeLen - 1}</td>` +
+      `<td class="seq">${p.probe}</td>` +
+      `<td class="${gcClass}">${p.gc.toFixed(1)}</td>` +
+      `<td>${p.tm.toFixed(1)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('results-panel').style.display = 'block';
+  document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Downloads ──────────────────────────────────────────────────────────────
+function getHandles() {
+  const ro5name = document.getElementById('ro5').value;
+  const ro3name = document.getElementById('ro3').value;
+  return {
+    h5: ro5name ? READOUT_SEQS[ro5name] : '',
+    h3: ro3name ? READOUT_SEQS[ro3name] : '',
+    ro5name, ro3name,
+  };
+}
+
+function downloadProbes(fmt) {
+  if (!lastResult || !lastResult.probes) return;
+  const { probes } = lastResult;
+  const { h5, h3, ro5name, ro3name } = getHandles();
+  const gene = lastGeneName.replace(/\s+/g,'_');
+  let content = '', mime = 'text/plain', ext = 'txt';
+
+  if (fmt === 'fasta') {
+    content = probes.map((p, i) => {
+      const fullSeq = h5 + p.probe + h3;
+      return `>${gene}_probe_${i+1} pos=${p.pos} gc=${p.gc.toFixed(1)}% tm=${p.tm.toFixed(1)}C\n${fullSeq}`;
+    }).join('\n');
+    ext = 'fasta';
+
+  } else if (fmt === 'tsv') {
+    const header = ['#', 'Position', 'Probe_seq', 'Full_oligo', 'GC_pct', 'Tm_C', '5prime_RO', '3prime_RO'];
+    const rows = probes.map((p, i) => [
+      i+1, p.pos, p.probe, h5+p.probe+h3,
+      p.gc.toFixed(1), p.tm.toFixed(1), ro5name || '', ro3name || ''
+    ]);
+    content = [header, ...rows].map(r => r.join('\t')).join('\n');
+    mime = 'text/tab-separated-values';
+    ext = 'tsv';
+
+  } else if (fmt === 'order') {
+    // Plate order format: Name \t Sequence (no header, ready for IDT bulk upload)
+    content = probes.map((p, i) => {
+      const fullSeq = h5 + p.probe + h3;
+      return `${gene}_probe_${String(i+1).padStart(3,'0')}\t${fullSeq}`;
+    }).join('\n');
+    ext = 'txt';
+  }
+
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${gene}_smiFISH_probes.${ext}`;
+  a.click();
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  event.target.dataset.tab = tab;
+  document.getElementById('tab-gene').style.display  = tab === 'gene'  ? '' : 'none';
+  document.getElementById('tab-paste').style.display = tab === 'paste' ? '' : 'none';
+  if (tab === 'paste') document.getElementById('design-btn').disabled = false;
+}
+
+// Fix tab dataset on load
+document.querySelectorAll('.tab').forEach((t, i) => t.dataset.tab = i === 0 ? 'gene' : 'paste');
+
+function setStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = `status-bar show ${type}`;
+  el.textContent = msg;
+}
+
+// ── Populate RO selectors ──────────────────────────────────────────────────
+function buildROSelectors() {
+  const sel5 = document.getElementById('ro5');
+  const sel3 = document.getElementById('ro3');
+  sel5.innerHTML = '<option value="">None</option>';
+  sel3.innerHTML = '<option value="">None</option>';
+
+  Object.entries(READOUT_SEQS).forEach(([name, seq]) => {
+    const label = `${name} — ${seq}`;
+    [sel5, sel3].forEach(s => {
+      const o = document.createElement('option');
+      o.value = name;
+      o.textContent = label;
+      s.appendChild(o);
+    });
+  });
+
+  // Default to RO1 on both ends
+  sel5.value = 'RO1';
+  sel3.value = 'RO1';
+}
+
+buildROSelectors();
+</script>
+</body>
+</html>
