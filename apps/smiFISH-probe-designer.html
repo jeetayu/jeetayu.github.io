@@ -109,7 +109,7 @@
 .chip strong { color: var(--accent, #3a6ea5); }
 
 /* ── Probe table ─────────────────────────────────────────────────────────── */
-.probe-table-wrap { max-height: 480px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 0.75rem; }
+.probe-table-wrap { max-height: 480px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 0.75rem; }
 table.probe-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 .probe-table th { background: #2c3e50; color: #fff; padding: 0.5rem 0.6rem; position: sticky; top: 0; text-align: left; white-space: nowrap; }
 .probe-table td { padding: 0.35rem 0.6rem; border-bottom: 1px solid #eee; font-family: monospace; }
@@ -193,7 +193,7 @@ details[open] summary { color: var(--accent, #3a6ea5); }
 
 <div class="page-title">
   <h2>smiFISH / MERFISH Probe Designer</h2>
-  <p>On-the-fly probe design using the Oligostan algorithm &mdash; <a href="https://pubmed.ncbi.nlm.nih.gov/27599845/" target="_blank">Tsanov et al. 2016</a></p>
+  <p>On-the-fly probe design using the Oligostan algorithm (GC/Tm &plus; repeat/complexity &plus; secondary-structure &plus; specificity filtering) &mdash; <a href="https://pubmed.ncbi.nlm.nih.gov/27599845/" target="_blank">Tsanov et al. 2016</a></p>
 </div>
 
 <div class="container">
@@ -272,6 +272,36 @@ details[open] summary { color: var(--accent, #3a6ea5); }
     <label>Min spacing between probes (nt)</label>
     <input type="number" id="min-spacing" value="2" min="0" max="20">
 
+    <details style="margin-top:.9rem" open>
+      <summary>Repeat / low-complexity masking</summary>
+      <p style="font-size:.78rem;color:#666;margin:.5rem 0">
+        Rejects candidate windows that look like simple tandem repeats or low-complexity
+        sequence (DUST-style triplet-frequency score). This is a lightweight in-browser
+        approximation of RepeatMasker &mdash; it catches homopolymers and simple/tandem
+        repeats but <em>not</em> interspersed repeats (Alu/LINE/SINE), which need a real
+        repeat database. For intronic probes crossing repeat-rich sequence, cross-check
+        candidates against the UCSC RepeatMasker track before ordering.
+      </p>
+      <label><input type="checkbox" id="dust-enabled" checked style="width:auto;margin-right:.4rem">Enable complexity filter</label>
+      <label>Max DUST score &nbsp;<span style="font-size:.75rem;color:#888">(higher = stricter; ~0&ndash;1 typical random 20mer, &gt;2 &asymp; simple repeat)</span></label>
+      <input type="number" id="dust-max" value="1.5" min="0" max="20" step="0.1">
+    </details>
+
+    <details style="margin-top:.6rem" open>
+      <summary>Secondary structure (hairpin &Delta;G)</summary>
+      <p style="font-size:.78rem;color:#666;margin:.5rem 0">
+        Scans each probe for self-complementary stem-loops and estimates hairpin &Delta;G at
+        37&deg;C using the same nearest-neighbour table as the Tm calculation, plus an
+        approximate loop-initiation penalty (SantaLucia &amp; Hicks 2004). This is a
+        simplified two-state estimate, not a full partition-function fold
+        (mfold/OligoArrayAux/UNAFold) &mdash; treat borderline probes as flagged for manual
+        follow-up, not automatically safe.
+      </p>
+      <label><input type="checkbox" id="hairpin-enabled" checked style="width:auto;margin-right:.4rem">Enable hairpin filter</label>
+      <label>Max hairpin stability &nbsp;<span style="font-size:.75rem;color:#888">(kcal/mol; probes more negative/stable than this are rejected)</span></label>
+      <input type="number" id="hairpin-max" value="-3" max="0" step="0.5">
+    </details>
+
     <details style="margin-top:.9rem">
       <summary>Readout (RO) handle sequences</summary>
       <p style="font-size:.78rem;color:#666;margin:.5rem 0">Select RO sequences to append to probe 5′ and 3′ ends. All probes in a set use the same RO pair.</p>
@@ -281,6 +311,40 @@ details[open] summary { color: var(--accent, #3a6ea5); }
       <label>3′ handle</label>
       <select id="ro3"><option value="">None</option></select>
     </details>
+  </div>
+
+  <div class="panel" style="margin-top:1rem">
+    <h3>3 &mdash; Specificity / Off-target Screen</h3>
+    <p style="font-size:.78rem;color:#666;margin:.3rem 0 .8rem">
+      The <strong>local search</strong> step Oligostan normally does with BLAST. Each
+      candidate probe's target window is compared against background sequence(s) by
+      sliding-window identity; probes that closely match a background sequence are flagged
+      as likely cross-hybridising and excluded by default. This does not replace a full
+      transcriptome BLAST/Bowtie search before ordering, but it catches the single most
+      common failure mode for paralogue-rich gene families (e.g. X&ndash;Y gametologs): a
+      probe that looks perfect in isolation but also binds a near-identical paralogue
+      transcript.
+    </p>
+
+    <label><input type="checkbox" id="specificity-enabled" checked style="width:auto;margin-right:.4rem">Enable specificity screen</label>
+
+    <label style="margin-top:.7rem">
+      <input type="checkbox" id="auto-paralogs" checked style="width:auto;margin-right:.4rem">
+      Auto-fetch paralogue sequence(s) from Ensembl <span style="font-size:.75rem;color:#888">(gene-lookup mode only)</span>
+    </label>
+
+    <label>Additional background / off-target sequence(s) <span style="font-size:.75rem;color:#888">(optional &mdash; paste raw or multi-FASTA)</span></label>
+    <textarea id="background-seq" rows="4" placeholder="Optional: paste one or more off-target sequences (e.g. other paralogues, ampliconic copies, or a transcriptome subset) as FASTA or raw text"></textarea>
+
+    <label>Identity threshold (%) <span style="font-size:.75rem;color:#888">over full probe length</span></label>
+    <input type="number" id="offtarget-threshold" value="85" min="50" max="100">
+
+    <label style="margin-top:.7rem">
+      <input type="checkbox" id="offtarget-exclude" checked style="width:auto;margin-right:.4rem">
+      Exclude flagged probes from final set <span style="font-size:.75rem;color:#888">(uncheck to keep them, marked in red)</span>
+    </label>
+
+    <div class="status-bar" id="status-specificity"></div>
   </div>
 
   <button class="btn btn-primary" id="design-btn" onclick="runDesign()" disabled>
@@ -318,6 +382,8 @@ details[open] summary { color: var(--accent, #3a6ea5); }
             <th>Probe sequence (5′→3′)</th>
             <th>GC%</th>
             <th>Tm °C</th>
+            <th>Hairpin ΔG</th>
+            <th>Off-target</th>
           </tr>
         </thead>
         <tbody id="probe-tbody"></tbody>
@@ -326,7 +392,13 @@ details[open] summary { color: var(--accent, #3a6ea5); }
 
     <p style="font-size:.75rem;color:#888;margin:.6rem 0 0">
       Probes are antisense to the input sequence (hybridise directly to mRNA).
-      Tm calculated with SantaLucia 1998 nearest-neighbour parameters, 300 mM NaCl.
+      Tm via SantaLucia 1998 NN parameters (300&nbsp;mM NaCl); hairpin &Delta;G via the same
+      NN table plus an approximate loop-initiation penalty (SantaLucia &amp; Hicks 2004) &mdash;
+      a simplified two-state estimate, not a full fold. The complexity filter is a DUST-style
+      approximation of RepeatMasker (simple/tandem repeats only, not interspersed repeats).
+      The specificity screen is a local sliding-window identity search against fetched
+      paralogue(s) and/or pasted background sequence(s) &mdash; rows highlighted in red were
+      flagged as possible cross-hybridisers (shown if "Exclude flagged probes" was unchecked).
     </p>
   </div>
 
@@ -337,6 +409,7 @@ details[open] summary { color: var(--accent, #3a6ea5); }
       <li>For &lt;20 probes use IDT or Sigma individual oligo ordering.</li>
       <li>For &ge;20 probes use IDT plate format (save ~70% cost).</li>
       <li>RO readout probes labelled with Cy3/Cy5 can be purchased from IDT or synthesised in-house.</li>
+      <li>Before ordering, run flagged/borderline probes through a real transcriptome BLAST/Bowtie search (this tool's specificity screen only checks fetched paralogues + any pasted background, not the whole transcriptome/genome) and a full fold predictor (mfold/OligoArrayAux/IDT OligoAnalyzer) to confirm the hairpin call.</li>
       <li>See <a href="https://pubmed.ncbi.nlm.nih.gov/27599845/" target="_blank">Tsanov et al. 2016</a> for full smiFISH protocol.</li>
     </ul>
   </div>
@@ -417,28 +490,134 @@ function gcPct(seq) {
   return (gc / seq.length) * 100;
 }
 
+// ── Repeat / low-complexity masking (DUST-style) ───────────────────────────
+// Approximates NCBI DUST / RepeatMasker "simple repeat" masking for short
+// windows: score = Σ C(triplet_count, 2) / (n_triplets − 1). Homopolymers and
+// di/tri-nucleotide tandem repeats score high; near-random sequence scores
+// low. This does NOT catch interspersed repeats (Alu/LINE/SINE) — those need
+// an external repeat database, which isn't available client-side.
+function dustScore(seq) {
+  const L = seq.length;
+  if (L < 3) return 0;
+  const counts = {};
+  for (let i = 0; i <= L - 3; i++) {
+    const t = seq.substr(i, 3);
+    counts[t] = (counts[t] || 0) + 1;
+  }
+  const nTriplets = L - 2;
+  let sum = 0;
+  for (const k in counts) { const c = counts[k]; sum += c * (c - 1) / 2; }
+  return nTriplets > 1 ? sum / (nTriplets - 1) : 0;
+}
+
+// ── Secondary structure: approximate hairpin ΔG at 37°C ────────────────────
+// Simplified two-state estimate — brute-force search for the most stable
+// self-complementary stem-loop within the probe, using the same
+// nearest-neighbour table as Tm plus a loop-initiation penalty (SantaLucia &
+// Hicks 2004 hairpin loop ΔG37 table, extrapolated for loops >10 nt via the
+// standard Jacobson-Stockmayer log-length correction). This is NOT a full
+// partition-function fold (mfold/OligoArrayAux/UNAFold) — treat it as a
+// screening heuristic, not a final answer.
+const LOOP_DG37 = {3:3.5, 4:3.5, 5:3.3, 6:4.0, 7:4.2, 8:4.3, 9:4.5, 10:4.6};
+function loopPenalty(loopLen) {
+  if (LOOP_DG37[loopLen] !== undefined) return LOOP_DG37[loopLen];
+  if (loopLen > 10) {
+    const R = 1.987, T = 310.15;
+    return LOOP_DG37[10] + (1.75 * R * T / 1000) * Math.log(loopLen / 10);
+  }
+  return 6.0; // loops <3 nt are sterically disallowed — heavy penalty
+}
+
+function stemDG(arm5) {
+  const T = 310.15;
+  let dH = 0, dS = 0;
+  for (const b of [arm5[0], arm5[arm5.length - 1]]) {
+    const init = 'GC'.includes(b) ? INIT_GC : INIT_AT;
+    dH += init.dH; dS += init.dS;
+  }
+  for (let i = 0; i < arm5.length - 1; i++) {
+    const nn = NN[arm5.slice(i, i + 2)];
+    if (nn) { dH += nn[0]; dS += nn[1]; }
+  }
+  return dH - T * dS / 1000;
+}
+
+function hairpinDeltaG(probe, minStem = 4, minLoop = 3) {
+  const n = probe.length;
+  let best = 0; // 0 = no self-structure found (most favourable baseline)
+  const maxStem = Math.floor((n - minLoop) / 2);
+  for (let stemLen = minStem; stemLen <= maxStem; stemLen++) {
+    for (let i = 0; i <= n - stemLen; i++) {
+      const arm5 = probe.slice(i, i + stemLen);
+      const jMin = i + stemLen + minLoop;
+      for (let j = jMin; j <= n - stemLen; j++) {
+        const arm3 = probe.slice(j, j + stemLen);
+        if (revComp(arm5) === arm3) {
+          const dG = stemDG(arm5) + loopPenalty(j - (i + stemLen));
+          if (dG < best) best = dG;
+        }
+      }
+    }
+  }
+  return Math.round(best * 100) / 100;
+}
+
+// ── Specificity / off-target "local search" ─────────────────────────────────
+// Slides the candidate's SENSE target window across each background sequence
+// and reports the best (highest-identity) hit. If a probe's target window is
+// near-identical to a stretch of a background sequence (e.g. an X-paralogue
+// transcript), the probe — being the reverse complement of that window — will
+// hybridise there too. This is a plain sliding-window identity scan, not a
+// gapped local alignment/BLAST, so it will miss indel-mediated homology; it
+// catches the dominant real-world case (near-identical paralogue exons).
+function maxOffTargetIdentity(win, backgroundSeqs) {
+  let best = 0, bestName = null;
+  for (const bg of backgroundSeqs) {
+    const seq = bg.seq;
+    for (let i = 0; i <= seq.length - win.length; i++) {
+      let match = 0;
+      for (let k = 0; k < win.length; k++) if (seq[i + k] === win[k]) match++;
+      const pct = 100 * match / win.length;
+      if (pct > best) { best = pct; bestName = bg.name; }
+    }
+  }
+  return { pct: Math.round(best * 10) / 10, name: bestName };
+}
+
 // ── Oligostan-inspired probe design ───────────────────────────────────────
-function designProbes(seq, params) {
-  const { probeLen, gcMin, gcMax, tmMin, tmMax, maxProbes, minSpacing } = params;
+function designProbes(seq, params, backgroundSeqs) {
+  const {
+    probeLen, gcMin, gcMax, tmMin, tmMax, maxProbes, minSpacing,
+    dustEnabled, dustMax,
+    hairpinEnabled, hairpinMax,
+    specificityEnabled, offtargetThreshold, offtargetExclude,
+  } = params;
 
   // Normalise sequence
   const s = seq.toUpperCase().replace(/[^ATGCN]/g, '').replace(/U/g, 'T');
   if (s.length < probeLen) return { error: `Sequence too short (${s.length} nt < probe length ${probeLen} nt)` };
 
-  const candidates = [];
+  const funnel = { windows: 0, passComplexity: 0, passGcTm: 0, passHairpin: 0, passSpecificity: 0 };
+  let candidates = [];
 
   for (let i = 0; i <= s.length - probeLen; i++) {
     const win = s.slice(i, i + probeLen);
 
     // Skip ambiguous positions
     if (win.includes('N')) continue;
+    funnel.windows++;
+
+    // Homopolymer filter: no run of ≥5 identical bases
+    if (/(.)\1{4,}/.test(win)) continue;
+
+    // Repeat / low-complexity filter (DUST-style)
+    const dust = dustScore(win);
+    if (dustEnabled && dust > dustMax) continue;
+    funnel.passComplexity++;
 
     // GC filter
     const gc = gcPct(win);
     if (gc < gcMin || gc > gcMax) continue;
-
-    // Homopolymer filter: no run of ≥5 identical bases
-    if (/(.)\1{4,}/.test(win)) continue;
 
     // Probe is antisense → reverse complement of mRNA window
     const probe = revComp(win);
@@ -446,12 +625,43 @@ function designProbes(seq, params) {
     // Tm filter (on probe sequence — it's the oligo we're ordering)
     const tm = calcTm(probe);
     if (tm < tmMin || tm > tmMax) continue;
+    funnel.passGcTm++;
 
-    candidates.push({ pos: i, win, probe, gc: Math.round(gc * 10) / 10, tm: Math.round(tm * 10) / 10 });
+    // Secondary structure (hairpin ΔG) filter
+    const hairpin = hairpinEnabled ? hairpinDeltaG(probe) : null;
+    if (hairpinEnabled && hairpin < hairpinMax) continue;
+    funnel.passHairpin++;
+
+    candidates.push({
+      pos: i, win, probe,
+      gc: Math.round(gc * 10) / 10, tm: Math.round(tm * 10) / 10,
+      dust: Math.round(dust * 100) / 100, hairpin,
+      offtargetPct: null, offtargetName: null, flagged: false,
+    });
   }
 
   if (candidates.length === 0) {
-    return { error: 'No probes passed all filters. Try relaxing GC% or Tm range.' };
+    return { error: 'No probes passed all filters. Try relaxing GC%, Tm, complexity, or hairpin thresholds.', funnel };
+  }
+
+  // Specificity / off-target local search — runs only on the already-filtered
+  // pool (cheap: tens–hundreds of candidates × a few kb of background).
+  if (specificityEnabled && backgroundSeqs && backgroundSeqs.length) {
+    for (const c of candidates) {
+      const r = maxOffTargetIdentity(c.win, backgroundSeqs);
+      c.offtargetPct = r.pct;
+      c.offtargetName = r.name;
+      c.flagged = r.pct >= offtargetThreshold;
+    }
+    if (offtargetExclude) candidates = candidates.filter(c => !c.flagged);
+  }
+  funnel.passSpecificity = candidates.length;
+
+  if (candidates.length === 0) {
+    return {
+      error: 'All candidates were flagged as cross-hybridising to a background sequence. Try relaxing the identity threshold or unchecking "Exclude flagged probes".',
+      funnel,
+    };
   }
 
   // Greedy maximal spacing selection
@@ -466,7 +676,7 @@ function designProbes(seq, params) {
     }
   }
 
-  return { probes: selected, seqLen: s.length, nCandidates: candidates.length };
+  return { probes: selected, seqLen: s.length, nCandidates: candidates.length, funnel };
 }
 
 // ── Ensembl REST API ───────────────────────────────────────────────────────
@@ -482,6 +692,8 @@ async function ensemblFetch(url) {
 }
 
 let geneTranscripts = []; // populated by lookupGene
+let lastGeneEnsemblId = null; // populated by lookupGene — used for paralogue auto-fetch
+let lastGeneSpecies = 'homo_sapiens';
 
 async function lookupGene() {
   const gene    = document.getElementById('gene-input').value.trim();
@@ -499,6 +711,9 @@ async function lookupGene() {
     );
 
     if (data.error) throw new Error(data.error);
+
+    lastGeneEnsemblId = data.id;
+    lastGeneSpecies = species;
 
     // 2. Collect protein-coding transcripts (prefer canonical)
     const txs = (data.Transcript || [])
@@ -558,6 +773,55 @@ async function fetchSequence() {
   return data.seq;
 }
 
+// ── Background sequence gathering for the specificity ("local search") screen ─
+function parseBackgroundInput(raw) {
+  if (!raw || !raw.trim()) return [];
+  const trimmed = raw.trim();
+  const seqs = [];
+  if (trimmed.startsWith('>')) {
+    const blocks = trimmed.split(/^>/m).filter(Boolean);
+    for (const b of blocks) {
+      const lines = b.split('\n');
+      const name = (lines[0] || 'pasted').trim() || 'pasted';
+      const seq = lines.slice(1).join('').toUpperCase().replace(/[^ATGCU]/g, '').replace(/U/g, 'T');
+      if (seq) seqs.push({ name, seq });
+    }
+  } else {
+    const seq = trimmed.toUpperCase().replace(/[^ATGCU]/g, '').replace(/U/g, 'T');
+    if (seq) seqs.push({ name: 'pasted_background', seq });
+  }
+  return seqs;
+}
+
+async function fetchParalogBackgrounds(geneId, species, statusEl) {
+  const backgrounds = [];
+  try {
+    const homData = await ensemblFetch(
+      `${ENSEMBL}/homology/id/${species}/${geneId}?type=paralogues;content-type=application/json`
+    );
+    const homologies = (homData.data && homData.data[0] && homData.data[0].homologies) || [];
+    const targets = homologies.slice(0, 5); // cap to avoid excessive API calls
+    for (const h of targets) {
+      const targetGeneId = h.target && h.target.id;
+      if (!targetGeneId) continue;
+      try {
+        const lookup = await ensemblFetch(`${ENSEMBL}/lookup/id/${targetGeneId}?content-type=application/json`);
+        const canonTxId = lookup.canonical_transcript ? lookup.canonical_transcript.split('.')[0] : null;
+        if (!canonTxId) continue;
+        const seqData = await ensemblFetch(`${ENSEMBL}/sequence/id/${canonTxId}?type=cdna;content-type=application/json`);
+        if (seqData.seq) {
+          const name = lookup.display_name || targetGeneId;
+          backgrounds.push({ name, seq: seqData.seq.toUpperCase().replace(/U/g, 'T') });
+          if (statusEl) setStatus(statusEl, 'info', `Fetched paralogue ${name} (${seqData.seq.length.toLocaleString()} nt) for specificity screen…`);
+        }
+      } catch (e) { /* skip this paralogue, keep going with the rest */ }
+    }
+  } catch (e) {
+    if (statusEl) setStatus(statusEl, 'warn', `Could not fetch paralogues from Ensembl (${e.message}). Specificity screen will use only pasted background sequences, if any.`);
+  }
+  return backgrounds;
+}
+
 // ── Main design runner ─────────────────────────────────────────────────────
 let lastResult = null;
 let lastGeneName = '';
@@ -565,6 +829,7 @@ let lastGeneName = '';
 async function runDesign() {
   document.getElementById('design-btn').disabled = true;
   document.getElementById('results-panel').style.display = 'none';
+  document.getElementById('status-specificity').className = 'status-bar';
 
   try {
     const seq = await fetchSequence();
@@ -577,9 +842,36 @@ async function runDesign() {
       tmMax:      parseFloat(document.getElementById('tm-max').value) || 72,
       maxProbes:  parseInt(document.getElementById('max-probes').value) || 48,
       minSpacing: parseInt(document.getElementById('min-spacing').value) || 2,
+      dustEnabled:        document.getElementById('dust-enabled').checked,
+      dustMax:            parseFloat(document.getElementById('dust-max').value),
+      hairpinEnabled:     document.getElementById('hairpin-enabled').checked,
+      hairpinMax:         parseFloat(document.getElementById('hairpin-max').value),
+      specificityEnabled: document.getElementById('specificity-enabled').checked,
+      offtargetThreshold: parseFloat(document.getElementById('offtarget-threshold').value) || 85,
+      offtargetExclude:   document.getElementById('offtarget-exclude').checked,
     };
 
-    const result = designProbes(seq, params);
+    // Gather background sequences for the specificity ("local search") screen
+    let backgroundSeqs = [];
+    if (params.specificityEnabled) {
+      backgroundSeqs = backgroundSeqs.concat(parseBackgroundInput(document.getElementById('background-seq').value));
+
+      const mode = document.querySelector('.tab.active').dataset.tab;
+      const autoParalogs = document.getElementById('auto-paralogs').checked;
+      if (mode === 'gene' && autoParalogs && lastGeneEnsemblId) {
+        setStatus('status-specificity', 'info', 'Fetching paralogue sequence(s) from Ensembl for specificity screen…');
+        const paralogs = await fetchParalogBackgrounds(lastGeneEnsemblId, lastGeneSpecies, 'status-specificity');
+        backgroundSeqs = backgroundSeqs.concat(paralogs);
+      }
+
+      if (backgroundSeqs.length === 0) {
+        setStatus('status-specificity', 'warn', 'No background sequences available (no paralogues found/fetched and none pasted) — specificity screen skipped for this run.');
+      } else {
+        setStatus('status-specificity', 'ok', `Specificity screen running against ${backgroundSeqs.length} background sequence(s): ${backgroundSeqs.map(b => b.name).join(', ')}.`);
+      }
+    }
+
+    const result = designProbes(seq, params, backgroundSeqs);
     if (result.error) throw new Error(result.error);
 
     lastResult = result;
@@ -597,18 +889,26 @@ async function runDesign() {
 }
 
 function renderResults(result, seqLen, params) {
-  const { probes, nCandidates } = result;
+  const { probes, nCandidates, funnel } = result;
   const tms = probes.map(p => p.tm);
   const gcs = probes.map(p => p.gc);
+  const nFlaggedKept = probes.filter(p => p.flagged).length;
 
   // Stat chips
-  document.getElementById('stat-chips').innerHTML = [
+  const chips = [
     `<span class="chip"><strong>${probes.length}</strong> probes</span>`,
-    `<span class="chip">from <strong>${nCandidates}</strong> candidates</span>`,
+    `<span class="chip">from <strong>${nCandidates}</strong> filtered candidates</span>`,
     `<span class="chip">Tm <strong>${Math.min(...tms).toFixed(1)}–${Math.max(...tms).toFixed(1)} °C</strong></span>`,
     `<span class="chip">GC <strong>${Math.min(...gcs).toFixed(0)}–${Math.max(...gcs).toFixed(0)}%</strong></span>`,
     `<span class="chip">Sequence <strong>${seqLen.toLocaleString()} nt</strong></span>`,
-  ].join('');
+  ];
+  if (funnel) {
+    chips.push(`<span class="chip">Funnel: <strong>${funnel.windows}</strong> windows → <strong>${funnel.passComplexity}</strong> pass complexity → <strong>${funnel.passGcTm}</strong> pass GC/Tm → <strong>${funnel.passHairpin}</strong> pass hairpin → <strong>${funnel.passSpecificity}</strong> pass specificity</span>`);
+  }
+  if (nFlaggedKept > 0) {
+    chips.push(`<span class="chip" style="background:#fde8e8;color:#a61a1a"><strong>${nFlaggedKept}</strong> kept probes flagged as possible off-target</span>`);
+  }
+  document.getElementById('stat-chips').innerHTML = chips.join('');
 
   // Coverage bar
   const bar = document.getElementById('coverage-bar');
@@ -617,6 +917,7 @@ function renderResults(result, seqLen, params) {
   probes.forEach(p => {
     const div = document.createElement('div');
     div.className = 'coverage-probe';
+    if (p.flagged) div.style.background = '#e74c3c';
     div.style.left  = (p.pos / seqLen * 100) + '%';
     div.style.width = (params.probeLen / seqLen * 100) + '%';
     div.title = `#${probes.indexOf(p)+1} pos ${p.pos}`;
@@ -628,13 +929,19 @@ function renderResults(result, seqLen, params) {
   tbody.innerHTML = '';
   probes.forEach((p, i) => {
     const gcClass = p.gc < 42 ? 'gc-low' : p.gc > 58 ? 'gc-high' : 'gc-mid';
+    const hairpinTxt = (p.hairpin === null || p.hairpin === undefined) ? '—' : p.hairpin.toFixed(2);
+    const offTxt = (p.offtargetPct === null || p.offtargetPct === undefined) ? '—' :
+      `${p.offtargetPct.toFixed(1)}%${p.offtargetName ? ' (' + p.offtargetName + ')' : ''}`;
     const tr = document.createElement('tr');
+    if (p.flagged) tr.style.background = '#fde8e8';
     tr.innerHTML =
       `<td>${i+1}</td>` +
       `<td>${p.pos}–${p.pos + params.probeLen - 1}</td>` +
       `<td class="seq">${p.probe}</td>` +
       `<td class="${gcClass}">${p.gc.toFixed(1)}</td>` +
-      `<td>${p.tm.toFixed(1)}</td>`;
+      `<td>${p.tm.toFixed(1)}</td>` +
+      `<td>${hairpinTxt}</td>` +
+      `<td>${offTxt}</td>`;
     tbody.appendChild(tr);
   });
 
@@ -663,15 +970,23 @@ function downloadProbes(fmt) {
   if (fmt === 'fasta') {
     content = probes.map((p, i) => {
       const fullSeq = h5 + p.probe + h3;
-      return `>${gene}_probe_${i+1} pos=${p.pos} gc=${p.gc.toFixed(1)}% tm=${p.tm.toFixed(1)}C\n${fullSeq}`;
+      const hairpinTxt = (p.hairpin === null || p.hairpin === undefined) ? 'NA' : p.hairpin;
+      const flagTxt = p.flagged ? ' FLAGGED_OFFTARGET' : '';
+      return `>${gene}_probe_${i+1} pos=${p.pos} gc=${p.gc.toFixed(1)}% tm=${p.tm.toFixed(1)}C hairpinDG=${hairpinTxt}${flagTxt}\n${fullSeq}`;
     }).join('\n');
     ext = 'fasta';
 
   } else if (fmt === 'tsv') {
-    const header = ['#', 'Position', 'Probe_seq', 'Full_oligo', 'GC_pct', 'Tm_C', '5prime_RO', '3prime_RO'];
+    const header = ['#', 'Position', 'Probe_seq', 'Full_oligo', 'GC_pct', 'Tm_C', 'DUST_score', 'Hairpin_dG_kcalmol', 'OffTarget_pct', 'OffTarget_match', 'Flagged', '5prime_RO', '3prime_RO'];
     const rows = probes.map((p, i) => [
       i+1, p.pos, p.probe, h5+p.probe+h3,
-      p.gc.toFixed(1), p.tm.toFixed(1), ro5name || '', ro3name || ''
+      p.gc.toFixed(1), p.tm.toFixed(1),
+      p.dust !== undefined ? p.dust : '',
+      (p.hairpin === null || p.hairpin === undefined) ? '' : p.hairpin,
+      (p.offtargetPct === null || p.offtargetPct === undefined) ? '' : p.offtargetPct,
+      p.offtargetName || '',
+      p.flagged ? 'yes' : 'no',
+      ro5name || '', ro3name || ''
     ]);
     content = [header, ...rows].map(r => r.join('\t')).join('\n');
     mime = 'text/tab-separated-values';
