@@ -242,8 +242,12 @@ details[open] summary { color: var(--accent, #3a6ea5); }
 
     <!-- Paste sequence -->
     <div id="tab-paste" style="display:none">
-      <label>Paste DNA or RNA sequence (5′ → 3′, any case, spaces/newlines OK)</label>
-      <textarea id="paste-seq" rows="7" placeholder="ATGCATGCATGC..."></textarea>
+      <label>Paste DNA or RNA sequence (5′ → 3′, any case, spaces/newlines OK) &mdash;
+        plain sequence, or a single FASTA record (<code>&gt;name</code> header used to label
+        downloads automatically)</label>
+      <textarea id="paste-seq" rows="7" placeholder="&gt;My_target_e1-3&#10;ATGCATGCATGC...&#10;&#10;(or just paste raw sequence with no header)"></textarea>
+      <label>Sequence/set name for downloads <span style="font-size:.75rem;color:#888">(optional &mdash; overrides the FASTA header above, if any)</span></label>
+      <input type="text" id="paste-name" placeholder="e.g. ZFY_exon_set_e1-3">
       <div class="status-bar" id="status-paste"></div>
     </div>
   </div>
@@ -746,14 +750,42 @@ async function lookupGene() {
   }
 }
 
+// Splits a pasted single FASTA record's header from its sequence body (and
+// strips the header BEFORE character-filtering, so letters in the header text
+// — e.g. the "G" in "Gene" or "U" anywhere — never leak into the sequence).
+// If more than one ">" record is pasted, only the first is used.
+function parsePastedSequence(raw) {
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('>')) {
+    const seq = trimmed.toUpperCase().replace(/[^ATGCUN\s]/g, '').replace(/\s/g, '').replace(/U/g, 'T');
+    return { name: null, seq, multiRecord: false };
+  }
+  const blocks = trimmed.split(/^>/m).filter(Boolean);
+  const first = blocks[0];
+  const nl = first.indexOf('\n');
+  const name = (nl === -1 ? first : first.slice(0, nl)).trim();
+  const body = nl === -1 ? '' : first.slice(nl + 1);
+  const seq = body.toUpperCase().replace(/[^ATGCUN\s]/g, '').replace(/\s/g, '').replace(/U/g, 'T');
+  return { name, seq, multiRecord: blocks.length > 1 };
+}
+
+let lastPasteName = 'custom_sequence';
+
 async function fetchSequence() {
   const mode = document.querySelector('.tab.active').dataset.tab;
 
   if (mode === 'paste') {
     const raw = document.getElementById('paste-seq').value;
-    const seq = raw.toUpperCase().replace(/[^ATGCUN\s]/g, '').replace(/\s/g, '').replace(/U/g,'T');
+    const { name: fastaName, seq, multiRecord } = parsePastedSequence(raw);
     if (seq.length < 50) throw new Error('Sequence too short (< 50 nt). Please paste at least 50 nt.');
-    setStatus('status-paste', 'ok', `Loaded ${seq.length.toLocaleString()} nt from pasted sequence.`);
+
+    const manualName = document.getElementById('paste-name').value.trim();
+    lastPasteName = (manualName || fastaName || 'custom_sequence').replace(/\s+/g, '_');
+    const nameSource = manualName ? 'name field' : (fastaName ? 'FASTA header' : 'default — no header or name given');
+
+    const warn = multiRecord ? ' (multiple ">" records detected — only the first was used)' : '';
+    setStatus('status-paste', 'ok',
+      `Loaded ${seq.length.toLocaleString()} nt from pasted sequence${warn}. Downloads will be labelled "${lastPasteName}" (from ${nameSource}).`);
     return seq;
   }
 
@@ -875,8 +907,10 @@ async function runDesign() {
     if (result.error) throw new Error(result.error);
 
     lastResult = result;
-    lastGeneName = document.getElementById('gene-input').value.trim() ||
-                   document.getElementById('transcript-select').value || 'custom';
+    const activeMode = document.querySelector('.tab.active').dataset.tab;
+    lastGeneName = activeMode === 'paste'
+      ? lastPasteName
+      : (document.getElementById('gene-input').value.trim() || 'custom_gene');
 
     renderResults(result, seq.length, params);
 
