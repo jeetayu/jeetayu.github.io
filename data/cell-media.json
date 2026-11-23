@@ -1150,7 +1150,11 @@
      "growth": "Suspension"
     }
    ],
-   "lab": null,
+   "lab": {
+    "lab_medium": null,
+    "lab_base": null,
+    "note": "MPN-like erythroleukemia line (JAK2 V617F). Medium shown is the ATCC/DSMZ recommendation (not yet lab-verified)."
+   },
    "species": "Human",
    "tissue": "Bone; Marrow",
    "disease": "Erythroleukemia",
@@ -1852,9 +1856,9 @@
     }
    ],
    "lab": {
-    "lab_medium": null,
-    "lab_base": null,
-    "note": "No vendor datasheet; medium taken from published methods, not lab-verified. Not available from ATCC or DSMZ; Cellosaurus lists no cell bank for it. CALR del61 MPN line independent of the CALR–MPL–JAK2–STAT5 pathway (NRAS Q61K)."
+    "lab_medium": "RPMI + 20% FBS",
+    "lab_base": "RPMI-1640",
+    "note": "Lab protocol. CALR del61 MPN line (ET-derived AML) independent of the CALR–MPL–JAK2–STAT5 pathway (NRAS Q61K). Not available from ATCC or DSMZ; published methods use 10–20% FBS."
    }
   },
   {
