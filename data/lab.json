@@ -1,0 +1,125 @@
+{
+ "generated": "2026-11-23",
+ "lab": {
+  "CVCL_0119": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "IL-3-dependent murine myeloid line (ATCC CRL-3594). Medium shown is the vendor recommendation (not yet lab-verified)."
+  },
+  "lab_cd34hscspdxaml": {
+   "lab_medium": "StemSpan SFEM + 1× CC100 + 500 nM UM171",
+   "lab_base": "StemSpan/serum-free",
+   "note": "Serum-free; StemCell Technologies."
+  },
+  "CVCL_1230": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "AML line (ATCC CRL-2627). Medium shown is the vendor recommendation (not yet lab-verified)."
+  },
+  "CVCL_0063": {
+   "lab_medium": "DMEM + 10% FBS + P/S",
+   "lab_base": "DMEM",
+   "note": "Use tetracycline-free FBS for inducible lines. Lentiviral packaging line."
+  },
+  "CVCL_0001": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "MPN-like erythroleukemia line (JAK2 V617F). Medium shown is the ATCC/DSMZ recommendation (not yet lab-verified)."
+  },
+  "CVCL_0027": {
+   "lab_medium": "DMEM + 10% FBS",
+   "lab_base": "DMEM",
+   "note": ""
+  },
+  "CVCL_0002": {
+   "lab_medium": "RPMI + 10% FBS",
+   "lab_base": "RPMI-1640",
+   "note": ""
+  },
+  "CVCL_2071": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "MDS/AML line (DSMZ ACC 600). Medium shown is the vendor recommendation (not yet lab-verified)."
+  },
+  "CVCL_0004": {
+   "lab_medium": "IMDM + 10% FBS",
+   "lab_base": "IMDM",
+   "note": "Suspension; split 1:5–1:10. Hemin for erythroid differentiation."
+  },
+  "CVCL_1321": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "AML suspension line; listed as 'KO52' in the JCRB catalogue. The Cell Lines page lists the vendor-recommended medium; the JCRB recommendation is shown below (not yet lab-verified)."
+  },
+  "CVCL_0598": {
+   "lab_medium": "MEBM with supplements",
+   "lab_base": "Basal epithelial/endothelial kit",
+   "note": ""
+  },
+  "CVCL_0031": {
+   "lab_medium": "DMEM/F12 + supplements",
+   "lab_base": "DMEM/F-12",
+   "note": "Tetracycline-free FBS for dox-inducible lines; split 1:2–1:4."
+  },
+  "lab_mef": {
+   "lab_medium": "High-glucose DMEM + normal calf serum (NCS)",
+   "lab_base": "DMEM",
+   "note": "Lab-specific protocol (from Yves Bhatt)."
+  },
+  "CVCL_C301": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "Adherent uveal melanoma line (GNAQ Q209L, SF3B1 R625G per Cellosaurus). The Cell Lines page lists the vendor-recommended medium; the ECACC recommendation is shown below (not yet lab-verified)."
+  },
+  "CVCL_2119": {
+   "lab_medium": "RPMI + 10% FBS + P/S",
+   "lab_base": "RPMI-1640",
+   "note": "BamBanker for freezing; split 1:10; dox-inducible lines."
+  },
+  "CVCL_0064": {
+   "lab_medium": "RPMI + 10% FBS + P/S",
+   "lab_base": "RPMI-1640",
+   "note": "AML line (FLT3-ITD). ATCC specifies IMDM + 10% FBS; DSMZ specifies RPMI 1640."
+  },
+  "CVCL_0092": {
+   "lab_medium": "RPMI + 10% FBS",
+   "lab_base": "RPMI-1640",
+   "note": ""
+  },
+  "CVCL_2187": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "MPN line (JAK2 V617F; ET-derived megakaryoblastic leukemia). Medium shown is the DSMZ recommendation (not yet lab-verified)."
+  },
+  "CVCL_0553": {
+   "lab_medium": "RPMI + 10% FBS",
+   "lab_base": "RPMI-1640",
+   "note": ""
+  },
+  "CVCL_0559": {
+   "lab_medium": "RPMI + 10% FBS + EPO",
+   "lab_base": "RPMI-1640",
+   "note": "EPO listed on the Cell Lines page; ATCC specifies GM-CSF."
+  },
+  "CVCL_0006": {
+   "lab_medium": "RPMI + 10% FBS + P/S",
+   "lab_base": "RPMI-1640",
+   "note": "Suspension monocyte line; PMA for differentiation."
+  },
+  "CVCL_0042": {
+   "lab_medium": "DMEM + 10% FBS + P/S",
+   "lab_base": "DMEM",
+   "note": ""
+  },
+  "CVCL_6992": {
+   "lab_medium": "RPMI + 20% FBS",
+   "lab_base": "RPMI-1640",
+   "note": "Lab protocol. CALR del61 MPN line (ET-derived AML) independent of the CALR–MPL–JAK2–STAT5 pathway (NRAS Q61K). Not available from ATCC or DSMZ; published methods use 10–20% FBS."
+  },
+  "CVCL_0104": {
+   "lab_medium": null,
+   "lab_base": null,
+   "note": "MPN line (JAK2 V617F). Media differ widely between sources; the medium actually used in our lab has not been recorded."
+  }
+ }
+}
