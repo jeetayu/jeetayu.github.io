@@ -138,7 +138,7 @@
       var txt = c.name + " — " + s.provider + " " + s.id + ": " + s.medium;
       if (window.biswasLabCopy) window.biswasLabCopy(txt, copy); else if (navigator.clipboard) navigator.clipboard.writeText(txt);
     });
-    var a = el("a", { href: s.url, target: "_blank", rel: "noopener", text: "View on " + s.provider + " ↗" });
+    var a = el("a", { href: s.url, target: "_blank", rel: "noopener", text: (s.provider === "Literature" ? "Open paper" : "View on " + s.provider) + " ↗" });
     actions.appendChild(copy); actions.appendChild(a);
     b.appendChild(actions);
     return b;

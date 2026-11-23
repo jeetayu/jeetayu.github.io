@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-23",
- "n": 145,
+ "n": 147,
  "cell_lines": [
   {
    "name": "32D Clone 3",
@@ -1800,6 +1800,64 @@
    "growth": "Adherent"
   },
   {
+   "id": "marimo",
+   "name": "MARIMO",
+   "aliases": [
+    "Marimo"
+   ],
+   "species": "Human",
+   "tissue": "Bone marrow",
+   "disease": "ET-derived therapy-related AML (CALR mutant; MPL S505N, NRAS Q61K, TP53 C135Y per Cellosaurus)",
+   "morphology": "",
+   "growth": "",
+   "sources": [
+    {
+     "provider": "Literature",
+     "id": "PMC8982588",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8982588/",
+     "medium": "RPMI + 10% FCS (MARIMO and SET2).",
+     "base": "RPMI-1640",
+     "serum": "10% FCS",
+     "conditions": null,
+     "subculture": null,
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    },
+    {
+     "provider": "Literature",
+     "id": "PMC11048154",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11048154/",
+     "medium": "80% RPMI 1640 + 20% FBS + 1% penicillin/streptomycin, 37 °C, 5% CO2 (SET-2, MARIMO, K562).",
+     "base": "RPMI-1640",
+     "serum": "20% FBS",
+     "conditions": null,
+     "subculture": null,
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    },
+    {
+     "provider": "Literature",
+     "id": "PMC10570306",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10570306/",
+     "medium": "RPMI + 10% FBS + antibiotics (CMK and MARIMO).",
+     "base": "RPMI-1640",
+     "serum": "10% FBS",
+     "conditions": null,
+     "subculture": null,
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    }
+   ],
+   "lab": {
+    "lab_medium": null,
+    "lab_base": null,
+    "note": "No vendor datasheet; medium taken from published methods, not lab-verified. Not available from ATCC or DSMZ; Cellosaurus lists no cell bank for it. CALR del61 MPN line independent of the CALR–MPL–JAK2–STAT5 pathway (NRAS Q61K)."
+   }
+  },
+  {
    "name": "MCF10A",
    "aliases": [
     "MCF 10A",
@@ -3275,7 +3333,10 @@
   },
   {
    "name": "SET-2",
-   "aliases": [],
+   "aliases": [
+    "SET2",
+    "Set-2"
+   ],
    "sources": [
     {
      "provider": "DSMZ",
@@ -3291,7 +3352,11 @@
      "growth": "Suspension"
     }
    ],
-   "lab": null,
+   "lab": {
+    "lab_medium": null,
+    "lab_base": null,
+    "note": "MPN line (JAK2 V617F; ET-derived megakaryoblastic leukemia). Medium shown is the DSMZ recommendation (not yet lab-verified)."
+   },
    "species": "Human",
    "disease": "essential thrombocythemia",
    "tissue": "",
@@ -3901,6 +3966,65 @@
    "morphology": "epithelial",
    "id": "u2os",
    "growth": "Adherent"
+  },
+  {
+   "id": "uke1",
+   "name": "UKE-1",
+   "aliases": [
+    "UKE1",
+    "GM23245"
+   ],
+   "species": "Human",
+   "tissue": "Peripheral blood",
+   "disease": "Essential thrombocythemia (JAK2 V617F, homozygous)",
+   "morphology": "mixed adherent/non-adherent",
+   "growth": "Semi-adherent",
+   "sources": [
+    {
+     "provider": "Coriell",
+     "id": "GM23245",
+     "url": "https://www.coriell.org/0/Sections/Search/Sample_Detail.aspx?Ref=GM23245",
+     "medium": "RPMI 1640 with 2 mM L-glutamine (or equivalent) + 20% fetal bovine serum (not heat-inactivated).",
+     "base": "RPMI-1640",
+     "serum": "20% FBS",
+     "conditions": "37 °C, 5% CO2, ambient O2",
+     "subculture": "Split ratio 1:2.",
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    },
+    {
+     "provider": "Literature",
+     "id": "PMC3346679",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3346679/",
+     "medium": "Iscove's modified Dulbecco's medium (IMDM) + 10% fetal calf serum + 10% horse serum + 1 µM hydrocortisone (original UKE-1 recipe, as used by Kyrillos et al., Blood Cancer J 2012). That paper also reports clonal evolution in culture (JAK2 copy-number gain, tetraploid clone) — re-check karyotype/JAK2 in your stocks.",
+     "base": "IMDM",
+     "serum": "10% FCS + 10% horse serum",
+     "conditions": null,
+     "subculture": null,
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    },
+    {
+     "provider": "Literature",
+     "id": "PMC13570177",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13570177/",
+     "medium": "RPMI-1640 + 10% FBS + penicillin/streptomycin + 1% GlutaMAX (UKE-1 from Coriell).",
+     "base": "RPMI-1640",
+     "serum": "10% FBS",
+     "conditions": null,
+     "subculture": null,
+     "renewal": null,
+     "freeze": null,
+     "growth": null
+    }
+   ],
+   "lab": {
+    "lab_medium": null,
+    "lab_base": null,
+    "note": "MPN line (JAK2 V617F). Media differ widely between sources; the medium actually used in our lab has not been recorded."
+   }
   },
   {
    "name": "UT-7",
