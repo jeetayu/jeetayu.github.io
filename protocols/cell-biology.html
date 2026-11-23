@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cell Biology Protocols – Jeet Biswas</title>
 <link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/media-finder.css">
 </head>
 <body>
 <header>
@@ -37,21 +38,12 @@
 <div class="container">
   <div class="breadcrumb"><a href="/protocols/">Protocols</a> / Cell Biology</div>
 
-  <!-- ══ Cell Culture Media ══ -->
-  <div class="card">
+  <!-- ══ Cell Culture Media (searchable; data in /data/cell-media.json) ══ -->
+  <div class="card" id="media-reference">
     <h2>Cell Culture Media Reference</h2>
-    <table>
-      <tr><th>Cell Line</th><th>Media</th><th>Notes</th></tr>
-      <tr><td>HEK293T</td><td>DMEM + 10% FBS + P/S</td><td>Standard; use tet-free FBS for inducible lines</td></tr>
-      <tr><td>U2OS</td><td>DMEM + 10% FBS + P/S</td><td>—</td></tr>
-      <tr><td>MEF</td><td>High-glucose DMEM + NCS</td><td>From Yves Bhatt; normal calf serum</td></tr>
-      <tr><td>MCF7</td><td>DMEM/F12 + supplements</td><td>Tetracycline-free FBS for dox-inducible; split 1:2–1:4</td></tr>
-      <tr><td>K562</td><td>IMDM + 10% FBS</td><td>Suspension; split 1:5–1:10</td></tr>
-      <tr><td>MOLM13</td><td>RPMI + 10% FBS + P/S</td><td>BamBanker for freezing; split 1:10; dox inducible</td></tr>
-      <tr><td>MV411</td><td>RPMI + 10% FBS + P/S</td><td>AML cell line</td></tr>
-      <tr><td>THP1</td><td>RPMI + 10% FBS + P/S</td><td>Suspension monocyte line</td></tr>
-      <tr><td>CD34+ HSCs / PDX AML</td><td>StemSpan SFEM + 1× CC100 + 500 nM UM171</td><td>Serum-free; StemCell Technologies</td></tr>
-    </table>
+    <p class="mf-hint">Find the recommended complete growth medium for a cell line. Data are drawn from ATCC, DSMZ, ECACC and JCRB product pages and compared against our lab's protocols.</p>
+    <div id="media-finder"></div>
+    <noscript><p>This reference needs JavaScript. See the ATCC product page for your cell line.</p></noscript>
   </div>
 
   <!-- ══ Cell Freezing ══ -->
@@ -350,5 +342,6 @@
 </div>
 <footer>Jeet Biswas – Research Site &bull; Hosted on Raspberry Pi &bull; Internal use only &bull; <a href="/contact.html">Contact</a></footer>
 <script src="/js/site.js"></script>
+<script src="/js/media-finder.js"></script>
 </body>
 </html>

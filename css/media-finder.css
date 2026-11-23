@@ -1,0 +1,32 @@
+/* Cell culture media finder — uses the site's CSS variables from style.css */
+.mf-search { position: relative; display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin: .4rem 0 .6rem; }
+.mf-search input[type=text] { flex: 1 1 280px; min-width: 220px; padding: .6rem .8rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--white); color: var(--text); }
+.mf-search input[type=text]:focus, .mf-search select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.mf-search select { padding: .55rem .6rem; font-size: .92rem; border: 1px solid var(--border); border-radius: 6px; background: var(--white); color: var(--text); max-width: 100%; }
+.mf-suggest { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; margin-top: 2px; background: var(--white); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.15); list-style: none; max-height: 320px; overflow-y: auto; }
+.mf-suggest li { padding: .45rem .8rem; cursor: pointer; display: flex; justify-content: space-between; gap: 1rem; font-size: .92rem; }
+.mf-suggest li small { color: var(--muted); }
+.mf-suggest li[aria-selected=true], .mf-suggest li:hover { background: var(--tag-bg); }
+.mf-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .3rem 0 1rem; }
+.mf-chip { border: 1px solid var(--border); background: var(--white); color: var(--tag-fg); border-radius: 999px; padding: .15rem .7rem; font-size: .8rem; cursor: pointer; }
+.mf-chip:hover, .mf-chip[aria-pressed=true] { background: var(--tag-fg); color: var(--white); border-color: var(--tag-fg); }
+.mf-hint { color: var(--muted); font-size: .85rem; }
+.mf-result { border: 1px solid var(--border); border-radius: 8px; background: var(--white); margin-top: .8rem; overflow: hidden; }
+.mf-result > header { background: var(--tag-bg); color: var(--navy); text-align: left; padding: .7rem 1rem; }
+.mf-result > header h3 { margin: 0; font-size: 1.15rem; }
+.mf-meta { color: var(--muted); font-size: .85rem; margin-top: .15rem; }
+.mf-src { padding: .8rem 1rem; border-top: 1px solid var(--border); }
+.mf-src h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: .35rem; }
+.mf-medium { font-size: 1.05rem; font-weight: 600; color: var(--navy); }
+.mf-tag { display: inline-block; font-size: .75rem; font-weight: 600; padding: .05rem .55rem; border-radius: 999px; background: var(--tag-bg); color: var(--tag-fg); margin-right: .3rem; }
+.mf-tag.ok { background: #e3f5e8; color: #1e6b3a; }
+.mf-tag.warn { background: #fff1d6; color: #8a5a00; }
+.mf-dl { display: grid; grid-template-columns: 9.5rem 1fr; gap: .25rem .8rem; font-size: .9rem; margin-top: .5rem; }
+.mf-dl dt { color: var(--muted); }
+.mf-dl dd { margin: 0; overflow-wrap: anywhere; }
+.mf-lab { background: #f7faff; border-left: 4px solid var(--accent); }
+.mf-actions { margin-top: .5rem; display: flex; gap: .8rem; align-items: center; font-size: .85rem; }
+.mf-actions button { font: inherit; font-size: .8rem; padding: .15rem .6rem; border: 1px solid var(--border); border-radius: 4px; background: var(--white); cursor: pointer; }
+.mf-foot { color: var(--muted); font-size: .8rem; margin-top: 1rem; }
+.mf-labtable td, .mf-labtable th { vertical-align: top; }
+@media (max-width: 600px) { .mf-dl { grid-template-columns: 1fr; } .mf-dl dt { margin-top: .4rem; } }
